@@ -22,12 +22,12 @@ Achieve 100% coverage for the application's single source of truth.
 
 ## Phase 3: Backend Services & API Middlewares
 Verify the "OS Bridge" logic with high-fidelity mocking.
-- [ ] Task: Test `SystemMonitor.ts`
+- [x] Task: Test `SystemMonitor.ts`
     - [ ] Mock `node:os` and `systeminformation` to simulate Windows/Linux environments.
     - [ ] Verify timeout handling logic for slow disk scans.
-- [ ] Task: Test `ProjectManager.ts` and `ActionExecutor.ts`
+- [x] Task: Test `ProjectManager.ts` and `ActionExecutor.ts`
     - [ ] Write tests for tech detection, git status parsing, and child process spawning.
-- [ ] Task: Test `src-ssr/middlewares/api.ts`
+- [x] Task: Test `src-ssr/middlewares/api.ts`
     - [ ] Set up supertest or equivalent to verify Express route handling and body parsing.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Backend Services & API Middlewares' (Protocol in workflow.md)
 

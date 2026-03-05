@@ -9,7 +9,12 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
-    include: ['src/**/*.{test,spec}.{js,ts,vue}'],
+    setupFiles: ['./vitest.setup.ts'],
+    include: [
+      'src/**/*.{test,spec}.{js,ts,vue}',
+      'src-ssr/**/*.{test,spec}.{js,ts}',
+      'src-electron/**/*.{test,spec}.{js,ts}'
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -31,6 +36,7 @@ export default defineConfig({
       'assets': fileURLToPath(new URL('./src/assets', import.meta.url)),
       'boot': fileURLToPath(new URL('./src/boot', import.meta.url)),
       'stores': fileURLToPath(new URL('./src/stores', import.meta.url)),
+      '#q-app/wrappers': fileURLToPath(new URL('./src/mock-wrappers.ts', import.meta.url)),
     }
   }
 })
