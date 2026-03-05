@@ -10,13 +10,13 @@ Establish the core testing environment and enforce 100% coverage gates.
 
 ## Phase 2: State Management (Pinia Stores)
 Achieve 100% coverage for the application's single source of truth.
-- [ ] Task: Test `projectsStore.ts`
+- [x] Task: Test `projectsStore.ts`
     - [ ] Write tests for initial state, `loadProjects`, `scanDirectory`, and all Git actions.
     - [ ] Mock `api` (axios) to test success and error responses.
-- [ ] Task: Test `bookmarksStore.ts`
+- [x] Task: Test `bookmarksStore.ts`
     - [ ] Write tests for IndexedDB integration and API synchronization.
     - [ ] Ensure 100% coverage for category filtering logic.
-- [ ] Task: Test `systemStore.ts` and `settingsStore.ts`
+- [x] Task: Test `systemStore.ts` and `settingsStore.ts`
     - [ ] Verify interval polling logic and reactive state updates.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: State Management (Pinia Stores)' (Protocol in workflow.md)
 
