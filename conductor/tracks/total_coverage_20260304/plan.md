@@ -20,7 +20,7 @@ Achieve 100% coverage for the application's single source of truth.
     - [ ] Verify interval polling logic and reactive state updates.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: State Management (Pinia Stores)' (Protocol in workflow.md)
 
-## Phase 3: Backend Services & API Middlewares
+## Phase 3: Backend Services & API Middlewares [checkpoint: 67623bc]
 Verify the "OS Bridge" logic with high-fidelity mocking.
 - [x] Task: Test `SystemMonitor.ts`
     - [ ] Mock `node:os` and `systeminformation` to simulate Windows/Linux environments.
@@ -29,7 +29,7 @@ Verify the "OS Bridge" logic with high-fidelity mocking.
     - [ ] Write tests for tech detection, git status parsing, and child process spawning.
 - [x] Task: Test `src-ssr/middlewares/api.ts`
     - [ ] Set up supertest or equivalent to verify Express route handling and body parsing.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Backend Services & API Middlewares' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Backend Services & API Middlewares' (Protocol in workflow.md)
 
 ## Phase 4: UI Components & Final Audit
 Ensure the view layer is fully tested and functional.
