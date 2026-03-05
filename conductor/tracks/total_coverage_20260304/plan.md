@@ -8,7 +8,7 @@ Establish the core testing environment and enforce 100% coverage gates.
     - [ ] Add `test:coverage` script to `package.json`.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Infrastructure & Thresholds' (Protocol in workflow.md)
 
-## Phase 2: State Management (Pinia Stores)
+## Phase 2: State Management (Pinia Stores) [checkpoint: 20eb710]
 Achieve 100% coverage for the application's single source of truth.
 - [x] Task: Test `projectsStore.ts`
     - [ ] Write tests for initial state, `loadProjects`, `scanDirectory`, and all Git actions.
@@ -18,7 +18,7 @@ Achieve 100% coverage for the application's single source of truth.
     - [ ] Ensure 100% coverage for category filtering logic.
 - [x] Task: Test `systemStore.ts` and `settingsStore.ts`
     - [ ] Verify interval polling logic and reactive state updates.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: State Management (Pinia Stores)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: State Management (Pinia Stores)' (Protocol in workflow.md)
 
 ## Phase 3: Backend Services & API Middlewares
 Verify the "OS Bridge" logic with high-fidelity mocking.
