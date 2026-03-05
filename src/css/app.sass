@@ -1,0 +1,57 @@
+// Quasar animations
+@import 'quasar.variables.sass'
+
+// Global Styles
+body
+  background: #0a0a0c !important
+  color: #e0e0e0
+  font-family: 'Inter', 'Roboto', sans-serif
+
+.q-card
+  background: #141417
+  border: 1px solid rgba(255, 255, 255, 0.05)
+  border-radius: 12px
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2)
+
+.q-drawer
+  background: #0f0f12 !important
+  border-right: 1px solid rgba(255, 255, 255, 0.05)
+
+.q-header
+  background: rgba(15, 15, 18, 0.8) !important
+  backdrop-filter: blur(8px)
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05)
+
+// Stats Cards
+.stat-value
+  font-family: 'JetBrains Mono', monospace
+  letter-spacing: -1px
+  line-height: 1
+
+.text-primary
+  color: #3d8bff !important
+.text-secondary
+  color: #00d1b2 !important
+.text-accent
+  color: #7957d5 !important
+
+// Project Grid
+.project-card
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1)
+  background: #1a1a1e
+  &:hover
+    transform: translateY(-4px)
+    background: #202026
+    border-color: #3d8bff
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4)
+
+// Custom scrollbar
+::-webkit-scrollbar
+  width: 8px
+::-webkit-scrollbar-track
+  background: #0a0a0c
+::-webkit-scrollbar-thumb
+  background: #2a2a2e
+  border-radius: 4px
+  &:hover
+    background: #3a3a3e
