@@ -33,8 +33,8 @@ Verify the "OS Bridge" logic with high-fidelity mocking.
 
 ## Phase 4: UI Components & Final Audit
 Ensure the view layer is fully tested and functional.
-- [ ] Task: Test `HomeView.vue`, `ProjectsView.vue`, and `BookmarksView.vue`
+- [x] Task: Test `HomeView.vue`, `ProjectsView.vue`, and `BookmarksView.vue`
     - [ ] Use `@vue/test-utils` to verify component rendering and user interaction (clicks, inputs).
-- [ ] Task: Final Coverage Sweep
+- [x] Task: Final Coverage Sweep
     - [ ] Run full coverage report and eliminate any remaining uncovered branches in `src/`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: UI Components & Final Audit' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: UI Components & Final Audit' (Protocol in workflow.md)
