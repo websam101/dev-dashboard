@@ -2,7 +2,7 @@
 
 ## Phase 1: Infrastructure & Thresholds
 Establish the core testing environment and enforce 100% coverage gates.
-- [ ] Task: Configure Vitest Coverage Engine
+- [x] Task: Configure Vitest Coverage Engine
     - [ ] Install `vitest`, `@vitest/coverage-v8`, and `happy-dom` (for component tests).
     - [ ] Update `vitest.config.ts` to set `coverage` thresholds to 100% for lines, functions, branches, and statements.
     - [ ] Add `test:coverage` script to `package.json`.
