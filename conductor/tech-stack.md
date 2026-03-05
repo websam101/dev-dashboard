@@ -3,6 +3,7 @@
 ## Core Philosophy: Agnosticism
 - **Platform Agnostic:** The application is architected to run seamlessly across Web (SSR), Desktop (Electron), and potentially mobile environments.
 - **Environment Agnostic:** Defensive service layers ensure the application remains functional even when OS-level integrations (Node.js) are unavailable (falling back to browser-native capabilities and local persistence).
+- **Reliability First:** A comprehensive testing strategy ensures stability across all supported platforms, targeting 100% code coverage for core logic.
 
 ## Core Technologies
 - **TypeScript:** Primary language for both frontend and backend logic, ensuring type safety across the application.
@@ -30,3 +31,7 @@
 - **ESLint:** Pluggable linting utility for maintaining code quality.
 - **Vite:** Fast frontend build tool and dev server.
 - **Electron Packager/Builder:** Tools for bundling the application as a desktop executable.
+- **Vitest:** Blazing fast unit test framework powered by Vite.
+- **@vitest/coverage-v8:** Native V8 code coverage provider for accurate reporting.
+- **@vue/test-utils:** Official utility library for Vue.js component testing.
+- **@pinia/testing:** Utilities for testing Pinia stores.
