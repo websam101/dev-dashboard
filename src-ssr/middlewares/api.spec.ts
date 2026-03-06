@@ -42,7 +42,7 @@ describe('API Middleware', () => {
     vi.mocked(fs.mkdir).mockRejectedValue(new Error('MKDIR fail') as any)
     
     await middleware({ app, resolve: { urlPath: (p: string) => p } } as any)
-    // expect(fs.mkdir).toHaveBeenCalled() // Skipping due to dynamic import mock complexity
+    // expect(fs.mkdir).toHaveBeenCalled() 
   })
 
   it('handles get stats success', async () => {
@@ -52,7 +52,7 @@ describe('API Middleware', () => {
     const mockStats = { cpuLoad: 10 }
     vi.spyOn(SystemMonitor.prototype, 'getStats').mockResolvedValue(mockStats as any)
 
-    handler({}, res)
+    handler!({}, res)
     await vi.waitFor(() => expect(res.json).toHaveBeenCalledWith(mockStats))
   })
 
@@ -62,7 +62,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() }
     vi.spyOn(SystemMonitor.prototype, 'getStats').mockRejectedValue(new Error('Stats error'))
 
-    handler({}, res)
+    handler!({}, res)
     await vi.waitFor(() => expect(res.status).toHaveBeenCalledWith(500))
   })
 
@@ -72,7 +72,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn() }
     db.data.projects = [{ name: 'P1' }]
 
-    handler({}, res)
+    handler!({}, res)
     expect(res.json).toHaveBeenCalledWith([{ name: 'P1' }])
   })
 
@@ -83,7 +83,7 @@ describe('API Middleware', () => {
     const req = { body: { rootPath: '/root' } }
     vi.spyOn(ProjectManager.prototype, 'scanDirectory').mockResolvedValue([{ name: 'New', path: '/root/new' }] as any)
 
-    handler(req, res)
+    handler!(req, res)
     await vi.waitFor(() => {
       expect(db.write).toHaveBeenCalled()
       expect(res.json).toHaveBeenCalled()
@@ -96,7 +96,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() }
     const req = { body: {} }
 
-    handler(req, res)
+    handler!(req, res)
     expect(res.status).toHaveBeenCalledWith(400)
   })
 
@@ -107,7 +107,7 @@ describe('API Middleware', () => {
     const req = { body: { rootPath: '/root' } }
     vi.spyOn(ProjectManager.prototype, 'scanDirectory').mockRejectedValue(new Error('Scan error'))
 
-    handler(req, res)
+    handler!(req, res)
     await vi.waitFor(() => expect(res.status).toHaveBeenCalledWith(500))
   })
 
@@ -117,7 +117,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn() }
     vi.spyOn(ProjectManager.prototype, 'syncAll').mockResolvedValue([{ name: 'Synced' }] as any)
 
-    handler({}, res)
+    handler!({}, res)
     await vi.waitFor(() => {
       expect(db.write).toHaveBeenCalled()
       expect(res.json).toHaveBeenCalledWith([{ name: 'Synced' }])
@@ -130,7 +130,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() }
     vi.spyOn(ProjectManager.prototype, 'syncAll').mockRejectedValue(new Error('Sync error'))
 
-    handler({}, res)
+    handler!({}, res)
     await vi.waitFor(() => expect(res.status).toHaveBeenCalledWith(500))
   })
 
@@ -141,7 +141,7 @@ describe('API Middleware', () => {
     const req = { body: { id: '1' } }
     db.data.projects = [{ id: '1', name: 'P1' }, { id: '2', name: 'P2' }]
 
-    handler(req, res)
+    handler!(req, res)
     await vi.waitFor(() => {
       expect(db.data.projects).toHaveLength(1)
       expect(db.write).toHaveBeenCalled()
@@ -156,7 +156,7 @@ describe('API Middleware', () => {
     const req = { body: { path: '/path' } }
     const spy = vi.spyOn(ActionExecutor.prototype, 'openVsCode')
 
-    handler(req, res)
+    handler!(req, res)
     expect(spy).toHaveBeenCalledWith('/path')
     expect(res.json).toHaveBeenCalledWith({ success: true })
   })
@@ -168,7 +168,7 @@ describe('API Middleware', () => {
     const req = { body: { path: '/path' } }
     const spy = vi.spyOn(ActionExecutor.prototype, 'openTerminal')
 
-    handler(req, res)
+    handler!(req, res)
     expect(spy).toHaveBeenCalledWith('/path')
     expect(res.json).toHaveBeenCalledWith({ success: true })
   })
@@ -180,7 +180,7 @@ describe('API Middleware', () => {
     const req = { body: { path: '/path' } }
     const spy = vi.spyOn(ActionExecutor.prototype, 'openFolder').mockResolvedValue(undefined)
 
-    handler(req, res)
+    handler!(req, res)
     await vi.waitFor(() => {
       expect(spy).toHaveBeenCalledWith('/path')
       expect(res.json).toHaveBeenCalledWith({ success: true })
@@ -194,7 +194,7 @@ describe('API Middleware', () => {
     const req = { body: { path: '/path' } }
     const spy = vi.spyOn(ProjectManager.prototype, 'gitPull').mockResolvedValue(undefined)
 
-    handler(req, res)
+    handler!(req, res)
     await vi.waitFor(() => {
       expect(spy).toHaveBeenCalledWith('/path')
       expect(res.json).toHaveBeenCalledWith({ success: true })
@@ -207,7 +207,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() }
     vi.spyOn(ProjectManager.prototype, 'gitPull').mockRejectedValue(new Error('Pull error'))
 
-    handler({ body: { path: '/path' } }, res)
+    handler!({ body: { path: '/path' } }, res)
     await vi.waitFor(() => expect(res.status).toHaveBeenCalledWith(500))
   })
 
@@ -218,7 +218,7 @@ describe('API Middleware', () => {
     const req = { body: { path: '/path' } }
     const spy = vi.spyOn(ProjectManager.prototype, 'gitPush').mockResolvedValue(undefined)
 
-    handler(req, res)
+    handler!(req, res)
     await vi.waitFor(() => {
       expect(spy).toHaveBeenCalledWith('/path')
       expect(res.json).toHaveBeenCalledWith({ success: true })
@@ -231,7 +231,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() }
     vi.spyOn(ProjectManager.prototype, 'gitPush').mockRejectedValue(new Error('Push error'))
 
-    handler({ body: { path: '/path' } }, res)
+    handler!({ body: { path: '/path' } }, res)
     await vi.waitFor(() => expect(res.status).toHaveBeenCalledWith(500))
   })
 
@@ -241,7 +241,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn() }
     db.data.bookmarks = [{ title: 'B1' }]
 
-    handler({}, res)
+    handler!({}, res)
     expect(res.json).toHaveBeenCalledWith([{ title: 'B1' }])
   })
 
@@ -251,7 +251,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn() }
     const req = { body: { id: '1', title: 'New' } }
     
-    handler(req, res)
+    handler!(req, res)
     await vi.waitFor(() => {
       expect(db.data.bookmarks).toHaveLength(1)
       expect(db.write).toHaveBeenCalled()
@@ -259,7 +259,7 @@ describe('API Middleware', () => {
 
     // Update existing
     const req2 = { body: { id: '1', title: 'Updated' } }
-    handler(req2, res)
+    handler!(req2, res)
     await vi.waitFor(() => {
       expect(db.data.bookmarks).toHaveLength(1)
       expect(db.data.bookmarks[0].title).toBe('Updated')
@@ -272,7 +272,7 @@ describe('API Middleware', () => {
     const res = { json: vi.fn(), status: vi.fn().mockReturnThis() }
     db.write.mockRejectedValue(new Error('Write error'))
 
-    handler({ body: { id: '1' } }, res)
+    handler!({ body: { id: '1' } }, res)
     await vi.waitFor(() => expect(res.status).toHaveBeenCalledWith(500))
   })
 
@@ -283,7 +283,7 @@ describe('API Middleware', () => {
     const req = { body: { id: '1' } }
     db.data.bookmarks = [{ id: '1', title: 'B1' }]
 
-    handler(req, res)
+    handler!(req, res)
     await vi.waitFor(() => {
       expect(db.data.bookmarks).toHaveLength(0)
       expect(db.write).toHaveBeenCalled()

@@ -1,80 +1,276 @@
 <template>
-  <q-page class="q-pa-lg">
-    <div class="row items-center q-mb-xl">
-      <div>
-        <div class="text-h4 text-weight-bold q-mb-xs text-grey-3">Resources</div>
-        <div class="text-grey-6">Organize your docs, tools, and project links</div>
+  <q-page class="q-pa-md">
+    <!-- Top Level Collection Selector (Compact) -->
+    <div class="row items-center q-mb-sm">
+      <q-tabs
+        v-model="activeCollection"
+        dense
+        no-caps
+        inline-label
+        class="rounded-borders shadow-1 q-pa-xs tabs-container overflow-hidden"
+        active-color="primary"
+        indicator-color="primary"
+        align="left"
+      >
+        <q-tab name="all" icon="apps" :label="$t('bookmarks.allResources')" class="text-weight-bold" />
+        <q-tab
+          v-for="col in sortedCollections"
+          :key="col.id"
+          :name="col.id"
+          :label="col.name"
+          class="text-weight-bold"
+        />
+        <q-tab name="unassigned" icon="question_mark" :label="$t('bookmarks.unassigned')" class="text-weight-bold" />
+        
+        <q-separator vertical class="q-mx-sm opacity-20" />
+        
+        <q-btn flat round dense icon="settings" color="primary" @click="showManageCollections = true" size="sm" />
+      </q-tabs>
+    </div>
+
+    <!-- Restored Compact Favorites Bar -->
+    <div v-if="sortedFavorites.length > 0" class="row items-center q-mb-md q-pa-xs rounded-borders border-primary-light fav-bar shadow-1">
+      <div class="text-overline text-wcag-bold q-mx-md opacity-70" style="font-size: 0.6rem">PINNED</div>
+      <div class="row no-wrap q-gutter-x-xs scroll hide-scrollbar overflow-hidden">
+        <q-chip
+          v-for="(fav, index) in sortedFavorites"
+          :key="fav.id"
+          clickable
+          @click="openLink(fav.url)"
+          outline
+          color="primary"
+          :class="'tag-bg-' + ((index % 6) + 1)"
+          class="q-ma-none text-weight-bolder shadow-1 hover-scale"
+          dense
+          style="font-size: 0.75rem"
+        >
+          <q-avatar rounded size="16px">
+            <FaviconRenderer :url="fav.url" />
+          </q-avatar>
+          <div class="ellipsis" style="max-width: 120px">{{ fav.title }}</div>
+        </q-chip>
       </div>
+    </div>
+
+    <!-- Project Context & Actions (Compact Header) -->
+    <div class="row items-center q-mb-sm">
+      <q-select
+        v-model="selectedProject"
+        :options="projectOptions"
+        filled
+        dense
+        options-dense
+        emit-value
+        map-options
+        style="width: 180px"
+        color="primary"
+        class="rounded-borders q-mr-sm"
+      >
+        <template v-slot:prepend>
+          <q-icon name="work" color="primary" size="xs" />
+        </template>
+      </q-select>
+
+      <q-input
+        v-model="searchQuery"
+        :placeholder="searchPlaceholder"
+        dense
+        outlined
+        class="shadow-1 q-mr-sm"
+        style="width: 180px"
+        clearable
+        @clear="searchQuery = ''"
+      >
+        <template v-slot:prepend>
+          <q-icon name="search" size="xs" />
+        </template>
+      </q-input>
+
+      <q-select
+        v-model="sortBy"
+        :options="sortOptions"
+        dense
+        outlined
+        emit-value
+        map-options
+        options-dense
+        style="width: 110px"
+        class="rounded-borders q-mr-sm"
+      >
+        <template v-slot:prepend>
+          <q-icon name="sort" size="xs" color="primary" />
+        </template>
+      </q-select>
+
       <q-space />
-      <q-btn color="primary" unelevated icon="add" label="New Bookmark" @click="showAddDialog = true" class="q-px-md" />
+
+      <div class="row q-gutter-x-xs">
+        <q-btn flat dense icon="download" color="primary" @click="exportData" size="sm" />
+        <q-btn flat dense icon="upload" color="primary" @click="triggerImport" size="sm" />
+        <q-separator vertical class="q-mx-xs opacity-20" />
+        <q-btn color="primary" unelevated icon="add" :label="$t('bookmarks.newBookmark')" @click="openAddDialog" size="sm" class="text-weight-bold" />
+      </div>
     </div>
 
-    <div v-if="bookmarksStore.loading" class="text-center q-pa-xl">
-      <q-spinner-dots color="primary" size="3em" />
-    </div>
+    <!-- Batch Actions Bar -->
+    <q-slide-transition>
+      <div v-if="selectedRows.length > 0" class="q-mb-sm q-pa-xs rounded-borders bg-gradient-primary text-white row items-center shadow-2">
+        <div class="text-weight-bolder q-mx-md">{{ selectedRows.length }} Selected</div>
+        <q-space />
+        <q-btn flat dense icon="delete" :label="$t('common.delete')" class="text-weight-bold" @click="confirmDeleteMultiple" />
+        <q-btn flat round dense icon="close" @click="selectedRows = []" class="q-ml-sm" />
+      </div>
+    </q-slide-transition>
 
-    <div v-else-if="bookmarksStore.categories.length === 0" class="text-center q-pa-xl">
-      <q-card bordered flat class="bg-grey-9 q-pa-xl dashed-border">
-        <q-icon name="bookmark_border" size="64px" color="grey-8" />
-        <div class="text-h6 text-grey-6 q-mt-md">Your library is empty</div>
-        <q-btn color="primary" outline label="Add your first bookmark" @click="showAddDialog = true" class="q-mt-md" />
-      </q-card>
-    </div>
+    <input type="file" ref="fileInput" style="display: none" accept=".json" @change="handleFileImport" />
 
-    <div v-else class="row q-col-gutter-xl">
-      <!-- Card per Category -->
-      <div v-for="category in bookmarksStore.categories" :key="category" class="col-12 col-sm-6 col-md-4">
-        <q-card bordered flat class="bookmark-category-card bg-grey-9">
-          <q-card-section class="bg-grey-10 text-grey-3 q-py-md border-bottom">
-            <div class="row items-center no-wrap">
-              <q-icon name="folder_special" color="primary" size="20px" class="q-mr-sm" />
-              <div class="text-subtitle1 text-weight-bold">{{ category }}</div>
-              <q-space />
-              <q-badge color="primary" outline class="text-weight-bold">{{ bookmarksStore.byCategory(category).length }}</q-badge>
+    <!-- High Density Bookmarks Table with Selection -->
+    <q-table
+      :rows="sortedBookmarks"
+      :columns="columns"
+      row-key="id"
+      dense
+      flat
+      bordered
+      :pagination="{ rowsPerPage: 0 }"
+      hide-pagination
+      selection="multiple"
+      v-model:selected="selectedRows"
+      class="compact-table rounded-borders shadow-1"
+      binary-state-sort
+    >
+      <!-- RESOURCE Column (Icon, Fav, Title) -->
+      <template v-slot:body-cell-title="props">
+        <q-td :props="props">
+          <div class="row items-center no-wrap">
+            <q-checkbox
+              :model-value="props.row.favorite"
+              @update:model-value="bookmarksStore.toggleFavorite(props.row.id)"
+              dense
+              color="amber-10"
+              icon="star_border"
+              checked-icon="star"
+              size="sm"
+              class="q-mr-xs"
+            />
+            <q-avatar rounded size="20px" class="q-mr-sm shadow-1">
+              <FaviconRenderer :url="props.row.url" />
+            </q-avatar>
+            <div class="text-weight-bold text-wcag ellipsis cursor-pointer" @click="openViewDialog(props.row)">
+              <span v-html="highlight(props.row.title)" />
             </div>
-          </q-card-section>
-          
-          <q-list padding class="q-py-xs">
-            <q-item v-for="link in bookmarksStore.byCategory(category)" :key="link.id" class="q-mb-xs">
-              <q-item-section avatar @click="openLink(link.url)" class="cursor-pointer">
-                <q-avatar rounded size="32px" color="grey-10">
-                  <FaviconRenderer :url="link.url" />
-                </q-avatar>
+          </div>
+        </q-td>
+      </template>
+
+      <!-- URL Column -->
+      <template v-slot:body-cell-url="props">
+        <q-td :props="props">
+          <div class="text-primary text-weight-bold ellipsis cursor-pointer hover-underline" @click="openLink(props.row.url)" style="max-width: 300px">
+            <span v-html="highlight(props.row.url)" />
+          </div>
+        </q-td>
+      </template>
+
+      <!-- Tags Column -->
+      <template v-slot:body-cell-tags="props">
+        <q-td :props="props">
+          <div class="row q-gutter-xs">
+            <q-badge v-for="(tag, idx) in (props.row.tags as string[])" :key="tag" :class="'tag-bg-' + ((Number(idx) % 6) + 1)" class="text-weight-bold" style="font-size: 0.65rem">
+              <span v-html="highlight(tag)" />
+            </q-badge>
+          </div>
+        </q-td>
+      </template>
+
+      <!-- Actions Column -->
+      <template v-slot:body-cell-actions="props">
+        <q-td :props="props" class="text-right">
+          <div class="row items-center justify-end q-gutter-x-xs">
+            <q-btn flat round dense icon="visibility" size="sm" color="primary" @click="openViewDialog(props.row)" />
+            <q-btn flat round dense icon="edit" size="sm" color="secondary" @click="openEditDialog(props.row)" />
+            <q-btn flat round dense icon="delete_outline" size="sm" color="negative" @click="confirmRemove(props.row)" />
+          </div>
+        </q-td>
+      </template>
+    </q-table>
+
+    <!-- Manage Collections Dialog -->
+    <q-dialog v-model="showManageCollections" backdrop-filter="blur(4px)">
+      <q-card style="min-width: 400px">
+        <q-card-section class="row items-center q-py-sm border-bottom">
+          <div class="text-subtitle1 text-weight-bolder">{{ $t('bookmarks.manageCollections') }}</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup size="sm" />
+        </q-card-section>
+        <q-card-section class="q-pa-md">
+          <div class="row q-gutter-sm q-mb-md">
+            <q-input v-model="newCollectionName" :label="$t('bookmarks.newCollection')" dense outlined class="col" @keyup.enter="addCollection" />
+            <q-btn color="primary" icon="add" @click="addCollection" :disable="!newCollectionName" size="sm" />
+          </div>
+          <q-list bordered separator>
+            <q-item v-for="col in sortedCollections" :key="col.id" dense>
+              <q-item-section v-if="editingCollectionId === col.id">
+                <q-input v-model="editingName" dense outlined @keyup.enter="saveRenamedCollection" @keyup.esc="editingCollectionId = null" autofocus />
               </q-item-section>
-              
-              <q-item-section @click="openLink(link.url)" class="cursor-pointer">
-                <q-item-label class="text-weight-medium text-grey-3">{{ link.title }}</q-item-label>
-                <q-item-label caption class="ellipsis text-grey-6">{{ link.url }}</q-item-label>
-              </q-item-section>
-              
+              <q-item-section v-else class="text-weight-bold">{{ col.name }}</q-item-section>
               <q-item-section side>
-                <q-btn flat round dense icon="delete_outline" color="grey-7" size="sm" @click="removeBookmark(link.id)">
-                  <q-tooltip>Remove</q-tooltip>
-                </q-btn>
+                <div class="row q-gutter-x-xs">
+                  <q-btn flat round dense :icon="editingCollectionId === col.id ? 'check' : 'edit'" :color="editingCollectionId === col.id ? 'positive' : 'primary'" size="sm" @click="editingCollectionId === col.id ? saveRenamedCollection() : startRenaming(col)" />
+                  <q-btn flat round dense icon="delete" color="negative" size="sm" @click="confirmDeleteCollection(col)" />
+                </div>
               </q-item-section>
             </q-item>
           </q-list>
-        </q-card>
-      </div>
-    </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 
-    <!-- Add Bookmark Dialog -->
-    <q-dialog v-model="showAddDialog" backdrop-filter="blur(4px)">
-      <q-card class="bg-grey-10 text-white" style="min-width: 450px">
-        <q-card-section>
-          <div class="text-h6">New Resource</div>
+    <!-- View Details Dialog -->
+    <q-dialog v-model="showViewDialog" backdrop-filter="blur(8px)">
+      <q-card style="min-width: 500px">
+        <q-card-section class="row items-start q-pa-md border-bottom bg-grey-1">
+          <q-avatar rounded size="40px" class="q-mr-md shadow-1">
+            <FaviconRenderer :url="viewingBookmark?.url || ''" />
+          </q-avatar>
+          <div class="col">
+            <div class="text-h6 text-wcag-bold">{{ viewingBookmark?.title }}</div>
+            <div class="text-caption text-primary text-weight-bolder cursor-pointer hover-underline" @click="openLink(viewingBookmark?.url || '')">
+              {{ viewingBookmark?.url }}
+            </div>
+          </div>
+          <q-btn icon="close" flat round dense v-close-popup size="sm" />
         </q-card-section>
-        
-        <q-card-section class="q-gutter-md">
-          <q-input v-model="newBookmark.title" label="Title" dark filled color="primary" />
-          <q-input v-model="newBookmark.url" label="URL" dark filled color="primary" placeholder="https://..." />
-          <q-input v-model="newBookmark.category" label="Category" dark filled color="primary" hint="e.g. AI, Docs, Clients" />
-          <q-input v-model="newBookmark.description" label="Notes" dark filled color="primary" type="textarea" />
+        <q-card-section class="q-pa-md">
+          <div class="bg-grey-2 q-pa-sm rounded-borders text-wcag" style="white-space: pre-wrap">
+            <FormattedText :text="viewingBookmark?.description || ''" />
+          </div>
         </q-card-section>
-        
-        <q-card-actions align="right" class="q-pa-md">
-          <q-btn flat label="Cancel" color="grey-5" v-close-popup />
-          <q-btn unelevated label="Save Bookmark" color="primary" @click="saveBookmark" v-close-popup />
+        <q-card-actions align="right" class="q-pa-sm border-top">
+          <q-btn flat :label="$t('common.edit')" color="primary" size="sm" @click="switchToEditFromView" />
+          <q-btn unelevated :label="$t('common.ok')" color="primary" size="sm" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Add/Edit Dialog -->
+    <q-dialog v-model="showDialog" backdrop-filter="blur(4px)">
+      <q-card style="min-width: 500px">
+        <q-card-section class="q-py-sm border-bottom">
+          <div class="text-subtitle1 text-weight-bolder">{{ isEditing ? 'Edit Resource' : 'New Resource' }}</div>
+        </q-card-section>
+        <q-card-section class="q-gutter-sm q-pt-md">
+          <q-input v-model="editingBookmark.url" label="URL" dense filled @keyup.enter="fetchMetadata" />
+          <q-input v-model="editingBookmark.title" label="Title" dense filled />
+          <div class="row q-col-gutter-xs">
+            <q-select v-model="editingBookmark.collectionId" :options="collectionOptions" label="Collection" dense filled emit-value map-options class="col-6" />
+            <q-select v-model="editingBookmark.tags" label="Tags" dense filled use-input use-chips multiple new-value-mode="add-unique" :options="tagOptions" @filter="filterTags" class="col-6" />
+          </div>
+          <q-input v-model="editingBookmark.description" label="Description" dense filled type="textarea" />
+        </q-card-section>
+        <q-card-actions align="right" class="q-pb-md q-px-md border-top">
+          <q-btn flat label="Cancel" color="primary" v-close-popup size="sm" />
+          <q-btn color="primary" label="Save" unelevated @click="saveBookmark" size="sm" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -82,56 +278,201 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useBookmarksStore } from '../../stores/bookmarksStore';
-import { api } from '../../boot/axios';
+import { useProjectsStore } from '../../stores/projectsStore';
+import { useI18n } from 'vue-i18n';
 import FaviconRenderer from '../../components/FaviconRenderer.vue';
+import FormattedText from '../../components/FormattedText.vue';
+import type { Bookmark } from '../../stores/bookmarksStore';
+import { api } from '../../boot/axios';
+import { useQuasar } from 'quasar';
 
+const $q = useQuasar();
+const { t } = useI18n();
 const bookmarksStore = useBookmarksStore();
-const showAddDialog = ref(false);
+const projectsStore = useProjectsStore();
 
-const newBookmark = ref({
-  title: '',
-  url: '',
-  category: 'General',
-  description: ''
+const showDialog = ref(false);
+const showViewDialog = ref(false);
+const showManageCollections = ref(false);
+const isEditing = ref(false);
+const selectedProject = ref('global');
+const activeCollection = ref('all');
+const searchQuery = ref('');
+const fileInput = ref<HTMLInputElement | null>(null);
+const newCollectionName = ref('');
+const sortBy = ref<'alpha' | 'newest' | 'oldest'>('newest');
+const editingCollectionId = ref<string | null>(null);
+const editingName = ref('');
+const viewingBookmark = ref<Bookmark | null>(null);
+const selectedRows = ref<Bookmark[]>([]);
+
+const columns: any[] = [
+  { name: 'title', label: 'RESOURCE', align: 'left', sortable: true },
+  { name: 'url', label: 'URL', align: 'left', sortable: true },
+  { name: 'tags', label: 'TAGS', align: 'left' },
+  { name: 'actions', label: '', align: 'right' }
+];
+
+const editingBookmark = ref<Omit<Bookmark, 'id' | 'createdAt'> & { id?: string; createdAt?: string }>({
+  title: '', url: '', tags: [], description: '', favorite: false, projectIds: ['global'], collectionId: undefined
 });
 
+const searchPlaceholder = computed(() => t('bookmarks.noMatches', { query: '' }).replace(' ""', '...'));
+const sortOptions = computed(() => [
+  { label: t('bookmarks.sortAlpha'), value: 'alpha' },
+  { label: t('bookmarks.sortNewest'), value: 'newest' },
+  { label: t('bookmarks.sortOldest'), value: 'oldest' }
+]);
+
+const projectOptions = computed(() => [{ label: t('bookmarks.globalContext'), value: 'global' }, ...projectsStore.projects.map(p => ({ label: p.name, value: p.id }))]);
+const collectionOptions = computed(() => [{ label: t('bookmarks.unassigned'), value: undefined }, ...bookmarksStore.collections.map(c => ({ label: c.name, value: c.id }))]);
+const sortedCollections = computed(() => [...bookmarksStore.collections].sort((a, b) => a.name.localeCompare(b.name)));
+
+const sortedFavorites = computed(() => {
+  const list = bookmarksStore.favorites;
+  if (selectedProject.value !== 'global') return list.filter(b => b.projectIds?.includes(selectedProject.value) || b.projectIds?.includes('global'));
+  return list;
+});
+
+const sortedBookmarks = computed(() => {
+  const query = (searchQuery.value || '').toLowerCase().trim();
+  let base = [...bookmarksStore.byCollection(activeCollection.value)];
+  if (selectedProject.value !== 'global') base = base.filter(b => b.projectIds?.includes(selectedProject.value) || b.projectIds?.includes('global'));
+  if (query) base = base.filter(b => b.title.toLowerCase().includes(query) || b.url.toLowerCase().includes(query) || b.tags.some(t => t.toLowerCase().includes(query)));
+  
+  if (sortBy.value === 'alpha') return base.sort((a, b) => a.title.localeCompare(b.title));
+  if (sortBy.value === 'newest') return base.reverse();
+  return base;
+});
+
+const highlight = (text: string) => {
+  const query = (searchQuery.value || '').toLowerCase().trim();
+  if (!query || !text) return text;
+  return text.replace(new RegExp(`(${query})`, 'gi'), '<mark class="highlight-text">$1</mark>');
+};
+
+const openLink = (url: string) => { if (typeof window !== 'undefined') window.open(url, '_blank'); };
+const openViewDialog = (b: Bookmark) => { viewingBookmark.value = b; showViewDialog.value = true; };
+const openEditDialog = (b: Bookmark) => { isEditing.value = true; editingBookmark.value = { ...b }; showDialog.value = true; };
+const openAddDialog = () => { isEditing.value = false; editingBookmark.value = { title: '', url: '', tags: [], description: '', favorite: false, projectIds: [selectedProject.value], collectionId: activeCollection.value !== 'all' ? activeCollection.value : undefined }; showDialog.value = true; };
+
 const saveBookmark = async () => {
-  if (!newBookmark.value.title || !newBookmark.value.url) return;
-  await bookmarksStore.addBookmark(newBookmark.value);
-  newBookmark.value = { title: '', url: '', category: 'General', description: '' };
+  if (isEditing.value && editingBookmark.value.id) await bookmarksStore.updateBookmark(editingBookmark.value as Bookmark);
+  else await bookmarksStore.addBookmark(editingBookmark.value as any);
+  showDialog.value = false;
 };
 
-const removeBookmark = async (id: string) => {
-  await api.post('/api/bookmarks/remove', { id });
-  await bookmarksStore.loadBookmarks();
+const confirmRemove = (b: Bookmark) => {
+  $q.dialog({ title: 'Remove', message: `Delete ${b.title}?`, cancel: true, dark: true }).onOk(() => {
+    void bookmarksStore.deleteBookmark(b.id);
+  });
 };
 
-const openLink = (url: string) => {
-  if (typeof window !== 'undefined') {
-    window.open(url, '_blank');
-  }
+const confirmDeleteMultiple = () => {
+  $q.dialog({ title: 'Confirm Delete', message: `Remove ${selectedRows.value.length} bookmarks?`, cancel: true, dark: true }).onOk(() => {
+    void (async () => {
+      for (const b of selectedRows.value) await bookmarksStore.deleteBookmark(b.id);
+      selectedRows.value = [];
+    })();
+  });
 };
+
+const tagOptions = ref<string[]>([]);
+const filterTags = (val: string, update: any) => update(() => { tagOptions.value = val === '' ? bookmarksStore.allTags : bookmarksStore.allTags.filter(v => v.toLowerCase().includes(val.toLowerCase())); });
+
+const startRenaming = (col: any) => { editingCollectionId.value = col.id; editingName.value = col.name; };
+const saveRenamedCollection = async () => { if (editingCollectionId.value) await bookmarksStore.updateCollection({ id: editingCollectionId.value, name: editingName.value }); editingCollectionId.value = null; };
+const addCollection = async () => { if (newCollectionName.value) await bookmarksStore.addCollection(newCollectionName.value); newCollectionName.value = ''; };
+const confirmDeleteCollection = (col: any) => { 
+  $q.dialog({ title: 'Delete', message: `Remove ${col.name}?`, cancel: true, dark: true })
+    .onOk(() => {
+      void (async () => {
+        await bookmarksStore.deleteCollection(col.id); 
+        if (activeCollection.value === col.id) activeCollection.value = 'all';
+      })();
+    }); 
+};
+
+const fetchMetadata = async () => {
+  const res = await api.post('/api/utils/fetch-metadata', { url: editingBookmark.value.url }).catch(() => null);
+  if (res?.data.title) editingBookmark.value.title = res.data.title;
+  if (res?.data.description) editingBookmark.value.description = res.data.description;
+};
+
+const exportData = () => {
+  const data = JSON.stringify({ bookmarks: bookmarksStore.bookmarks, collections: bookmarksStore.collections }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `bookmarks-export-${new Date().toISOString().split('T')[0]}.json`; a.click();
+  URL.revokeObjectURL(url);
+};
+
+const triggerImport = () => fileInput.value?.click();
+const handleFileImport = (e: any) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = (event: any) => {
+    void (async () => {
+      try {
+        const imported = JSON.parse(event.target.result);
+        const bToImport = Array.isArray(imported) ? imported : (imported.bookmarks || []);
+        for (const b of bToImport) await bookmarksStore.addBookmark(b);
+        $q.notify({ message: 'Import Success', color: 'positive' });
+      } catch { $q.notify({ message: 'Import Failed', color: 'negative' }); }
+    })();
+  };
+  reader.readAsText(file);
+};
+
+const switchToEditFromView = () => { if (viewingBookmark.value) { openEditDialog(viewingBookmark.value); showViewDialog.value = false; } };
 
 onMounted(() => {
   void bookmarksStore.loadBookmarks();
+  void projectsStore.loadProjects();
 });
 </script>
 
 <style lang="sass" scoped>
-.bookmark-category-card
-  height: 100%
-  border-radius: 12px
-  transition: transform 0.2s ease, box-shadow 0.2s ease
+.compact-table
+  background: var(--dd-card-bg)
+  border: 1px solid var(--dd-border)
+  
+  :deep(th)
+    font-weight: 800
+    color: var(--dd-text-secondary)
+    background: rgba(0,0,0,0.02)
+    font-size: 0.7rem
+    letter-spacing: 1px
+    
+  :deep(td)
+    font-size: 0.85rem
+    border-bottom: 1px solid var(--dd-border)
+
+.body--dark .compact-table
+  :deep(th)
+    background: rgba(255,255,255,0.03)
+
+.fav-bar
+  background: var(--dd-card-bg)
+  border: 1px solid var(--dd-border)
+  border-left: 6px solid var(--dd-primary)
+
+.tabs-container
+  background: rgba(var(--dd-primary), 0.05)
+  border: 1px solid var(--dd-border)
+
+.hide-scrollbar
+  scrollbar-width: none
+  &::-webkit-scrollbar
+    display: none
+
+.border-primary-light
+  border: 1px solid var(--dd-primary-glow)
+
+.hover-scale
+  transition: transform 0.2s ease
   &:hover
-    transform: translateY(-4px)
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4)
-
-.border-bottom
-  border-bottom: 1px solid rgba(255,255,255,0.05)
-
-.dashed-border
-  border: 2px dashed rgba(255,255,255,0.1)
-  border-radius: 16px
+    transform: scale(1.05)
 </style>

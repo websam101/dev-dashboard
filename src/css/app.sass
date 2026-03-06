@@ -1,57 +1,144 @@
-// Quasar animations
-@import 'quasar.variables.sass'
+@use './quasar.variables.sass' as *
+
+// Centralized Variable System for Dev Dashboard
+:root
+  --dd-bg: #F8FAFC
+  --dd-bg-mesh: radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(126, 34, 206, 0.05) 0px, transparent 50%)
+  --dd-card-bg: #FFFFFF
+  --dd-text-primary: #0F172A
+  --dd-text-secondary: #475569
+  --dd-link: #2563EB
+  --dd-link-hover: #1D4ED8
+  
+  --dd-primary: #0D47A1
+  --dd-secondary: #00695C
+  --dd-accent: #7B1FA2
+  --dd-success: #2E7D32
+  --dd-warning: #F57F17
+  --dd-danger: #C62828
+  --dd-info: #0277BD
+  
+  --dd-border: rgba(15, 23, 42, 0.1)
+  --dd-primary-glow: rgba(13, 71, 161, 0.1)
+  --dd-highlight-bg: #FFE082
+  --dd-highlight-text: #000000
+
+  // 6-Color Palette
+  --dd-c1: #0284C7
+  --dd-c1-bg: #E0F2FE
+  --dd-c2: #059669
+  --dd-c2-bg: #D1FAE5
+  --dd-c3: #7C3AED
+  --dd-c3-bg: #EDE9FE
+  --dd-c4: #EA580C
+  --dd-c4-bg: #FFEDD5
+  --dd-c5: #DB2777
+  --dd-c5-bg: #FCE7F3
+  --dd-c6: #2563EB
+  --dd-c6-bg: #DBEAFE
+
+.body--dark
+  color-scheme: dark
+  --dd-bg: #0F172A
+  --dd-bg-mesh: radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(192, 132, 252, 0.1) 0px, transparent 50%)
+  --dd-card-bg: #1E293B
+  --dd-text-primary: #F1F5F9
+  --dd-text-secondary: #94A3B8
+  --dd-link: #90CAF9
+  --dd-link-hover: #BBDEFB
+  
+  --dd-primary: #90CAF9
+  --dd-secondary: #80CBC4
+  --dd-accent: #CE93D8
+  --dd-success: #81C784
+  --dd-warning: #FFD54F
+  --dd-danger: #E57373
+  --dd-info: #4FC3F7
+  
+  --dd-border: rgba(241, 245, 249, 0.12)
+  --dd-primary-glow: rgba(144, 202, 249, 0.2)
+  --dd-highlight-bg: #FFD54F
+  --dd-highlight-text: #000000
+
+  // 6-Color Palette Dark
+  --dd-c1: #38BDF8
+  --dd-c1-bg: rgba(56, 189, 248, 0.15)
+  --dd-c2: #34D399
+  --dd-c2-bg: rgba(52, 211, 153, 0.15)
+  --dd-c3: #A78BFA
+  --dd-c3-bg: rgba(167, 139, 250, 0.15)
+  --dd-c4: #FB923C
+  --dd-c4-bg: rgba(251, 146, 60, 0.15)
+  --dd-c5: #F472B6
+  --dd-c5-bg: rgba(244, 114, 182, 0.15)
+  --dd-c6: #60A5FA
+  --dd-c6-bg: rgba(96, 165, 250, 0.15)
 
 // Global Styles
 body
-  background: #0a0a0c !important
-  color: #e0e0e0
-  font-family: 'Inter', 'Roboto', sans-serif
+  background: var(--dd-bg)
+  background-image: var(--dd-bg-mesh)
+  color: var(--dd-text-primary)
+  transition: background 0.3s ease, color 0.3s ease
 
-.q-card
-  background: #141417
-  border: 1px solid rgba(255, 255, 255, 0.05)
-  border-radius: 12px
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2)
+::selection
+  background: var(--dd-primary-glow)
+  color: inherit
 
-.q-drawer
-  background: #0f0f12 !important
-  border-right: 1px solid rgba(255, 255, 255, 0.05)
+// Layout & Core Component Overrides
+.q-layout, .q-header, .q-footer, .q-drawer
+  background: var(--dd-bg) !important
+  color: var(--dd-text-primary)
 
 .q-header
-  background: rgba(15, 15, 18, 0.8) !important
-  backdrop-filter: blur(8px)
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05)
+  background: var(--dd-bg) !important
+  backdrop-filter: blur(12px)
 
-// Stats Cards
-.stat-value
-  font-family: 'JetBrains Mono', monospace
-  letter-spacing: -1px
-  line-height: 1
+.q-card
+  background: var(--dd-card-bg)
+  color: var(--dd-text-primary)
+  border-color: var(--dd-border)
+  border-radius: 24px
+  &--bordered
+    border: 1px solid var(--dd-border)
 
-.text-primary
-  color: #3d8bff !important
-.text-secondary
-  color: #00d1b2 !important
-.text-accent
-  color: #7957d5 !important
+// Deterministic Coloring
+@for $i from 1 through 6
+  .tag-bg-#{$i}
+    background: var(--dd-c#{$i}-bg) !important
+    color: var(--dd-c#{$i}) !important
+  
+  .tag-solid-#{$i}
+    background: var(--dd-c#{$i}) !important
+    color: #FFFFFF !important
+    .body--dark &
+      color: #000000 !important
 
-// Project Grid
-.project-card
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1)
-  background: #1a1a1e
-  &:hover
-    transform: translateY(-4px)
-    background: #202026
-    border-color: #3d8bff
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4)
+// Utility Classes
+.text-wcag
+  color: var(--dd-text-primary) !important
+  font-weight: 500
 
-// Custom scrollbar
-::-webkit-scrollbar
-  width: 8px
-::-webkit-scrollbar-track
-  background: #0a0a0c
-::-webkit-scrollbar-thumb
-  background: #2a2a2e
-  border-radius: 4px
-  &:hover
-    background: #3a3a3e
+.text-wcag-bold
+  color: var(--dd-text-primary) !important
+  font-weight: 700
+
+.text-wcag-caption
+  color: var(--dd-text-secondary) !important
+  font-weight: 500
+
+.highlight-text
+  background: var(--dd-highlight-bg)
+  color: var(--dd-highlight-text)
+  border-radius: 2px
+  padding: 0 2px
+  font-weight: bold
+
+.border-bottom
+  border-bottom: 1px solid var(--dd-border)
+
+.bg-primary-transparent
+  background: var(--dd-primary-glow)
+
+.rounded-borders
+  border-radius: 12px

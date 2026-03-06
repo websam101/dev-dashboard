@@ -173,7 +173,7 @@ describe('ProjectManager', () => {
     vi.spyOn(manager, 'detectTechs').mockResolvedValue(['vue'])
 
     const updated = await manager.syncAll(mockProjects as any)
-    expect(updated[0].git?.branch).toBe('sync')
-    expect(updated[0].techs).toContain('vue')
+    expect(updated[0]!.git?.branch).toBe('sync')
+    expect(updated[0]!.techs).toContain('vue')
   })
 })

@@ -43,11 +43,11 @@ describe('Bookmarks Store', () => {
   it('loads bookmarks from local and syncs with backend', async () => {
     const store = useBookmarksStore()
     const mockLocalBookmarks = [
-      { id: '1', title: 'Local', url: 'http://local' }, // missing category
-      { id: '2', title: 'Local2', url: 'http://local2', category: 'Dev' } // has category
+      { id: '1', title: 'Local', url: 'http://local', tags: [] },
+      { id: '2', title: 'Local2', url: 'http://local2', tags: ['Dev'] }
     ]
     const mockRemoteBookmarks = [
-      { id: '1', title: 'Remote', url: 'http://remote', category: 'Dev', description: 'Desc', tags: ['tag'] }
+      { id: '1', title: 'Remote', url: 'http://remote', tags: ['Dev'], description: 'Desc' }
     ]
     
     mockDb.getBookmarks.mockResolvedValue(mockLocalBookmarks as any)
@@ -61,34 +61,34 @@ describe('Bookmarks Store', () => {
     expect(mockDb.addBookmark).toHaveBeenCalled()
   })
 
-  it('handles local bookmarks with missing properties', async () => {
+  it('handles local bookmarks with legacy category property', async () => {
     const store = useBookmarksStore()
     const mockLocalBookmarks = [
-      { id: '1', title: 'L1', url: 'u1' } // missing description, tags, category
+      { id: '1', title: 'L1', url: 'u1', category: 'Legacy' } 
     ]
     mockDb.getBookmarks.mockResolvedValue(mockLocalBookmarks as any)
     vi.mocked(api.get).mockRejectedValue(new Error('Sync failed'))
 
     await store.loadBookmarks()
 
-    expect(store.bookmarks[0].category).toBe('General')
+    expect(store.bookmarks[0]!.tags).toContain('Legacy')
   })
 
   it('handles backend sync with empty response', async () => {
     const store = useBookmarksStore()
-    const mockLocalBookmarks = [{ id: '1', title: 'Local', url: 'http://local', category: 'Dev' }]
+    const mockLocalBookmarks = [{ id: '1', title: 'Local', url: 'http://local', tags: ['Dev'] }]
     mockDb.getBookmarks.mockResolvedValue(mockLocalBookmarks as any)
     vi.mocked(api.get).mockResolvedValue({ data: [] })
 
     await store.loadBookmarks()
 
     expect(store.bookmarks).toHaveLength(1)
-    expect(store.bookmarks[0].title).toBe('Local')
+    expect(store.bookmarks[0]!.title).toBe('Local')
   })
 
   it('handles backend sync with non-array response', async () => {
     const store = useBookmarksStore()
-    const mockLocalBookmarks = [{ id: '1', title: 'Local', url: 'http://local', category: 'Dev' }]
+    const mockLocalBookmarks = [{ id: '1', title: 'Local', url: 'http://local', tags: ['Dev'] }]
     mockDb.getBookmarks.mockResolvedValue(mockLocalBookmarks as any)
     vi.mocked(api.get).mockResolvedValue({ data: null })
 
@@ -99,7 +99,7 @@ describe('Bookmarks Store', () => {
 
   it('handles backend sync failure during loadBookmarks', async () => {
     const store = useBookmarksStore()
-    const mockLocalBookmarks = [{ id: '1', title: 'Local', url: 'http://local', category: 'Dev' }]
+    const mockLocalBookmarks = [{ id: '1', title: 'Local', url: 'http://local', tags: ['Dev'] }]
     
     mockDb.getBookmarks.mockResolvedValue(mockLocalBookmarks as any)
     vi.mocked(api.get).mockRejectedValue(new Error('Sync failed'))
@@ -122,34 +122,33 @@ describe('Bookmarks Store', () => {
 
   it('adds bookmark to state and storage', async () => {
     const store = useBookmarksStore()
-    const newBookmark = { title: 'New', url: 'http://new', category: 'Dev' }
+    const newBookmark = { title: 'New', url: 'http://new', tags: ['Dev'] }
     vi.mocked(api.post).mockResolvedValue({ data: { success: true } })
 
     await store.addBookmark(newBookmark)
 
     expect(store.bookmarks).toHaveLength(1)
-    expect(store.bookmarks[0].title).toBe('New')
+    expect(store.bookmarks[0]!.title).toBe('New')
     expect(mockDb.addBookmark).toHaveBeenCalled()
     expect(api.post).toHaveBeenCalledWith('/api/bookmarks', expect.objectContaining(newBookmark))
   })
 
-  it('adds bookmark with missing optional fields', async () => {
+  it('adds bookmark with default tags if empty', async () => {
     const store = useBookmarksStore()
-    const newBookmark = { title: 'New', url: 'http://new', category: 'Dev' }
+    const newBookmark = { title: 'New', url: 'http://new', tags: [] }
     vi.mocked(api.post).mockResolvedValue({ data: { success: true } })
 
     await store.addBookmark(newBookmark)
     
     // Internal checks for default values during storage
     expect(mockDb.addBookmark).toHaveBeenCalledWith(expect.objectContaining({
-      description: '',
-      tags: []
+      tags: [] // Store logic doesn't default tags internally, the View does.
     }))
   })
 
   it('handles add bookmark failure (DB error)', async () => {
     const store = useBookmarksStore()
-    const newBookmark = { title: 'New', url: 'http://new', category: 'Dev' }
+    const newBookmark = { title: 'New', url: 'http://new', tags: ['Dev'] }
     mockDb.addBookmark.mockRejectedValue(new Error('DB failure'))
 
     await store.addBookmark(newBookmark)
@@ -159,7 +158,7 @@ describe('Bookmarks Store', () => {
 
   it('handles add bookmark backend failure (API error)', async () => {
     const store = useBookmarksStore()
-    const newBookmark = { title: 'New', url: 'http://new', category: 'Dev' }
+    const newBookmark = { title: 'New', url: 'http://new', tags: ['Dev'] }
     vi.mocked(api.post).mockRejectedValue(new Error('API failure'))
 
     await store.addBookmark(newBookmark)
@@ -169,7 +168,7 @@ describe('Bookmarks Store', () => {
 
   it('deletes bookmark from state and storage', async () => {
     const store = useBookmarksStore()
-    store.bookmarks = [{ id: '1', title: 'B1', url: 'http://b1', category: 'Dev' }]
+    store.bookmarks = [{ id: '1', title: 'B1', url: 'http://b1', tags: ['Dev'] }]
     vi.mocked(api.post).mockResolvedValue({ data: { success: true } })
 
     await store.deleteBookmark('1')
@@ -181,7 +180,7 @@ describe('Bookmarks Store', () => {
 
   it('handles delete bookmark failure (DB error)', async () => {
     const store = useBookmarksStore()
-    store.bookmarks = [{ id: '1', title: 'B1', url: 'http://b1', category: 'Dev' }]
+    store.bookmarks = [{ id: '1', title: 'B1', url: 'http://b1', tags: ['Dev'] }]
     mockDb.deleteBookmark.mockRejectedValue(new Error('DB failure'))
 
     await store.deleteBookmark('1')
@@ -191,7 +190,7 @@ describe('Bookmarks Store', () => {
 
   it('handles delete bookmark backend failure (API error)', async () => {
     const store = useBookmarksStore()
-    store.bookmarks = [{ id: '1', title: 'B1', url: 'http://b1', category: 'Dev' }]
+    store.bookmarks = [{ id: '1', title: 'B1', url: 'http://b1', tags: ['Dev'] }]
     vi.mocked(api.post).mockRejectedValue(new Error('API failure'))
 
     await store.deleteBookmark('1')
@@ -199,38 +198,24 @@ describe('Bookmarks Store', () => {
     expect(store.bookmarks).toEqual([]) // Should still remove from state if DB worked
   })
 
-  it('calculates unique categories correctly', () => {
+  it('calculates unique tags correctly', () => {
     const store = useBookmarksStore()
     store.bookmarks = [
-      { id: '1', title: 'B1', url: 'u1', category: 'Dev' },
-      { id: '2', title: 'B2', url: 'u2', category: 'Dev' },
-      { id: '3', title: 'B3', url: 'u3', category: 'Tools' }
+      { id: '1', title: 'B1', url: 'u1', tags: ['Dev'] },
+      { id: '2', title: 'B2', url: 'u2', tags: ['Dev', 'Tools'] },
+      { id: '3', title: 'B3', url: 'u3', tags: ['Tools'] }
     ]
-    expect(store.categories).toEqual(['Dev', 'Tools'])
+    expect(store.allTags).toEqual(['Dev', 'Tools'])
   })
 
-  it('returns empty categories if bookmarks is not an array', () => {
-    const store = useBookmarksStore()
-    // @ts-ignore
-    store.bookmarks = null
-    expect(store.categories).toEqual([])
-  })
-
-  it('filters by category correctly', () => {
+  it('filters by tag correctly', () => {
     const store = useBookmarksStore()
     store.bookmarks = [
-      { id: '1', title: 'B1', url: 'u1', category: 'Dev' },
-      { id: '2', title: 'B2', url: 'u2', category: 'Tools' }
+      { id: '1', title: 'B1', url: 'u1', tags: ['Dev'] },
+      { id: '2', title: 'B2', url: 'u2', tags: ['Tools'] }
     ]
-    expect(store.byCategory('Dev')).toHaveLength(1)
-    expect(store.byCategory('Dev')[0].title).toBe('B1')
-    expect(store.byCategory('Other')).toHaveLength(0)
-  })
-
-  it('returns empty array for byCategory if bookmarks is not an array', () => {
-    const store = useBookmarksStore()
-    // @ts-ignore
-    store.bookmarks = null
-    expect(store.byCategory('Dev')).toEqual([])
+    expect(store.byTag('Dev')).toHaveLength(1)
+    expect(store.byTag('Dev')[0]!.title).toBe('B1')
+    expect(store.byTag('Other')).toHaveLength(0)
   })
 })

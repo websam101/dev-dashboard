@@ -3,12 +3,16 @@ import os from 'node:os';
 
 export interface SystemStats {
   cpuLoad: number;
+  cpuCores: number;
   memTotal: number;
   memUsed: number;
   memPercent: number;
   diskTotal: number;
   diskUsed: number;
   diskPercent: number;
+  loadAvg: number[];
+  netSent: number;
+  netRecv: number;
   uptime: number;
   platform: string;
 }
@@ -25,49 +29,77 @@ export class SystemMonitor {
   }
 
   async getStats(): Promise<SystemStats> {
-    try {
-      // Use native 'os' module for CPU/RAM as it's near-instant and never hangs
-      const freeMem = os.freemem();
-      const totalMem = os.totalmem();
-      const usedMem = totalMem - freeMem;
-      const memPercent = Math.round((usedMem / totalMem) * 100);
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    const memPercent = Math.round((usedMem / totalMem) * 100);
+    const platform = process.platform;
+    const uptime = Math.round(os.uptime());
+    const cpuCores = os.cpus().length;
+    
+    // On Windows, os.loadavg() is [0,0,0]. 
+    // We'll try to get si.currentLoad() which has some load info or use CPU as proxy
+    let loadAvg = os.loadavg();
 
-      // CPU load from 'os' is an average, let's try 'si' but with a very aggressive timeout
-      const cpu = await this.withTimeout(si.currentLoad(), 1000, { currentLoad: 0 } as si.Systeminformation.CurrentLoadData);
-      
-      // Disk is the most likely to hang (network drives, sleeping HDDs)
-      const disk = await this.withTimeout(si.fsSize(), 800, [] as si.Systeminformation.FsSizeData[]);
+    try {
+      const cpu = await this.withTimeout(si.currentLoad(), 2000, { currentLoad: 0, avgLoad: 0 } as si.Systeminformation.CurrentLoadData);
+      const disk = await this.withTimeout(si.fsSize(), 2000, [] as si.Systeminformation.FsSizeData[]);
+      const net = await this.withTimeout(si.networkStats(), 2000, [] as si.Systeminformation.NetworkStatsData[]);
+
+      // If loadAvg is all zeros (Windows), use SI's currentLoad as a proxy for the 1m load
+      if (platform === 'win32' && loadAvg.every(v => v === 0)) {
+        const current = (cpu.currentLoad || 0) / 100 * cpuCores;
+        // Mocking 5m and 15m based on current for UI consistency on Windows
+        loadAvg = [
+          Math.round(current * 100) / 100,
+          Math.round(current * 0.8 * 100) / 100,
+          Math.round(current * 0.7 * 100) / 100
+        ];
+      }
 
       const mainDisk = Array.isArray(disk) && disk.length > 0 
         ? (disk.find(d => d.mount === '/' || d.mount === 'C:') || disk[0])
         : null;
 
-      // Add Memory usage via native OS as final verification
-      const totalMem = os.totalmem();
-      const freeMem = os.freemem();
-      const usedMem = totalMem - freeMem;
+      let totalSent = 0;
+      let totalRecv = 0;
+      if (Array.isArray(net)) {
+        net.forEach(iface => {
+          totalSent += (iface.tx_bytes || 0);
+          totalRecv += (iface.rx_bytes || 0);
+        });
+      }
 
       return {
         cpuLoad: Math.round(cpu.currentLoad || 0),
+        cpuCores,
         memTotal: Math.round(totalMem / (1024 ** 3) * 100) / 100,
         memUsed: Math.round(usedMem / (1024 ** 3) * 100) / 100,
-        memPercent: Math.round((usedMem / totalMem) * 100),
+        memPercent: memPercent,
         diskTotal: mainDisk ? Math.round(mainDisk.size / (1024 ** 3) * 100) / 100 : 0,
         diskUsed: mainDisk ? Math.round(mainDisk.used / (1024 ** 3) * 100) / 100 : 0,
         diskPercent: mainDisk ? Math.round(mainDisk.use) : 0,
-        uptime: Math.round(os.uptime()),
-        platform: process.platform
+        loadAvg,
+        netSent: Math.round(totalSent / (1024 ** 2) * 100) / 100,
+        netRecv: Math.round(totalRecv / (1024 ** 2) * 100) / 100,
+        uptime,
+        platform
       };
     } catch (e) {
-      console.error('SystemMonitor Critical Failure:', e);
       return {
         cpuLoad: 0,
-        memTotal: Math.round(os.totalmem() / (1024 ** 3) * 100) / 100,
-        memUsed: Math.round((os.totalmem() - os.freemem()) / (1024 ** 3) * 100) / 100,
-        memPercent: Math.round(((os.totalmem() - os.freemem()) / os.totalmem()) * 100),
-        diskTotal: 0, diskUsed: 0, diskPercent: 0, 
-        uptime: Math.round(os.uptime()), 
-        platform: process.platform
+        cpuCores,
+        memTotal: Math.round(totalMem / (1024 ** 3) * 100) / 100,
+        memUsed: Math.round(usedMem / (1024 ** 3) * 100) / 100,
+        memPercent: memPercent,
+        diskTotal: 0, 
+        diskUsed: 0, 
+        diskPercent: 0,
+        loadAvg: [0, 0, 0],
+        netSent: 0,
+        netRecv: 0,
+        uptime,
+        platform
       };
     }
   }

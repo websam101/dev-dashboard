@@ -63,7 +63,7 @@ describe('SystemMonitor', () => {
 
   it('handles systeminformation timeouts', async () => {
     // Mock currentLoad to be slow
-    vi.mocked(si.currentLoad).mockReturnValue(new Promise(resolve => setTimeout(() => resolve({ currentLoad: 10 }), 5000)))
+    vi.mocked(si.currentLoad).mockReturnValue(new Promise(resolve => setTimeout(() => resolve({ currentLoad: 10 } as any), 5000)))
     vi.mocked(si.fsSize).mockResolvedValue([{ mount: 'C:', size: 100, used: 10, use: 10 }] as any)
 
     const stats = await monitor.getStats()

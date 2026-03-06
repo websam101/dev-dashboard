@@ -83,7 +83,6 @@ describe('SettingsView', () => {
     const settingsStore = useSettingsStore()
     settingsStore.settings.scanRoots = ['/path1', '/path2']
     
-    // Simulate UI interaction if possible, or direct call
     wrapper.vm.removeRoot('/path1')
     
     expect(settingsStore.settings.scanRoots).not.toContain('/path1')
@@ -96,9 +95,9 @@ describe('SettingsView', () => {
     const settingsStore = useSettingsStore()
     settingsStore.settings.scanRoots = []
     
-    await w.vm.browseFolder()
+    await (w.vm as any).browseFolder()
     
-    expect(window.electronApi.selectFolder).toHaveBeenCalled()
+    expect((window as any).electronApi.selectFolder).toHaveBeenCalled()
     expect(settingsStore.settings.scanRoots).toContain('/path')
     
     vi.unstubAllGlobals()
@@ -112,7 +111,7 @@ describe('SettingsView', () => {
 
   it('detects electron environment', () => {
     const w = createWrapper(true)
-    expect(w.vm.isElectron).toBe(true)
+    expect((w.vm as any).isElectron).toBe(true)
     vi.unstubAllGlobals()
   })
 })

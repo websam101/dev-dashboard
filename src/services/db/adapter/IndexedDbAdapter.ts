@@ -20,8 +20,19 @@ interface DevDashboardDB extends DBSchema {
   };
   settings: {
     key: string;
-    value: unknown;
+    value: { key: string; value: unknown };
   };
+  collections: {
+    key: string;
+    value: BookmarkCollection;
+  };
+}
+
+export interface BookmarkCollection {
+  id: string;
+  name: string;
+  color?: string;
+  icon?: string;
 }
 
 export interface Bookmark {
@@ -31,6 +42,9 @@ export interface Bookmark {
   description: string;
   tags: string[];
   createdAt: string;
+  favorite?: boolean;
+  projectIds?: string[];
+  collectionId?: string | undefined;
 }
 
 export interface Project {
@@ -39,9 +53,9 @@ export interface Project {
   path: string;
   description: string;
   ports: number[];
-  repoUrl?: string;
-  branch?: string;
-  gitStatus?: string;
+  techs: string[];
+  git?: any;
+  managedPorts?: number[];
 }
 
 export interface PortRecord {
@@ -67,7 +81,7 @@ export class IndexedDbAdapter {
 
   async connect(): Promise<void> {
     if (!this.db) {
-      this.db = await openDB<DevDashboardDB>(this.dbName, 1, {
+      this.db = await openDB<DevDashboardDB>(this.dbName, 2, {
         upgrade(db) {
           if (!db.objectStoreNames.contains("bookmarks")) {
             db.createObjectStore("bookmarks", { keyPath: "id" });
@@ -84,6 +98,9 @@ export class IndexedDbAdapter {
           if (!db.objectStoreNames.contains("settings")) {
             db.createObjectStore("settings", { keyPath: "key" });
           }
+          if (!db.objectStoreNames.contains("collections")) {
+            db.createObjectStore("collections", { keyPath: "id" });
+          }
         },
       });
     }
@@ -94,6 +111,27 @@ export class IndexedDbAdapter {
       this.db.close();
       this.db = null;
     }
+  }
+
+  // Collection methods
+  async addCollection(collection: BookmarkCollection): Promise<void> {
+    await this.connect();
+    await this.db!.put("collections", collection);
+  }
+
+  async getCollections(): Promise<BookmarkCollection[]> {
+    await this.connect();
+    return await this.db!.getAll("collections");
+  }
+
+  async updateCollection(collection: BookmarkCollection): Promise<void> {
+    await this.connect();
+    await this.db!.put("collections", collection);
+  }
+
+  async deleteCollection(id: string): Promise<void> {
+    await this.connect();
+    await this.db!.delete("collections", id);
   }
 
   // Bookmark methods
@@ -115,18 +153,6 @@ export class IndexedDbAdapter {
   async deleteBookmark(id: string): Promise<void> {
     await this.connect();
     await this.db!.delete("bookmarks", id);
-  }
-
-  async searchBookmarks(query: string): Promise<Bookmark[]> {
-    const all = await this.getBookmarks();
-    const q = query.toLowerCase();
-    return all.filter(
-      (b) =>
-        b.title.toLowerCase().includes(q) ||
-        b.url.toLowerCase().includes(q) ||
-        b.description.toLowerCase().includes(q) ||
-        b.tags.some((t) => t.toLowerCase().includes(q)),
-    );
   }
 
   // Project methods
@@ -171,35 +197,17 @@ export class IndexedDbAdapter {
     await this.db!.delete("ports", port);
   }
 
-  // GitRepo methods
-  async addGitRepo(repo: GitRepo): Promise<void> {
-    await this.connect();
-    await this.db!.put("gitRepos", repo);
-  }
-
-  async getGitRepos(): Promise<GitRepo[]> {
-    await this.connect();
-    return await this.db!.getAll("gitRepos");
-  }
-
-  async updateGitRepo(repo: GitRepo): Promise<void> {
-    await this.connect();
-    await this.db!.put("gitRepos", repo);
-  }
-
-  async deleteGitRepo(url: string): Promise<void> {
-    await this.connect();
-    await this.db!.delete("gitRepos", url);
-  }
-
   // Settings methods
   async getSetting<T = unknown>(key: string): Promise<T | undefined> {
     await this.connect();
-    return await this.db!.get("settings", key) as T | undefined;
+    const res = await this.db!.get("settings", key);
+    return res ? (res.value as T) : undefined;
   }
 
   async setSetting(key: string, value: unknown): Promise<void> {
     await this.connect();
-    await this.db!.put("settings", { key, value });
+    // Final guard: Ensure data is clean and serializable
+    const cleanedValue = JSON.parse(JSON.stringify(value));
+    await this.db!.put("settings", { key, value: cleanedValue });
   }
 }

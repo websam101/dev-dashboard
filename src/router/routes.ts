@@ -15,14 +15,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import("pages/Projects/ProjectsView.vue"),
       },
       {
-        path: "ports",
-        component: () => import("pages/PortManager/PortManagerView.vue"),
-      },
-      {
-        path: "git",
-        component: () => import("pages/GitManager/GitManagerView.vue"),
-      },
-      {
         path: "settings",
         component: () => import("pages/Settings/SettingsView.vue"),
       },

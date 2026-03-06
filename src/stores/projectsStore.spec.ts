@@ -68,7 +68,7 @@ describe('Projects Store', () => {
     await store.loadProjects()
 
     expect(store.projects).toHaveLength(1)
-    expect(store.projects[0].name).toBe('Local')
+    expect(store.projects[0]!.name).toBe('Local')
   })
 
   it('handles backend sync with non-array response', async () => {
@@ -80,7 +80,7 @@ describe('Projects Store', () => {
     await store.loadProjects()
 
     expect(store.projects).toHaveLength(1)
-    expect(store.projects[0].name).toBe('Local')
+    expect(store.projects[0]!.name).toBe('Local')
   })
 
   it('handles backend sync with null response', async () => {

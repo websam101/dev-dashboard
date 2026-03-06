@@ -1,0 +1,697 @@
+{
+  "bookmarks": [
+    {
+      "title": "Quasar docs",
+      "url": "https://quasar.dev/docs",
+      "tags": [
+        "Quasar",
+        "Docs"
+      ],
+      "description": "Welcome to Quasar documentation website!",
+      "favorite": true,
+      "projectId": "global",
+      "id": "1772753923504",
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.823Z"
+    },
+    {
+      "title": "Quasar App q-markdown",
+      "url": "https://qmarkdown.netlify.app/",
+      "tags": [
+        "Quasar",
+        "Docs",
+        "Markdown"
+      ],
+      "description": "https://github.com/quasarframework/quasar-ui-qmarkdown",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754398387",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.829Z"
+    },
+    {
+      "title": "Quasar App q-icon-picker",
+      "url": "https://quasarframework.github.io/quasar-ui-qiconpicker/docs",
+      "tags": [
+        "Quasar",
+        "Docs",
+        "icon-picker"
+      ],
+      "description": "",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754536182",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.834Z"
+    },
+    {
+      "title": "Directus Docs",
+      "url": "https://directus.io/docs/",
+      "tags": [
+        "Directus",
+        "Docs"
+      ],
+      "description": "Explore our resources and powerful data engine to build your projects confidently.\nhttps://github.com/directus-labs/directus-templates/tree/main",
+      "favorite": true,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754648032",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:09:23.531Z"
+    },
+    {
+      "title": "Learn Directus Today",
+      "url": "https://learndirectus.com/",
+      "tags": [
+        "Directus",
+        "Docs"
+      ],
+      "description": "Articles and guides to help you get the most out of the Directus platform.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754688992",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.866Z"
+    },
+    {
+      "title": "Overview &mdash; Apache CouchDB® 3.5 Documentation",
+      "url": "https://docs.couchdb.org/en/latest/",
+      "tags": [
+        "CouchDB",
+        "Docs"
+      ],
+      "description": "",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754745907",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.872Z"
+    },
+    {
+      "title": "Pandoc - index",
+      "url": "https://pandoc.org/",
+      "tags": [
+        "Pandoc",
+        "Docs"
+      ],
+      "description": "https://pandoc.org/MANUAL.html",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754771032",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T17:43:06.053Z"
+    },
+    {
+      "title": "HTML reference - HTML | MDN",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference",
+      "tags": [
+        "HTML",
+        "Docs"
+      ],
+      "description": "This HTML reference describes all elements and attributes of HTML, including global attributes that apply to all elements.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754803687",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.879Z"
+    },
+    {
+      "title": "W3Schools Online Web Tutorials",
+      "url": "https://www.w3schools.com/",
+      "tags": [
+        "HTML",
+        "CSS",
+        "JS",
+        "SQL",
+        "Docs"
+      ],
+      "description": "Well organized and easy to understand Web building tutorials with lots of examples of how to use HTML, CSS, JavaScript, SQL, Python, PHP, Bootstrap, Java, XML and more.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754882391",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.884Z"
+    },
+    {
+      "title": "CSS/Properties/color/keywords - W3C Wiki",
+      "url": "https://www.w3.org/wiki/CSS/Properties/color/keywords",
+      "tags": [
+        "CSS",
+        "Docs"
+      ],
+      "description": "",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754911346",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.889Z"
+    },
+    {
+      "title": "Google Fonts",
+      "url": "https://fonts.google.com/selection/embed",
+      "tags": [
+        "Fonts"
+      ],
+      "description": "Making the web more beautiful, fast, and open through great typography",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754932511",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.894Z"
+    },
+    {
+      "title": "Material Symbols and Icons - Google Fonts",
+      "url": "https://fonts.google.com/icons?icon.size=24&icon.color=%23e3e3e3&icon.platform=web",
+      "tags": [
+        "Fonts",
+        "Icons",
+        "Material-icons"
+      ],
+      "description": "Material Symbols are our newest icons consolidating over 2,500 glyphs in a single font file with a wide range of design variants.",
+      "favorite": true,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772754983887",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.898Z"
+    },
+    {
+      "title": "Material Design Icons - Icon Library - Pictogrammers",
+      "url": "https://pictogrammers.com/library/mdi/",
+      "tags": [
+        "Fonts",
+        "Icons",
+        "MDI"
+      ],
+      "description": "",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755029332",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.902Z"
+    },
+    {
+      "title": "Markdown Cheat Sheet | Markdown Guide",
+      "url": "https://www.markdownguide.org/cheat-sheet/",
+      "tags": [
+        "Markdown",
+        "Docs"
+      ],
+      "description": "A quick reference to the Markdown syntax.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755046195",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.908Z"
+    },
+    {
+      "title": "What is D3? | D3 by Observable",
+      "url": "https://d3js.org/what-is-d3",
+      "tags": [
+        "JS",
+        "Docs",
+        "Visualization"
+      ],
+      "description": "The JavaScript library for bespoke data visualization",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755095597",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.912Z"
+    },
+    {
+      "title": "LearnVue",
+      "url": "https://learnvue.co/articles",
+      "tags": [
+        "VueJs",
+        "Docs"
+      ],
+      "description": "The developer-friendly way to LearnVue faster",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755149477",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.915Z"
+    },
+    {
+      "id": "1772755379247",
+      "title": "Animate.css | A cross-browser library of CSS animations.",
+      "url": "https://animate.style/",
+      "tags": [
+        "CSS",
+        "Animations",
+        "Docs"
+      ],
+      "description": "Animate.css is a library of ready-to-use, cross-browser animations for you to use in your projects. Great for emphasis, home pages, sliders, and attention-guiding hints.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.919Z"
+    },
+    {
+      "title": "Sass: Documentation",
+      "url": "https://sass-lang.com/documentation/",
+      "tags": [
+        "CSS",
+        "SASS",
+        "Docs"
+      ],
+      "description": "Syntactically Awesome Style Sheets",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755478817",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.925Z"
+    },
+    {
+      "title": "Vue.js",
+      "url": "https://vuejs.org/guide/introduction.html",
+      "tags": [
+        "VueJs",
+        "Docs"
+      ],
+      "description": "Vue.js - The Progressive JavaScript Framework",
+      "favorite": true,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755504417",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.929Z"
+    },
+    {
+      "title": "Vue Router",
+      "url": "https://router.vuejs.org/introduction.html",
+      "tags": [
+        "VueJs",
+        "Docs",
+        "Router"
+      ],
+      "description": "The official Router for Vue.js",
+      "favorite": true,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755538112",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.932Z"
+    },
+    {
+      "title": "Vite",
+      "url": "https://vite.dev/guide/",
+      "tags": [
+        "Vite",
+        "Docs",
+        "JS"
+      ],
+      "description": "Next Generation Frontend Tooling",
+      "favorite": true,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755569567",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.935Z"
+    },
+    {
+      "title": "Pinia",
+      "url": "https://pinia.vuejs.org/core-concepts/",
+      "tags": [
+        "VueJs",
+        "Pinia",
+        "JS"
+      ],
+      "description": "Intuitive, type safe, light and flexible Store for Vue",
+      "favorite": true,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755614643",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.940Z"
+    },
+    {
+      "title": "Vue I18n",
+      "url": "https://vue-i18n.intlify.dev/guide/introduction.html",
+      "tags": [
+        "VueJs",
+        "JS",
+        "I18N",
+        "Docs"
+      ],
+      "description": "Internationalization plugin for Vue.js",
+      "favorite": true,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755657352",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.944Z"
+    },
+    {
+      "title": "Express 5.x - API Reference",
+      "url": "https://expressjs.com/en/5x/api.html",
+      "tags": [
+        "Express",
+        "Docs",
+        "Router"
+      ],
+      "description": "Access the API reference for Express.js 5.x, detailing all modules, methods, and properties for building web applications with this latest version.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755725927",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.947Z"
+    },
+    {
+      "title": "Documentation | NestJS - A progressive Node.js framework",
+      "url": "https://docs.nestjs.com/",
+      "tags": [
+        "NestJs",
+        "Docs",
+        "JS"
+      ],
+      "description": "Nest is a framework for building efficient, scalable Node.js server-side applications. It uses progressive JavaScript, is built with TypeScript and combines elements of OOP (Object Oriented Programming), FP (Functional Programming), and FRP (Functional Reactive Programming).",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772755753636",
+      "collectionId": "1772762962202",
+      "createdAt": "2026-03-06T18:16:43.951Z"
+    },
+    {
+      "title": "VueUse",
+      "url": "https://vueuse.org/",
+      "tags": [
+        "VueJs",
+        "JS",
+        "Docs"
+      ],
+      "description": "Collection of essential Vue Composition Utilities",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772763160561",
+      "createdAt": "2026-03-06T18:16:43.957Z"
+    },
+    {
+      "title": "CASL - Isomorphic Authorization JavaScript library",
+      "url": "https://casl.js.org/v6/en/guide/intro",
+      "tags": [
+        "NestJs",
+        "JS",
+        "Docs"
+      ],
+      "description": "CASL (pronounced /ˈkæsəl/, like castle) is an isomorphic authorization JavaScript library which restricts what resources a given user is allowed to access. It",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772763206036",
+      "createdAt": "2026-03-06T18:16:43.961Z"
+    },
+    {
+      "title": "Email Concealment: Meaning and Utilization",
+      "url": "https://www.mailslurp.com/blog/email-obfuscation/",
+      "tags": [
+        "EMail",
+        "Obfuscation"
+      ],
+      "description": "Stop Spam Emails with Email Obfuscation Techniques! Learn How to Prevent Unsolicited Emails by Changing Email Formats and Using Google reCaptcha.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772818965615",
+      "id": "1772819009900",
+      "createdAt": "2026-03-06T17:43:29.900Z"
+    },
+    {
+      "title": "Email obfuscation: What works in 2026?",
+      "url": "https://spencermortensen.com/articles/email-obfuscation/",
+      "tags": [
+        "EMail",
+        "Obfuscation"
+      ],
+      "description": "",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772818965615",
+      "id": "1772819043510",
+      "createdAt": "2026-03-06T17:44:03.510Z"
+    },
+    {
+      "title": "SortableJS",
+      "url": "https://sortablejs.github.io/Sortable/",
+      "tags": [
+        "JS",
+        "Sortable"
+      ],
+      "description": "Sortable — is a JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices. No jQuery required. Supports Meteor, AngularJS, React, Polymer, Vue, Knockout and any CSS library, e.g. Bootstrap.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772819120980",
+      "createdAt": "2026-03-06T17:45:20.980Z"
+    },
+    {
+      "title": "A Beginner&#039;s Guide to VH, DVH, SVH &amp; LVH in CSS | CSS Units Explained",
+      "url": "https://learnbricksbuilder.com/demystifying-vh-dvh-svh-and-lvh-in-css/",
+      "tags": [
+        "CSS"
+      ],
+      "description": "Learn the basics of VH, DVH, SVH, and LVH in CSS with this beginner&#039;s guide. Understand how these units work and how to use them effectively in your website design.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772818965615",
+      "id": "1772819148755",
+      "createdAt": "2026-03-06T17:45:48.755Z"
+    },
+    {
+      "title": "FormKit ⚡️",
+      "url": "https://formkit.com/getting-started/installation",
+      "tags": [
+        "JS",
+        "Forms"
+      ],
+      "description": "Get up and running with FormKit in your project.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772819284285",
+      "createdAt": "2026-03-06T17:48:04.285Z"
+    },
+    {
+      "title": "FormKit - Drag &amp; Drop",
+      "url": "https://drag-and-drop.formkit.com/#install",
+      "tags": [
+        "JS",
+        "Forms"
+      ],
+      "description": "An open-source JavaScript library for declarative data-first drag & drop.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772819352324",
+      "createdAt": "2026-03-06T17:49:12.324Z"
+    },
+    {
+      "title": "🛍️ Build a commerce storefront - DEV Community",
+      "url": "https://dev.to/frontendfoxes/build-a-commerce-storefront-e29",
+      "tags": [
+        "ECommerce"
+      ],
+      "description": "Project Goal: Build an e-commerce web store with a products listing.  What you’ll learn: Setting up... Tagged with codenewbie, ecommerce, react, developer.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772818965615",
+      "id": "1772819389845",
+      "createdAt": "2026-03-06T17:49:49.845Z"
+    },
+    {
+      "title": "Storefront UI Documentation ",
+      "url": "https://docs.storefrontui.io/v2/",
+      "tags": [
+        "ECommerce"
+      ],
+      "description": "",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772819987904",
+      "createdAt": "2026-03-06T17:59:47.904Z"
+    },
+    {
+      "title": "nodemailer",
+      "url": "https://nodemailer.com/",
+      "tags": [
+        "EMail",
+        "Docs"
+      ],
+      "description": "",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772820013150",
+      "createdAt": "2026-03-06T18:00:13.150Z"
+    },
+    {
+      "title": "I Automated My Entire Dev Workflow with AI (You Won't Believe How Easy It Is) - DEV Community",
+      "url": "https://dev.to/shayy/i-automated-my-entire-dev-workflow-with-ai-you-wont-believe-how-easy-it-is-45n0",
+      "tags": [
+        "Automation"
+      ],
+      "description": "As a solo developer building UserJot, I was spending too much time on repetitive tasks. Between... Tagged with webdev, programming, ai, javascript.",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772818965615",
+      "id": "1772820073370",
+      "createdAt": "2026-03-06T18:01:13.370Z"
+    },
+    {
+      "title": "Stripe Docs",
+      "url": "https://docs.stripe.com/development",
+      "tags": [
+        "Stripe"
+      ],
+      "description": "",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772820150305",
+      "createdAt": "2026-03-06T18:02:30.305Z"
+    },
+    {
+      "title": "PM2 - Quick Start",
+      "url": "https://pm2.keymetrics.io/docs/usage/quick-start/",
+      "tags": [
+        "JS",
+        "Docs"
+      ],
+      "description": "PM2 is an advanced production process manager for Node.js applications with built-in load balancer,  zero-downtime reload, startup scripts, monitoring, and microservice management features.\n\npm2 start npm -- start\n\npm2 start npm --name \"app name\" -- start\n\n{\n    \"apps\": [\n        {\n            \"name\": \"my-nested-app\",\n            \"cwd\": \"./nested-app\",\n            \"script\": \"npm\",\n            \"args\": \"start\"\n        }\n    ]\n}",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772820194669",
+      "createdAt": "2026-03-06T18:03:14.669Z"
+    },
+    {
+      "title": "Telegram Bot API",
+      "url": "https://core.telegram.org/bots/api",
+      "tags": [
+        "Docs"
+      ],
+      "description": "",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772820637170",
+      "createdAt": "2026-03-06T18:10:37.170Z"
+    },
+    {
+      "title": "mailcow: dockerized - Blog",
+      "url": "https://mailcow.email/",
+      "tags": [
+        "EMail",
+        "Docs"
+      ],
+      "description": "The mailserver suite with the ...\nhttps://github.com/mailcow/mailcow-dockerized\nhttps://www.youtube.com/watch?v=rylCQdx3di8\nhttps://cloud.thesysadminhub.com/s/Zyk7k6fTP2nz8bb",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "collectionId": "1772762962202",
+      "id": "1772820699024",
+      "createdAt": "2026-03-06T18:11:39.024Z"
+    },
+    {
+      "title": "VueFlow - Vue.js Framework for Webflow ",
+      "url": "https://vueflow.webflow.io/",
+      "tags": [
+        "General"
+      ],
+      "description": "https://vue-flow-docs.netlify.app/\nhttps://github.com/bcakmakoglu/vue-flow",
+      "favorite": false,
+      "projectIds": [
+        "global"
+      ],
+      "id": "1772821129215",
+      "createdAt": "2026-03-06T18:18:49.215Z"
+    }
+  ],
+  "collections": [
+    {
+      "id": "1772762962202",
+      "name": "Dev"
+    },
+    {
+      "id": "1772818965615",
+      "name": "Dev HowTo"
+    }
+  ]
+}

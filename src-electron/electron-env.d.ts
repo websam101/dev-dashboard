@@ -9,6 +9,8 @@ declare namespace NodeJS {
 
 export interface ElectronApi {
   selectFolder: () => Promise<string | null>;
+  exportBookmarks: (data: string) => Promise<boolean>;
+  importBookmarks: () => Promise<string | null>;
 }
 
 declare global {

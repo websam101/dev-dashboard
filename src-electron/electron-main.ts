@@ -65,6 +65,38 @@ async function startInternalServer() {
     return result.filePaths[0];
   });
 
+  ipcMain.handle('export-bookmarks', async (event, data: string) => {
+    if (!mainWindow) return false;
+    const result = await dialog.showSaveDialog(mainWindow, {
+      title: 'Export Bookmarks',
+      defaultPath: 'bookmarks-export.json',
+      filters: [{ name: 'JSON', extensions: ['json'] }]
+    });
+    
+    if (!result.canceled && result.filePath) {
+      const fs = await import('node:fs/promises');
+      await fs.writeFile(result.filePath, data, 'utf8');
+      return true;
+    }
+    return false;
+  });
+
+  ipcMain.handle('import-bookmarks', async () => {
+    if (!mainWindow) return null;
+    const result = await dialog.showOpenDialog(mainWindow, {
+      title: 'Import Bookmarks',
+      filters: [{ name: 'JSON', extensions: ['json'] }],
+      properties: ['openFile']
+    });
+    
+    if (!result.canceled && result.filePaths[0]) {
+      const fs = await import('node:fs/promises');
+      const content = await fs.readFile(result.filePaths[0], 'utf8');
+      return content;
+    }
+    return null;
+  });
+
   server.get('/api/system/stats', (req, res) => {
     void (async () => {
       res.json(await sys.getStats());
@@ -160,9 +192,32 @@ async function startInternalServer() {
   server.post('/api/bookmarks/remove', (req, res) => {
     void (async () => {
       const { id } = req.body as { id: string };
-      db.data.bookmarks = db.data.bookmarks.filter((b: Bookmark) => b.id !== id);
+      db.data.bookmarks = db.data.bookmarks.filter(b => b.id !== id);
       await db.write();
       res.json({ success: true });
+    })();
+  });
+
+  server.post('/api/utils/fetch-metadata', (req, res) => {
+    void (async () => {
+      try {
+        const { url } = req.body as { url: string };
+        if (!url) return res.status(400).json({ error: 'URL required' });
+
+        const response = await fetch(url);
+        const html = await response.text();
+
+        const titleMatch = html.match(/<title>(.*?)<\/title>/i);
+        const descMatch = html.match(/<meta\s+name=["']description["']\s+content=["'](.*?)["']/i) || 
+                          html.match(/<meta\s+property=["']og:description["']\s+content=["'](.*?)["']/i);
+
+        res.json({
+          title: titleMatch ? titleMatch[1] : '',
+          description: descMatch ? descMatch[1] : ''
+        });
+      } catch (e) {
+        res.status(500).json({ error: String(e) });
+      }
     })();
   });
 
@@ -191,13 +246,13 @@ async function createWindow() {
       contextIsolation: true,
       preload: path.resolve(
         currentDir,
-        path.join(process.env.QUASAR_ELECTRON_PRELOAD_FOLDER, 'electron-preload' + process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION)
+        path.join(process.env.QUASAR_ELECTRON_PRELOAD_FOLDER!, 'electron-preload' + process.env.QUASAR_ELECTRON_PRELOAD_EXTENSION!)
       ),
     },
   });
 
   if (process.env.DEV) {
-    await mainWindow.loadURL(process.env.APP_URL);
+    await mainWindow.loadURL(process.env.APP_URL!);
   } else {
     await mainWindow.loadFile('index.html');
   }

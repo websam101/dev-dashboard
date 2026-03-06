@@ -1,137 +1,183 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="row items-center q-mb-lg">
-      <div class="text-h5">Project Hub</div>
-      <q-space />
-      <div class="q-gutter-sm">
-        <q-btn outline color="primary" icon="refresh" label="Sync All" :loading="projectsStore.loading" @click="projectsStore.syncAll" />
-        <q-btn color="primary" icon="search" label="Scan Directory" @click="showScanDialog = true" />
-      </div>
-    </div>
-
-    <div v-if="projectsStore.loading && projectsStore.projects.length === 0" class="text-center q-pa-xl">
-      <q-spinner color="primary" size="3em" />
-      <div class="q-mt-md text-grey-6">Syncing your lab...</div>
-    </div>
-
-    <div v-else class="row q-col-gutter-md">
-      <div v-for="project in projectsStore.projects" :key="project.id" class="col-12">
-        <q-card bordered flat class="project-row bg-grey-9">
-          <q-card-section class="row items-center no-wrap">
-            <!-- Project Identification -->
-            <div class="col-grow">
-              <div class="row items-center q-gutter-x-sm">
-                <div class="text-h6 text-grey-3">{{ project.name }}</div>
-                <q-badge v-if="project.git?.branch" color="grey-8" text-color="primary" class="q-px-sm">
-                  <q-icon name="history" size="14px" class="q-mr-xs" />
-                  {{ project.git.branch }}
-                </q-badge>
-                <q-icon v-if="project.git?.isDirty" name="edit_note" color="warning" size="20px">
-                  <q-tooltip>Uncommitted Changes</q-tooltip>
-                </q-icon>
-              </div>
-              <div class="text-caption text-grey-6 ellipsis">{{ project.path }}</div>
-            </div>
-
-            <!-- Tech Stack -->
-            <div class="col-auto q-px-md row q-gutter-xs">
-              <q-avatar v-for="tech in project.techs" :key="tech" size="28px" font-size="18px" color="grey-10" text-color="grey-5">
-                <q-icon :name="getTechIcon(tech)" />
-                <q-tooltip>{{ tech }}</q-tooltip>
-              </q-avatar>
-            </div>
-
-            <!-- Git Status Indicators -->
-            <div v-if="project.git" class="col-auto q-px-md text-center">
-              <div class="row q-gutter-x-sm items-center">
-                <div v-if="project.git.ahead > 0" class="text-positive text-caption text-weight-bold">
-                  <q-icon name="cloud_upload" /> {{ project.git.ahead }}
-                </div>
-                <div v-if="project.git.behind > 0" class="text-negative text-caption text-weight-bold">
-                  <q-icon name="cloud_download" /> {{ project.git.behind }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="col-auto q-gutter-x-sm">
-              <q-btn v-if="project.git" flat round icon="download" color="blue-5" :loading="!!gitLoading[project.id + 'pull']" @click="handleGitPull(project)">
-                <q-tooltip>Git Pull</q-tooltip>
-              </q-btn>
-              <q-btn v-if="project.git" flat round icon="upload" color="green-5" :loading="!!gitLoading[project.id + 'push']" @click="handleGitPush(project)">
-                <q-tooltip>Git Push</q-tooltip>
-              </q-btn>
-              <q-btn flat round icon="code" color="primary" @click="projectsStore.openVsCode(project.path)">
-                <q-tooltip>Open in VS Code</q-tooltip>
-              </q-btn>
-              <q-btn flat round icon="terminal" color="secondary" @click="projectsStore.openTerminal(project.path)">
-                <q-tooltip>Open Terminal</q-tooltip>
-              </q-btn>
-              <q-btn flat round icon="folder" color="grey-5" @click="projectsStore.openFolder(project.path)">
-                <q-tooltip>Reveal in File Explorer</q-tooltip>
-              </q-btn>
-              <q-btn flat round icon="delete_outline" color="red-5" @click="confirmDelete(project)">
-                <q-tooltip>Remove Project</q-tooltip>
-              </q-btn>
-            </div>
-          </q-card-section>
-        </q-card>
-      </div>
+    <!-- Compact Header -->
+    <div class="row items-center q-mb-md">
+      <div class="text-h5 text-wcag-bold q-mr-lg">{{ $t('projects.title') }}</div>
       
-      <!-- Empty State -->
-      <div v-if="projectsStore.projects.length === 0 && !projectsStore.loading" class="col-12 text-center q-pa-xl">
-        <q-icon name="inventory_2" size="64px" color="grey-8" />
-        <div class="text-grey-6 q-mt-md">No projects tracked yet.</div>
-        <q-btn color="primary" label="Scan your workspace" @click="showScanDialog = true" class="q-mt-md" />
+      <div class="row q-gutter-x-sm items-center">
+        <q-input
+          v-model.number="radarPort"
+          :placeholder="$t('projects.portRadar')"
+          dense
+          outlined
+          type="number"
+          style="width: 120px"
+          @keyup.enter="checkRadar"
+          class="shadow-1"
+        >
+          <template v-slot:append>
+            <q-btn flat round dense icon="radar" :color="radarStatus === 'busy' ? 'negative' : (radarStatus === 'free' ? 'positive' : 'primary')" @click="checkRadar" size="sm" />
+          </template>
+        </q-input>
+
+        <q-input
+          v-model="searchQuery"
+          :placeholder="searchPlaceholder"
+          dense
+          outlined
+          class="shadow-1"
+          style="width: 200px"
+          clearable
+          @clear="searchQuery = ''"
+        >
+          <template v-slot:prepend>
+            <q-icon name="search" size="sm" />
+          </template>
+        </q-input>
+        
+        <q-btn outline color="primary" icon="refresh" :loading="projectsStore.loading" @click="projectsStore.syncAll" size="sm" class="text-weight-bold" />
+        <q-btn color="primary" icon="history" @click="scanAllRoots" :disable="!settingsStore.settings.scanRoots?.length" size="sm" class="text-weight-bold shadow-1" unelevated />
+        <q-btn color="accent" icon="add" :label="$t('projects.manualScan')" @click="showScanDialog = true" size="sm" class="text-weight-bold shadow-1" unelevated />
       </div>
     </div>
 
-    <!-- Delete Confirmation -->
-    <q-dialog v-model="showDeleteDialog">
-      <q-card class="bg-grey-10 text-white" style="min-width: 350px">
-        <q-card-section class="row items-center">
-          <q-avatar icon="warning" color="red" text-color="white" />
-          <span class="q-ml-sm">Remove <strong>{{ projectToDelete?.name }}</strong> from dashboard?</span>
-        </q-card-section>
+    <!-- Batch Actions Mini-Bar -->
+    <q-slide-transition>
+      <div v-if="selectedIds.length > 0" class="q-mb-md q-pa-sm rounded-borders bg-gradient-primary text-white row items-center shadow-2">
+        <div class="text-weight-bolder q-mx-md">{{ selectedIds.length }} Selected</div>
+        <q-space />
+        <q-btn flat dense icon="delete" :label="$t('common.delete')" class="text-weight-bold" @click="confirmDeleteMultiple" />
+        <q-btn flat round dense icon="close" @click="selectedIds = []" class="q-ml-sm" />
+      </div>
+    </q-slide-transition>
 
-        <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="grey-5" v-close-popup />
-          <q-btn flat label="Remove" color="red" @click="deleteProject" v-close-popup />
+    <!-- High Density Projects Table -->
+    <q-table
+      :rows="filteredProjects"
+      :columns="columns"
+      row-key="id"
+      dense
+      flat
+      bordered
+      :pagination="{ rowsPerPage: 0 }"
+      hide-pagination
+      selection="multiple"
+      v-model:selected="selectedRows"
+      class="compact-table rounded-borders shadow-1"
+      binary-state-sort
+    >
+      <!-- Name Column -->
+      <template v-slot:body-cell-name="props">
+        <q-td :props="props">
+          <div class="row items-center no-wrap">
+            <q-icon name="folder" color="primary" class="q-mr-sm" size="18px" />
+            <div class="text-weight-bolder text-wcag">{{ props.row.name }}</div>
+            <q-icon v-if="props.row.git?.isDirty" name="mdi-pencil-box-multiple" color="warning" class="q-ml-xs" size="16px" />
+          </div>
+        </q-td>
+      </template>
+
+      <!-- Git Column -->
+      <template v-slot:body-cell-git="props">
+        <q-td :props="props">
+          <div v-if="props.row.git" class="row items-center no-wrap q-gutter-x-xs">
+            <q-badge color="primary" class="text-weight-bold" size="sm">
+              <q-icon name="mdi-source-branch" size="12px" class="q-mr-xs" />
+              {{ props.row.git.branch }}
+            </q-badge>
+            <div v-if="props.row.git.ahead > 0" class="text-positive text-weight-bold" style="font-size: 0.7rem">
+              ↑{{ props.row.git.ahead }}
+            </div>
+            <div v-if="props.row.git.behind > 0" class="text-negative text-weight-bold" style="font-size: 0.7rem">
+              ↓{{ props.row.git.behind }}
+            </div>
+          </div>
+          <div v-else class="text-grey-5">-</div>
+        </q-td>
+      </template>
+
+      <!-- Ports Column -->
+      <template v-slot:body-cell-ports="props">
+        <q-td :props="props">
+          <div class="row q-gutter-xs items-center">
+            <q-badge v-for="port in props.row.ports" :key="port" color="positive" class="text-weight-bold" style="font-size: 0.65rem">
+              {{ port }}
+            </q-badge>
+            <q-badge v-for="port in getMissingManagedPorts(props.row)" :key="'m'+port" outline color="primary" class="text-weight-bold" style="font-size: 0.65rem">
+              {{ port }}
+            </q-badge>
+            <q-btn flat round dense icon="add" size="6px" color="primary" @click="promptAddPort(props.row.id)" />
+          </div>
+        </q-td>
+      </template>
+
+      <!-- Tech Column -->
+      <template v-slot:body-cell-tech="props">
+        <q-td :props="props">
+          <div class="row q-gutter-xs">
+            <q-icon v-for="tech in props.row.techs" :key="tech" :name="getTechIcon(tech)" size="18px" :color="techColorMap[tech] || 'grey-7'">
+              <q-tooltip>{{ tech }}</q-tooltip>
+            </q-icon>
+          </div>
+        </q-td>
+      </template>
+
+      <!-- Actions Column -->
+      <template v-slot:body-cell-actions="props">
+        <q-td :props="props" class="text-right">
+          <div class="row items-center justify-end q-gutter-x-xs">
+            <q-btn flat round dense icon="mdi-microsoft-visual-studio-code" size="sm" color="primary" @click="projectsStore.openVsCode(props.row.path)">
+              <q-tooltip>VS Code</q-tooltip>
+            </q-btn>
+            <q-btn flat round dense icon="terminal" size="sm" color="secondary" @click="projectsStore.openTerminal(props.row.path)">
+              <q-tooltip>Terminal</q-tooltip>
+            </q-btn>
+            <q-btn flat round dense icon="more_vert" size="sm" color="grey-7">
+              <q-menu dense>
+                <q-list style="min-width: 150px">
+                  <q-item clickable v-close-popup @click="projectsStore.openFolder(props.row.path)">
+                    <q-item-section side><q-icon name="folder_open" size="xs" /></q-item-section>
+                    <q-item-section>Explorer</q-item-section>
+                  </q-item>
+                  <q-separator />
+                  <q-item clickable v-close-popup @click="confirmDelete(props.row)" class="text-negative">
+                    <q-item-section side><q-icon name="delete" size="xs" color="negative" /></q-item-section>
+                    <q-item-section>Remove</q-item-section>
+                  </q-item>
+                </q-list>
+              </q-menu>
+            </q-btn>
+          </div>
+        </q-td>
+      </template>
+    </q-table>
+
+    <!-- Scan Dialog (Same logic, more compact) -->
+    <q-dialog v-model="showScanDialog" backdrop-filter="blur(4px)">
+      <q-card style="min-width: 400px" class="rounded-borders">
+        <q-card-section class="bg-gradient-primary text-white q-py-sm">
+          <div class="text-subtitle1 text-weight-bolder">{{ $t('projects.scanTitle') }}</div>
+        </q-card-section>
+        <q-card-section class="q-gutter-sm q-pt-md">
+          <q-input v-model="scanPath" :label="$t('projects.rootPathLabel')" dense filled @keyup.enter="startScan" autofocus />
+        </q-card-section>
+        <q-card-actions align="right" class="q-pb-md q-px-md">
+          <q-btn flat :label="$t('common.cancel')" color="primary" v-close-popup size="sm" />
+          <q-btn color="primary" :label="$t('projects.startScan')" unelevated @click="startScan" v-close-popup size="sm" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
-    <!-- Scan Dialog -->
-    <q-dialog v-model="showScanDialog" backdrop-filter="blur(4px)">
-      <q-card class="bg-grey-10 text-white" style="min-width: 450px">
-        <q-card-section>
-          <div class="text-h6">Scan for Projects</div>
-          <div class="text-caption text-grey-6">Recursively find Git repos and tech stacks.</div>
-          <div v-if="!isElectron" class="text-caption text-warning q-mt-xs">
-            <q-icon name="info" /> Manual path entry required for web mode.
-          </div>
+    <!-- Delete Confirmation -->
+    <q-dialog v-model="showDeleteDialog">
+      <q-card style="min-width: 300px">
+        <q-card-section class="row items-center q-py-sm">
+          <q-icon name="warning" color="negative" size="md" class="q-mr-sm" />
+          <div class="text-weight-bold text-wcag">Remove {{ projectToDelete?.name }}?</div>
         </q-card-section>
-        <q-card-section>
-          <div class="row q-gutter-sm items-center">
-            <q-input 
-              v-model="scanPath" 
-              label="Root Directory Path" 
-              filled 
-              dark 
-              color="primary" 
-              class="col" 
-              autofocus 
-              @keyup.enter="startScan"
-              placeholder="C:\Users\Name\Projects"
-            />
-            <q-btn v-if="isElectron" color="secondary" icon="folder" @click="browseFolder">
-              <q-tooltip>Open File Picker</q-tooltip>
-            </q-btn>
-          </div>
-        </q-card-section>
-        <q-card-actions align="right" class="q-pa-md">
-          <q-btn flat label="Cancel" color="grey-5" v-close-popup />
-          <q-btn color="primary" label="Start Scan" unelevated @click="startScan" v-close-popup />
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup size="sm" />
+          <q-btn flat label="Remove" color="negative" @click="deleteProject" v-close-popup size="sm" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -139,64 +185,138 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useProjectsStore } from '../../stores/projectsStore';
+import { useSettingsStore } from '../../stores/settingsStore';
+import { useSystemStore } from '../../stores/systemStore';
 import { api } from '../../boot/axios';
 import type { Project } from '../../stores/projectsStore';
 import { useQuasar } from 'quasar';
+import { useI18n } from 'vue-i18n';
+import FaviconRenderer from '../../components/FaviconRenderer.vue';
 
 const $q = useQuasar();
+const { t } = useI18n();
 const projectsStore = useProjectsStore();
+const settingsStore = useSettingsStore();
+const systemStore = useSystemStore();
+
 const showScanDialog = ref(false);
 const showDeleteDialog = ref(false);
 const projectToDelete = ref<Project | null>(null);
 const scanPath = ref('');
-const gitLoading = ref<Record<string, boolean>>({});
+const searchQuery = ref('');
+const selectedRows = ref<Project[]>([]);
 
-const isElectron = computed(() => typeof window !== 'undefined' && !!window.electronApi);
+const selectedIds = computed(() => selectedRows.value.map(r => r.id));
+
+// Port Radar
+const radarPort = ref<number | null>(null);
+const radarStatus = ref<'idle' | 'free' | 'busy'>('idle');
+
+const columns: any[] = [
+  { name: 'name', label: 'PROJECT', field: 'name', align: 'left', sortable: true },
+  { name: 'git', label: 'GIT', align: 'left' },
+  { name: 'ports', label: 'PORTS', align: 'left' },
+  { name: 'tech', label: 'STACK', align: 'left' },
+  { name: 'actions', label: '', align: 'right' }
+];
+
+const techColorMap: Record<string, string> = {
+  vue: 'positive',
+  react: 'info',
+  nodejs: 'positive',
+  typescript: 'primary',
+  python: 'warning',
+  docker: 'primary',
+  rust: 'orange-9',
+  php: 'indigo-9',
+  go: 'light-blue-7'
+};
+
+const searchPlaceholder = computed(() => t('projects.noProjectsMatching', { query: '' }).replace(' ""', '...'));
+
+const filteredProjects = computed(() => {
+  const query = (searchQuery.value || '').toLowerCase().trim();
+  if (!query) return projectsStore.projects;
+  return projectsStore.projects.filter(p => 
+    p.name.toLowerCase().includes(query) || 
+    p.path.toLowerCase().includes(query) ||
+    p.techs.some(t => t.toLowerCase().includes(query))
+  );
+});
+
+const getMissingManagedPorts = (project: Project) => (project.managedPorts || []).filter(p => !project.ports.includes(p));
 
 const getTechIcon = (tech: string) => {
+  const t = tech.toLowerCase();
   const icons: Record<string, string> = {
-    nodejs: 'javascript',
-    vue: 'vuejs',
-    react: 'rebase_edit',
-    quasar: 'extension',
-    typescript: 'terminal',
-    python: 'settings_input_component',
-    docker: 'dock',
-    rust: 'settings_suggest',
-    go: 'terminal',
-    php: 'settings_input_hdmi'
+    nodejs: 'mdi-nodejs',
+    vue: 'mdi-vuejs',
+    react: 'mdi-react',
+    quasar: 'mdi-lightning-bolt',
+    typescript: 'mdi-language-typescript',
+    python: 'mdi-language-python',
+    docker: 'mdi-docker',
+    rust: 'mdi-language-rust',
+    go: 'mdi-language-go',
+    php: 'mdi-language-php'
   };
-  return icons[tech] || 'code';
+  return icons[t] || 'mdi-code-braces';
+};
+
+const getShortPath = (path: string) => {
+  const parts = path.split(/[\\/]/);
+  return parts[parts.length - 1] || path;
+};
+
+const checkRadar = async () => {
+  if (!radarPort.value) return;
+  try {
+    await api.post('/api/projects/sync-all');
+    await projectsStore.loadProjects();
+    const isUsed = projectsStore.projects.some(p => p.ports.includes(radarPort.value!));
+    radarStatus.value = isUsed ? 'busy' : 'free';
+    $q.notify({
+      message: `Port ${radarPort.value} is ${isUsed ? 'BUSY' : 'FREE'}`,
+      color: isUsed ? 'negative' : 'positive',
+      position: 'top',
+      timeout: 1500
+    });
+  } catch (e) {}
 };
 
 const startScan = async () => {
   if (scanPath.value) {
-    try {
-      await projectsStore.scanDirectory(scanPath.value);
-      $q.notify({
-        message: 'Scan completed. Lab synchronized.',
-        color: 'positive',
-        icon: 'sync',
-        position: 'bottom-right'
-      });
-    } catch (e) {
-      $q.notify({
-        message: `Scan failed: ${String(e)}`,
-        color: 'negative'
-      });
-    }
+    await projectsStore.scanDirectory(scanPath.value);
+    $q.notify({ message: 'Scan completed', color: 'positive', icon: 'check', position: 'bottom-right' });
   }
 };
 
-const browseFolder = async () => {
-  if (typeof window !== 'undefined' && window.electronApi) {
-    const path = await window.electronApi.selectFolder();
-    if (path) {
-      scanPath.value = path;
-    }
-  }
+const scanAllRoots = async () => {
+  $q.loading.show();
+  try {
+    for (const root of settingsStore.settings.scanRoots) await projectsStore.scanDirectory(root);
+  } finally { $q.loading.hide(); }
+};
+
+const scanSpecificRoot = (root: string) => {
+  scanPath.value = root;
+  void startScan();
+};
+
+const confirmDeleteMultiple = () => {
+  $q.dialog({
+    title: 'Confirm Delete',
+    message: `Remove ${selectedRows.value.length} projects?`,
+    cancel: true,
+    dark: true
+  }).onOk(() => {
+    void (async () => {
+      for (const p of selectedRows.value) await projectsStore.deleteProject(p.id);
+      selectedRows.value = [];
+    })();
+  });
 };
 
 const confirmDelete = (project: Project) => {
@@ -204,54 +324,66 @@ const confirmDelete = (project: Project) => {
   showDeleteDialog.value = true;
 };
 
-const handleGitPull = async (project: Project) => {
-  const key = project.id + 'pull';
-  gitLoading.value[key] = true;
-  try {
-    await projectsStore.gitPull(project.path);
-    $q.notify({ message: `Pulled ${project.name}`, color: 'positive', icon: 'check' });
-  } catch (e) {
-    $q.notify({ message: `Pull failed: ${String(e)}`, color: 'negative' });
-  } finally {
-    gitLoading.value[key] = false;
-  }
-};
-
-const handleGitPush = async (project: Project) => {
-  const key = project.id + 'push';
-  gitLoading.value[key] = true;
-  try {
-    await projectsStore.gitPush(project.path);
-    $q.notify({ message: `Pushed ${project.name}`, color: 'positive', icon: 'check' });
-  } catch (e) {
-    $q.notify({ message: `Push failed: ${String(e)}`, color: 'negative' });
-  } finally {
-    gitLoading.value[key] = false;
-  }
-};
-
 const deleteProject = async () => {
   if (projectToDelete.value) {
     await api.post('/api/projects/remove', { id: projectToDelete.value.id });
     await projectsStore.loadProjects();
-    $q.notify({
-      message: `${projectToDelete.value.name} removed`,
-      color: 'info',
-      icon: 'delete',
-      position: 'bottom-right'
-    });
     projectToDelete.value = null;
   }
 };
 
+const promptAddPort = (projectId: string) => {
+  $q.dialog({
+    title: 'Pin Port',
+    message: 'Port number:',
+    prompt: { model: '', type: 'number' },
+    cancel: true,
+    dark: true
+  }).onOk((data: string) => {
+    const port = parseInt(data);
+    if (!isNaN(port)) void projectsStore.addManagedPort(projectId, port);
+  });
+};
+
 onMounted(() => {
   void projectsStore.loadProjects();
+  void settingsStore.loadSettings();
 });
 </script>
 
 <style lang="sass" scoped>
-.project-row
-  transition: background 0.2s ease
-  &:hover
-    background: rgba($primary, 0.05)
+.compact-table
+  background: var(--dd-card-bg)
+  border: 1px solid var(--dd-border)
+  
+  :deep(th)
+    font-weight: 800
+    color: var(--dd-text-secondary)
+    background: rgba(0,0,0,0.02)
+    font-size: 0.7rem
+    letter-spacing: 1px
+    
+  :deep(td)
+    font-size: 0.85rem
+    border-bottom: 1px solid var(--dd-border)
+
+.body--dark .compact-table
+  :deep(th)
+    background: rgba(255,255,255,0.03)
+
+.batch-actions-bar
+  overflow: hidden
+  position: relative
+
+.glossy-overlay
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  height: 100%
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 100%)
+  pointer-events: none
+
+.tracking-tight
+  letter-spacing: -1.5px
 </style>

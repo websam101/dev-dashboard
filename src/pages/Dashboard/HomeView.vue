@@ -1,136 +1,183 @@
 <template>
-  <q-page class="q-pa-lg">
-    <!-- Defensive wrapper to prevent SSR hydration mismatches entirely -->
-    <div v-if="mounted">
-      <div class="row q-col-gutter-lg">
-        <!-- Welcome Section -->
-        <div class="col-12">
-          <div class="text-h4 text-weight-bold q-mb-xs text-grey-3">Dashboard</div>
-          <div class="text-grey-6">System Overview & Quick Access</div>
-        </div>
-
-        <!-- System Overview -->
-        <div class="col-12 col-md-4">
-          <q-card bordered flat class="stats-card bg-grey-9">
-            <q-card-section>
-              <div class="row items-center q-mb-md">
-                <q-icon name="monitor_heart" color="primary" size="24px" class="q-mr-sm" />
-                <div class="text-h6 text-grey-3">System Resources</div>
-              </div>
-              
-              <div class="row q-col-gutter-md">
-                <div class="col-6 text-center">
-                  <q-circular-progress
-                    show-value
-                    font-size="16px"
-                    :value="systemStore.stats?.cpuLoad || 0"
-                    size="100px"
-                    :thickness="0.15"
-                    color="primary"
-                    track-color="grey-8"
-                    center-color="grey-10"
-                  >
-                    <div class="text-weight-bold">{{ systemStore.stats?.cpuLoad || 0 }}%</div>
-                    <div class="text-caption text-grey-6" style="font-size: 10px">CPU Load</div>
-                  </q-circular-progress>
-                </div>
-                <div class="col-6 text-center">
-                  <q-circular-progress
-                    show-value
-                    font-size="16px"
-                    :value="systemStore.stats?.memPercent || 0"
-                    size="100px"
-                    :thickness="0.15"
-                    color="secondary"
-                    track-color="grey-8"
-                    center-color="grey-10"
-                  >
-                    <div class="text-weight-bold">{{ systemStore.stats?.memPercent || 0 }}%</div>
-                    <div class="text-caption text-grey-6" style="font-size: 10px">{{ systemStore.stats?.memUsed || 0 }} GB</div>
-                  </q-circular-progress>
-                </div>
-              </div>
-              
-              <q-separator class="q-my-md bg-grey-8" />
-              
-              <div class="row items-center justify-between text-grey-5 text-caption">
-                <div>Uptime: {{ systemStore.stats?.uptime ? formatUptime(systemStore.stats.uptime) : '-' }}</div>
-                <div>Platform: {{ systemStore.stats?.platform || 'Unknown' }}</div>
-              </div>
-            </q-card-section>
-          </q-card>
-        </div>
-
-        <!-- Quick Status -->
-        <div class="col-12 col-md-8">
-          <div class="row q-col-gutter-md full-height">
-            <div class="col-12 col-sm-6">
-              <q-card bordered flat class="bg-grey-9 full-height flex column justify-center items-center q-py-lg text-center">
-                <template v-if="!projectsStore.loading">
-                  <div class="text-h2 text-primary text-weight-bolder">{{ totalProjects }}</div>
-                  <div class="text-subtitle1 text-grey-5 q-mt-sm">Active Projects</div>
-                </template>
-                <q-spinner v-else color="primary" size="2em" />
-                <q-btn flat color="primary" label="Manage Projects" to="/projects" class="q-mt-sm" />
-              </q-card>
-            </div>
-            <div class="col-12 col-sm-6">
-              <q-card bordered flat class="bg-grey-9 full-height flex column justify-center items-center q-py-lg text-center">
-                <template v-if="!bookmarksStore.loading">
-                  <div class="text-h2 text-accent text-weight-bolder">{{ totalBookmarks }}</div>
-                  <div class="text-subtitle1 text-grey-5 q-mt-sm">Saved Bookmarks</div>
-                </template>
-                <q-spinner v-else color="accent" size="2em" />
-                <q-btn flat color="accent" label="View Library" to="/bookmarks" class="q-mt-sm" />
-              </q-card>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Projects -->
-        <div class="col-12">
-          <div class="row items-center q-mb-md">
-            <div class="text-h6 text-weight-medium">Recent Projects</div>
-            <q-space />
-            <q-btn outline color="primary" label="View All" to="/projects" size="sm" />
-          </div>
-          
-          <div class="row q-col-gutter-md">
-            <div v-for="project in recentProjects" :key="project.id" class="col-12 col-sm-6 col-md-4">
-              <q-card bordered flat class="bg-grey-9 project-card" @click="openVsCode(project.path)">
-                <q-card-section>
-                  <div class="row items-center no-wrap q-mb-sm">
-                    <q-icon name="folder" color="primary" size="20px" class="q-mr-sm" />
-                    <div class="text-subtitle1 text-weight-bold ellipsis">{{ project.name }}</div>
-                    <q-space />
-                    <q-icon name="arrow_forward" color="grey-7" size="16px" />
-                  </div>
-                  <div class="text-caption text-grey-6 ellipsis q-mb-md">{{ project.path }}</div>
-                  
-                  <div class="row q-gutter-xs">
-                    <q-badge v-for="tech in (project.techs || []).slice(0, 3)" :key="tech" color="grey-8" text-color="grey-4">
-                      {{ tech }}
-                    </q-badge>
-                    <q-badge v-if="(project.techs || []).length > 3" color="grey-8" text-color="grey-4">+{{ project.techs.length - 3 }}</q-badge>
-                  </div>
-                </q-card-section>
-              </q-card>
-            </div>
-            
-            <!-- Empty State -->
-            <div v-if="recentProjects.length === 0 && !projectsStore.loading" class="col-12">
-              <q-card bordered flat class="bg-grey-9 q-pa-lg text-center dashed-border">
-                <div class="text-grey-5 q-mb-md">No projects found. Scan your directory to get started.</div>
-                <q-btn color="primary" label="Scan Directory" to="/projects" />
-              </q-card>
-            </div>
+  <q-page class="q-pa-md">
+    <div class="row q-col-gutter-sm">
+      <!-- System Overview Mini-Header -->
+      <div class="col-12">
+        <div class="row items-center q-gutter-x-md q-mb-xs">
+          <div class="text-h5 text-wcag-bold tracking-tight">{{ $t('dashboard.title') }}</div>
+          <q-badge :color="backendOnline ? 'positive' : 'negative'" class="text-weight-bolder" size="sm">
+            <q-icon :name="backendOnline ? 'cloud_done' : 'cloud_off'" class="q-mr-xs" />
+            {{ backendOnline ? 'OS OK' : 'OFFLINE' }}
+          </q-badge>
+          <q-space />
+          <div class="text-wcag-caption text-caption text-weight-bold">
+            {{ systemStore.stats?.platform }} | {{ systemStore.stats?.uptime ? formatUptime(systemStore.stats.uptime) : '-' }}
           </div>
         </div>
       </div>
-    </div>
-    <!-- Placeholder while mounting -->
-    <div v-else class="flex flex-center q-pa-xl">
-      <q-spinner-grid color="primary" size="4em" />
+
+      <!-- Detailed but Compact System Resources -->
+      <div class="col-12">
+        <div class="row q-col-gutter-sm">
+          <!-- CPU -->
+          <div class="col-12 col-sm-4 col-md-2">
+            <q-card bordered flat class="compact-resource-card border-cpu">
+              <q-card-section class="q-pa-sm">
+                <div class="row items-center no-wrap">
+                  <q-icon name="memory" color="primary" size="18px" class="q-mr-xs" />
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">CPU</div>
+                </div>
+                <div class="text-weight-bolder text-wcag-bold text-subtitle2">{{ systemStore.stats?.cpuLoad || 0 }}%</div>
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">({{ systemStore.stats?.cpuCores || '-' }} cores)</div>
+                <q-linear-progress :value="(systemStore.stats?.cpuLoad || 0) / 100" color="primary" class="q-mt-xs" style="height: 3px" />
+              </q-card-section>
+            </q-card>
+          </div>
+
+          <!-- RAM -->
+          <div class="col-12 col-sm-4 col-md-2">
+            <q-card bordered flat class="compact-resource-card border-ram">
+              <q-card-section class="q-pa-sm">
+                <div class="row items-center no-wrap">
+                  <q-icon name="mdi-memory" color="secondary" size="18px" class="q-mr-xs" />
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">RAM</div>
+                </div>
+                <div class="text-weight-bolder text-wcag-bold text-subtitle2">
+                  {{ systemStore.stats?.memUsed || '0' }}/{{ systemStore.stats?.memTotal || '0' }} GB
+                </div>
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">{{ systemStore.stats?.memPercent || 0 }}% used</div>
+                <q-linear-progress :value="(systemStore.stats?.memPercent || 0) / 100" color="secondary" class="q-mt-xs" style="height: 3px" />
+              </q-card-section>
+            </q-card>
+          </div>
+
+          <!-- DISK -->
+          <div class="col-12 col-sm-4 col-md-2">
+            <q-card bordered flat class="compact-resource-card border-disk">
+              <q-card-section class="q-pa-sm">
+                <div class="row items-center no-wrap">
+                  <q-icon name="storage" color="accent" size="18px" class="q-mr-xs" />
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">DISK</div>
+                </div>
+                <div class="text-weight-bolder text-wcag-bold text-subtitle2">
+                  {{ systemStore.stats?.diskUsed || '0' }}/{{ systemStore.stats?.diskTotal || '0' }} GB
+                </div>
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">{{ systemStore.stats?.diskPercent || 0 }}% used</div>
+                <q-linear-progress :value="(systemStore.stats?.diskPercent || 0) / 100" color="accent" class="q-mt-xs" style="height: 3px" />
+              </q-card-section>
+            </q-card>
+          </div>
+
+          <!-- LOAD -->
+          <div class="col-12 col-sm-4 col-md-2">
+            <q-card bordered flat class="compact-resource-card border-load">
+              <q-card-section class="q-pa-sm">
+                <div class="row items-center no-wrap">
+                  <q-icon name="speed" color="warning" size="18px" class="q-mr-xs" />
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">LOAD (1/5/15)</div>
+                </div>
+                <div class="text-weight-bolder text-wcag-bold text-subtitle2">
+                  {{ formatFullLoad(systemStore.stats?.loadAvg) }}
+                </div>
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">System Averages</div>
+                <q-linear-progress :value="((systemStore.stats?.loadAvg?.[0] || 0) * 10) / 100" color="warning" class="q-mt-xs" style="height: 3px" />
+              </q-card-section>
+            </q-card>
+          </div>
+
+          <!-- NET -->
+          <div class="col-12 col-sm-4 col-md-2">
+            <q-card bordered flat class="compact-resource-card border-net">
+              <q-card-section class="q-pa-sm">
+                <div class="row items-center no-wrap">
+                  <q-icon name="lan" color="info" size="18px" class="q-mr-xs" />
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">NET (SINCE BOOT)</div>
+                </div>
+                <div class="text-weight-bolder text-wcag-bold text-subtitle2 no-wrap ellipsis">
+                  <span class="text-positive">{{ formatNet(systemStore.stats?.netSent) }}</span> / <span class="text-info">{{ formatNet(systemStore.stats?.netRecv) }}</span>
+                </div>
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">Sent / Recv</div>
+                <q-linear-progress :value="0.5" color="info" class="q-mt-xs" style="height: 3px" />
+              </q-card-section>
+            </q-card>
+          </div>
+
+          <!-- STATUS -->
+          <div class="col-12 col-sm-4 col-md-2">
+            <q-card bordered flat class="compact-resource-card border-info">
+              <q-card-section class="q-pa-sm">
+                <div class="row items-center no-wrap">
+                  <q-icon name="info" color="success" size="18px" class="q-mr-xs" />
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">INFO</div>
+                </div>
+                <div class="text-weight-bolder text-wcag-bold text-subtitle2">{{ systemStore.stats?.platform || '-' }}</div>
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">Uptime: {{ systemStore.stats?.uptime ? formatUptime(systemStore.stats.uptime) : '-' }}</div>
+                <q-linear-progress :value="1" color="success" class="q-mt-xs" style="height: 3px" />
+              </q-card-section>
+            </q-card>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Small -->
+      <div class="col-12">
+        <div class="row q-col-gutter-sm">
+          <div class="col-12 col-sm-6">
+            <q-btn 
+              unelevated 
+              class="full-width action-btn-small bg-gradient-primary text-white shadow-glow-primary" 
+              to="/projects"
+            >
+              <q-icon name="terminal" size="20px" class="q-mr-sm" />
+              <div class="text-weight-bolder">{{ totalProjects }} Projects</div>
+              <q-space />
+              <q-icon name="chevron_right" />
+            </q-btn>
+          </div>
+          <div class="col-12 col-sm-6">
+            <q-btn 
+              unelevated 
+              class="full-width action-btn-small bg-gradient-secondary text-white shadow-glow-primary" 
+              to="/bookmarks"
+            >
+              <q-icon name="bookmark" size="20px" class="q-mr-sm" />
+              <div class="text-weight-bolder">{{ totalBookmarks }} Bookmarks</div>
+              <q-space />
+              <q-icon name="chevron_right" />
+            </q-btn>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="col-12">
+        <div class="text-overline text-wcag-bold q-mb-xs q-mt-md">{{ $t('dashboard.recentProjects') }}</div>
+        <q-list bordered separator class="rounded-borders bg-card shadow-1">
+          <q-item v-for="project in recentProjects" :key="project.id" clickable v-ripple @click="openVsCode(project.path)" dense class="q-py-xs">
+            <q-item-section avatar>
+              <q-icon name="folder" color="primary" size="20px" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label class="text-weight-bold text-wcag" style="font-size: 0.9rem">{{ project.name }}</q-item-label>
+              <q-item-label caption class="text-wcag-caption ellipsis" style="font-size: 0.75rem">{{ project.path }}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <div class="row q-gutter-xs">
+                <q-badge v-for="tech in (project.techs || []).slice(0, 3)" :key="tech" outline color="primary" size="sm" class="text-weight-bold" style="font-size: 0.65rem">
+                  {{ tech }}
+                </q-badge>
+              </div>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn flat round dense icon="mdi-microsoft-visual-studio-code" size="sm" color="primary" @click.stop="openVsCode(project.path)" />
+            </q-item-section>
+          </q-item>
+          
+          <q-item v-if="recentProjects.length === 0" class="text-center q-pa-md">
+            <q-item-section class="text-wcag-caption italic">{{ $t('dashboard.noProjects') }}</q-item-section>
+          </q-item>
+        </q-list>
+      </div>
     </div>
   </q-page>
 </template>
@@ -140,33 +187,35 @@ import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useSystemStore } from '../../stores/systemStore';
 import { useProjectsStore } from '../../stores/projectsStore';
 import { useBookmarksStore } from '../../stores/bookmarksStore';
+import { useSettingsStore } from '../../stores/settingsStore';
+import { api } from '../../boot/axios';
 
 const systemStore = useSystemStore();
 const projectsStore = useProjectsStore();
 const bookmarksStore = useBookmarksStore();
+const settingsStore = useSettingsStore();
 
-const mounted = ref(false);
+const backendOnline = ref(false);
 let statsInterval: ReturnType<typeof setInterval> | undefined;
 
-const recentProjects = computed(() => {
-  const list = projectsStore.projects;
-  return Array.isArray(list) ? list.slice(0, 3) : [];
-});
-
-const totalProjects = computed(() => {
-  const list = projectsStore.projects;
-  return Array.isArray(list) ? list.length : 0;
-});
-
-const totalBookmarks = computed(() => {
-  const list = bookmarksStore.bookmarks;
-  return Array.isArray(list) ? list.length : 0;
-});
+const recentProjects = computed(() => projectsStore.projects.slice(0, 5));
+const totalProjects = computed(() => projectsStore.projects.length);
+const totalBookmarks = computed(() => bookmarksStore.bookmarks.length);
 
 const formatUptime = (seconds: number) => {
-  const days = Math.floor(seconds / (24 * 3600));
-  const hrs = Math.floor((seconds % (24 * 3600)) / 3600);
-  return days > 0 ? `${days}d ${hrs}h` : `${hrs}h`;
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  return `${hrs}h ${mins}m`;
+};
+
+const formatFullLoad = (avg?: number[]) => {
+  if (!avg || !Array.isArray(avg)) return '-';
+  return avg.map(v => v.toFixed(2)).join(' / ');
+};
+
+const formatNet = (mb?: number) => {
+  if (!mb) return '0MB';
+  return mb > 1024 ? `${(mb / 1024).toFixed(1)}GB` : `${mb.toFixed(0)}MB`;
 };
 
 const openVsCode = (path: string) => {
@@ -174,37 +223,53 @@ const openVsCode = (path: string) => {
 };
 
 onMounted(async () => {
-  mounted.value = true;
   try {
-    await Promise.all([
-      systemStore.fetchStats(),
-      projectsStore.loadProjects(),
-      bookmarksStore.loadBookmarks()
-    ]);
-  } catch (e) {
-    console.error('Initial load failed', e);
-  }
+    const ping = await api.get('/api/system/stats').catch(() => null);
+    backendOnline.value = !!ping?.data;
+    await Promise.all([systemStore.fetchStats(), projectsStore.loadProjects(), bookmarksStore.loadBookmarks()]);
+  } catch (e) { console.error(e); }
   
   statsInterval = setInterval(() => {
-    void systemStore.fetchStats();
+    void (async () => {
+      try {
+        await systemStore.fetchStats();
+        backendOnline.value = true;
+        if (settingsStore.settings.autoCheckPorts) await projectsStore.syncAll();
+      } catch { backendOnline.value = false; }
+    })();
   }, 5000);
 });
 
-onUnmounted(() => {
-  if (statsInterval) clearInterval(statsInterval);
-});
+onUnmounted(() => { if (statsInterval) clearInterval(statsInterval); });
 </script>
 
 <style lang="sass" scoped>
-.stats-card
-  height: 100%
-.project-card
-  cursor: pointer
-  transition: all 0.3s ease
-  &:hover
-    border-color: var(--q-primary)
-    transform: translateY(-2px)
-.dashed-border
-  border: 2px dashed rgba(255,255,255,0.1)
-  border-radius: 12px
+.compact-resource-card
+  border-left: 4px solid var(--dd-border)
+  border-radius: 8px
+  background: var(--dd-card-bg)
+  
+.border-cpu
+  border-left-color: var(--dd-primary) !important
+.border-ram
+  border-left-color: var(--dd-secondary) !important
+.border-disk
+  border-left-color: var(--dd-accent) !important
+.border-load
+  border-left-color: var(--dd-warning) !important
+.border-net
+  border-left-color: var(--dd-info) !important
+.border-info
+  border-left-color: var(--dd-success) !important
+
+.action-btn-small
+  height: 44px
+  border-radius: 10px
+  text-transform: none
+
+.bg-card
+  background: var(--dd-card-bg)
+
+.tracking-tight
+  letter-spacing: -1px
 </style>
