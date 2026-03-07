@@ -31,10 +31,12 @@ yarn-error.log*
 *.sln
 
 # local .env files
-.data
 .env.local*
 .env
 
 # Project specific exclusions
 /conductor
 /docs/*.json
+
+# Local files
+.data
