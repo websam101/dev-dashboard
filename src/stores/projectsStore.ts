@@ -6,6 +6,7 @@ export interface Project {
   id: string;
   name: string;
   path: string;
+  description: string; // Added to match adapter
   techs: string[];
   git?: {
     branch: string;
@@ -27,11 +28,14 @@ export const useProjectsStore = defineStore('projects', {
   state: () => ({
     projects: [] as Project[],
     loading: false,
-    isSyncing: false
+    isSyncing: false,
+    hasLoaded: false,
+    hasInitiallySynced: false
   }),
   actions: {
-    async loadProjects() {
+    async loadProjects(force = false) {
       if (!process.env.CLIENT) return;
+      if (this.hasLoaded && !force) return;
 
       this.loading = true;
       try {
@@ -40,31 +44,14 @@ export const useProjectsStore = defineStore('projects', {
           id: p.id,
           name: p.name,
           path: p.path,
+          description: p.description || '',
           techs: p.techs || [],
           git: p.git,
           ports: p.ports || [],
           managedPorts: p.managedPorts || [],
           favorite: !!p.favorite
         }));
-
-        try {
-          const response = await api.get('/api/projects');
-          if (Array.isArray(response.data)) {
-            const remoteProjects = response.data;
-            for (const rp of remoteProjects) {
-              const localMatch = this.projects.find(p => p.id === rp.id);
-              const merged = {
-                ...rp,
-                managedPorts: rp.managedPorts || localMatch?.managedPorts || [],
-                favorite: rp.favorite !== undefined ? rp.favorite : (localMatch?.favorite || false)
-              };
-              const idx = this.projects.findIndex(p => p.id === rp.id);
-              if (idx >= 0) this.projects[idx] = merged;
-              else this.projects.push(merged);
-              await db.addProject(clean({ ...merged, description: '' }));
-            }
-          }
-        } catch (e) { /* sync failure ignored */ }
+        this.hasLoaded = true;
       } catch (e) {
         console.error('Failed to load projects', e);
       } finally {
@@ -168,12 +155,12 @@ export const useProjectsStore = defineStore('projects', {
     async openFolder(path: string) { await api.post('/api/actions/open-folder', { path }); },
     async gitPull(path: string) { await api.post('/api/projects/git-pull', { path }); await this.loadProjects(); },
     async gitPush(path: string) { await api.post('/api/projects/git-push', { path }); await this.loadProjects(); },
-    async syncAll() {
+    async syncAll(deep = false) {
       if (!process.env.CLIENT || this.isSyncing) return;
       
       this.isSyncing = true;
       try {
-        const response = await api.post('/api/projects/sync-all');
+        const response = await api.post('/api/projects/sync-all', { deep });
         const remoteProjects = Array.isArray(response.data) ? response.data : [];
         
         this.projects = remoteProjects.map((rp: any) => {

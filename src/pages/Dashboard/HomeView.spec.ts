@@ -56,10 +56,10 @@ describe('HomeView', () => {
     const bookmarksStore = useBookmarksStore()
     
     projectsStore.projects = [
-      { id: '1', name: 'P1', path: 'p1', techs: [], ports: [], favorite: true },
-      { id: '2', name: 'P2', path: 'p2', techs: [], ports: [], favorite: false },
-      { id: '3', name: 'P3', path: 'p3', techs: [], ports: [], favorite: true },
-      { id: '4', name: 'P4', path: 'p4', techs: [], ports: [], favorite: false }
+      { id: '1', name: 'P1', path: 'p1', description: '', techs: [], ports: [], favorite: true },
+      { id: '2', name: 'P2', path: 'p2', description: '', techs: [], ports: [], favorite: false },
+      { id: '3', name: 'P3', path: 'p3', description: '', techs: [], ports: [], favorite: true },
+      { id: '4', name: 'P4', path: 'p4', description: '', techs: [], ports: [], favorite: false }
     ]
     bookmarksStore.bookmarks = [{ id: 'b1', title: 'B1', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
 

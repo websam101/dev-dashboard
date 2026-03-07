@@ -22,6 +22,7 @@ interface Settings {
   autoCheckPorts: boolean;
   portCheckInterval: number;
   scanRoots: string[];
+  locale: string;
 }
 
 interface DatabaseSchema {
@@ -56,7 +57,8 @@ export default defineSsrMiddleware(async ({ app, resolve }) => {
       darkMode: true, 
       autoCheckPorts: true, 
       portCheckInterval: 30000, 
-      scanRoots: [] 
+      scanRoots: [],
+      locale: 'en-US'
     } 
   };
   const db = await JSONFilePreset<DatabaseSchema>(dbPath, defaultData);
@@ -104,7 +106,8 @@ export default defineSsrMiddleware(async ({ app, resolve }) => {
   app.post('/api/projects/sync-all', (req, res) => {
     void (async () => {
       try {
-        db.data.projects = await projects.syncAll(db.data.projects);
+        const { deep } = req.body as { deep?: boolean };
+        db.data.projects = await projects.syncAll(db.data.projects, !!deep);
         await db.write();
         res.json(db.data.projects);
       } catch (e) {

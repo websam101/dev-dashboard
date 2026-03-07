@@ -34,31 +34,6 @@
       </q-tabs>
     </div>
 
-    <!-- Restored Compact Favorites Bar (Context-Aware) -->
-    <div v-if="sortedFavorites.length > 0" class="row items-center q-mb-md q-pa-xs rounded-borders border-primary-light fav-bar shadow-1">
-      <div class="text-overline text-wcag-bold q-mx-md opacity-70" style="font-size: 0.6rem">PINNED</div>
-      <div class="row no-wrap q-gutter-x-xs scroll hide-scrollbar overflow-hidden">
-        <q-chip
-          v-for="(fav, index) in sortedFavorites"
-          :key="fav.id"
-          clickable
-          @click="openLink(fav.url)"
-          outline
-          color="primary"
-          :class="'tag-bg-' + ((index % 6) + 1)"
-          class="q-ma-none text-weight-bolder shadow-1 hover-scale"
-          dense
-          style="font-size: 0.75rem"
-        >
-          <q-avatar rounded size="16px">
-            <FaviconRenderer :url="fav.url" />
-          </q-avatar>
-          <div class="ellipsis" style="max-width: 120px">{{ fav.title }}</div>
-          <q-tooltip>{{ fav.url }}</q-tooltip>
-        </q-chip>
-      </div>
-    </div>
-
     <!-- Project Context & Actions (Compact Header) -->
     <div class="row items-center q-mb-sm">
       <q-select
@@ -94,23 +69,6 @@
         </template>
       </q-input>
 
-      <q-select
-        v-model="sortBy"
-        :options="sortOptions"
-        dense
-        outlined
-        emit-value
-        map-options
-        options-dense
-        style="width: 110px"
-        class="rounded-borders q-mr-sm"
-      >
-        <template v-slot:prepend>
-          <q-icon name="sort" size="xs" color="primary" />
-        </template>
-        <q-tooltip>{{ $t('bookmarks.sortHint') }}</q-tooltip>
-      </q-select>
-
       <q-space />
 
       <div class="row q-gutter-x-xs">
@@ -124,6 +82,31 @@
         <q-btn color="primary" unelevated icon="add" :label="$t('bookmarks.newBookmark')" @click="openAddDialog" size="sm" class="text-weight-bold">
           <q-tooltip>{{ $t('bookmarks.newBookmarkHint') }}</q-tooltip>
         </q-btn>
+      </div>
+    </div>
+
+    <!-- Restored Compact Favorites Bar (Context-Aware & Filtered) -->
+    <div v-if="filteredFavorites.length > 0" class="row items-center q-mb-md q-pa-xs rounded-borders border-primary-light fav-bar shadow-1">
+      <div class="text-overline text-wcag-bold q-mx-md opacity-70" style="font-size: 0.6rem">PINNED</div>
+      <div class="row no-wrap q-gutter-x-xs scroll hide-scrollbar overflow-hidden">
+        <q-chip
+          v-for="(fav, index) in filteredFavorites"
+          :key="fav.id"
+          clickable
+          @click="openLink(fav.url)"
+          outline
+          color="primary"
+          :class="'tag-bg-' + ((index % 6) + 1)"
+          class="q-ma-none text-weight-bolder shadow-1 hover-scale"
+          dense
+          style="font-size: 0.75rem"
+        >
+          <q-avatar rounded size="16px">
+            <FaviconRenderer :url="fav.url" />
+          </q-avatar>
+          <div class="ellipsis" style="max-width: 120px">{{ fav.title }}</div>
+          <q-tooltip>{{ fav.url }}</q-tooltip>
+        </q-chip>
       </div>
     </div>
 
@@ -143,21 +126,28 @@
 
     <input type="file" ref="fileInput" style="display: none" accept=".json" @change="handleFileImport" />
 
-    <!-- High Density Bookmarks Table with Selection -->
+    <!-- High Density Bookmarks Table with Selection & Native Sorting -->
     <q-table
-      :rows="sortedBookmarks"
+      :rows="filteredBookmarks"
       :columns="columns"
       row-key="id"
       dense
       flat
       bordered
-      :pagination="{ rowsPerPage: 0 }"
+      v-model:pagination="pagination"
       hide-pagination
       selection="multiple"
       v-model:selected="selectedRows"
       class="compact-table rounded-borders shadow-1"
-      binary-state-sort
     >
+      <!-- Header Cell Override for Right-Click Reset -->
+      <template v-slot:header-cell="props">
+        <q-th :props="props" @contextmenu.prevent="resetSort" class="cursor-pointer">
+          {{ props.col.label }}
+          <q-tooltip>{{ $t('bookmarks.sortResetHint') }}</q-tooltip>
+        </q-th>
+      </template>
+
       <!-- Header Selection Override -->
       <template v-slot:header-selection="scope">
         <q-checkbox v-model="scope.selected" dense :aria-label="$t('common.selectAll')" />
@@ -172,19 +162,18 @@
       <template v-slot:body-cell-title="props">
         <q-td :props="props">
           <div class="row items-center no-wrap">
-            <q-checkbox
-              :model-value="props.row.favorite"
-              @update:model-value="bookmarksStore.toggleFavorite(props.row.id)"
+            <q-btn
+              flat
+              round
               dense
-              color="amber-10"
-              icon="star_border"
-              checked-icon="star"
+              :icon="props.row.favorite ? 'star' : 'star_border'"
+              :color="props.row.favorite ? 'amber-10' : 'grey-5'"
               size="sm"
               class="q-mr-xs"
-              :aria-label="props.row.favorite ? $t('bookmarks.unpinHint') : $t('bookmarks.pinHint')"
+              @click="bookmarksStore.toggleFavorite(props.row.id)"
             >
               <q-tooltip>{{ props.row.favorite ? $t('bookmarks.unpinHint') : $t('bookmarks.pinHint') }}</q-tooltip>
-            </q-checkbox>
+            </q-btn>
             <q-avatar rounded size="20px" class="q-mr-sm shadow-1">
               <FaviconRenderer :url="props.row.url" />
             </q-avatar>
@@ -209,10 +198,22 @@
       <!-- Tags Column -->
       <template v-slot:body-cell-tags="props">
         <q-td :props="props">
-          <div class="row q-gutter-xs">
-            <q-badge v-for="(tag, idx) in (props.row.tags as string[])" :key="tag" :class="'tag-bg-' + ((Number(idx) % 6) + 1)" class="text-weight-bold" style="font-size: 0.65rem">
-              <span v-html="highlight(tag)" />
-            </q-badge>
+          <div class="row items-center no-wrap">
+            <div class="row q-gutter-xs col">
+              <q-badge v-for="(tag, idx) in (props.row.tags as string[])" :key="tag" :class="'tag-bg-' + ((Number(idx) % 6) + 1)" class="text-weight-bold" style="font-size: 0.65rem">
+                <span v-html="highlight(tag)" />
+              </q-badge>
+            </div>
+            <!-- Project Assignment Counter -->
+            <div v-if="props.row.projectIds?.length" class="q-ml-sm">
+              <q-badge color="accent" outline class="text-weight-bolder" style="font-size: 0.65rem">
+                <q-icon name="work" size="10px" class="q-mr-xs" />
+                {{ props.row.projectIds.length }}
+                <q-tooltip>
+                  {{ $t('bookmarks.assignedToProjects', { count: props.row.projectIds.length }) }}
+                </q-tooltip>
+              </q-badge>
+            </div>
           </div>
         </q-td>
       </template>
@@ -316,8 +317,9 @@
           <q-input v-model="editingBookmark.title" label="Title" dense filled />
           <div class="row q-col-gutter-xs">
             <q-select v-model="editingBookmark.collectionId" :options="collectionOptions" label="Collection" dense filled emit-value map-options class="col-6" />
-            <q-select v-model="editingBookmark.tags" label="Tags" dense filled use-input use-chips multiple new-value-mode="add-unique" :options="tagOptions" @filter="filterTags" class="col-6" />
+            <q-select v-model="editingBookmark.projectIds" :options="projectOptions" label="Projects" dense filled multiple use-chips emit-value map-options class="col-6" />
           </div>
+          <q-select v-model="editingBookmark.tags" label="Tags" dense filled use-input use-chips multiple new-value-mode="add-unique" :options="tagOptions" @filter="filterTags" />
           <q-input v-model="editingBookmark.description" label="Description" dense filled type="textarea" />
         </q-card-section>
         <q-card-actions align="right" class="q-pb-md q-px-md border-top">
@@ -354,15 +356,19 @@ const activeCollection = ref('all');
 const searchQuery = ref('');
 const fileInput = ref<HTMLInputElement | null>(null);
 const newCollectionName = ref('');
-const sortBy = ref<'alpha' | 'newest' | 'oldest'>('newest');
+const pagination = ref({
+  sortBy: null,
+  descending: false,
+  rowsPerPage: 0
+});
 const editingCollectionId = ref<string | null>(null);
 const editingName = ref('');
 const viewingBookmark = ref<Bookmark | null>(null);
 const selectedRows = ref<Bookmark[]>([]);
 
 const columns: any[] = [
-  { name: 'title', label: t('bookmarks.colResource'), align: 'left', sortable: true },
-  { name: 'url', label: t('bookmarks.colUrl'), align: 'left', sortable: true },
+  { name: 'title', label: t('bookmarks.colResource'), align: 'left', sortable: true, field: 'title' },
+  { name: 'url', label: t('bookmarks.colUrl'), align: 'left', sortable: true, field: 'url' },
   { name: 'tags', label: t('bookmarks.colTags'), align: 'left' },
   { name: 'actions', label: t('common.actions'), align: 'right' }
 ];
@@ -372,34 +378,39 @@ const editingBookmark = ref<Omit<Bookmark, 'id' | 'createdAt'> & { id?: string; 
 });
 
 const searchPlaceholder = computed(() => t('bookmarks.noMatches', { query: '' }).replace(' ""', '...'));
-const sortOptions = computed(() => [
-  { label: t('bookmarks.sortAlpha'), value: 'alpha' },
-  { label: t('bookmarks.sortNewest'), value: 'newest' },
-  { label: t('bookmarks.sortOldest'), value: 'oldest' }
-]);
 
 const projectOptions = computed(() => [{ label: t('bookmarks.globalContext'), value: 'global' }, ...projectsStore.projects.map(p => ({ label: p.name, value: p.id }))]);
 const collectionOptions = computed(() => [{ label: t('bookmarks.unassigned'), value: undefined }, ...bookmarksStore.collections.map(c => ({ label: c.name, value: c.id }))]);
 const sortedCollections = computed(() => [...bookmarksStore.collections].sort((a, b) => a.name.localeCompare(b.name)));
 
-const sortedFavorites = computed(() => {
+const filteredFavorites = computed(() => {
+  const query = (searchQuery.value || '').toLowerCase().trim();
   let list = bookmarksStore.favorites;
   if (activeCollection.value !== 'all') {
     if (activeCollection.value === 'unassigned') list = list.filter(b => !b.collectionId);
     else list = list.filter(b => b.collectionId === activeCollection.value);
   }
   if (selectedProject.value !== 'global') list = list.filter(b => b.projectIds?.includes(selectedProject.value) || b.projectIds?.includes('global'));
+  if (query) {
+    list = list.filter(b => b.title.toLowerCase().includes(query) || b.url.toLowerCase().includes(query) || b.tags.some(t => t.toLowerCase().includes(query)));
+  }
   return list;
 });
 
-const sortedBookmarks = computed(() => {
+const filteredBookmarks = computed(() => {
   const query = (searchQuery.value || '').toLowerCase().trim();
   let base = [...bookmarksStore.byCollection(activeCollection.value)];
   if (selectedProject.value !== 'global') base = base.filter(b => b.projectIds?.includes(selectedProject.value) || b.projectIds?.includes('global'));
   if (query) base = base.filter(b => b.title.toLowerCase().includes(query) || b.url.toLowerCase().includes(query) || b.tags.some(t => t.toLowerCase().includes(query)));
   
-  if (sortBy.value === 'alpha') return base.sort((a, b) => a.title.localeCompare(b.title));
-  if (sortBy.value === 'newest') return base.reverse();
+  // Default sort is newest to oldest if no table sort is active
+  if (!pagination.value.sortBy) {
+    return base.sort((a, b) => {
+      const dateA = new Date(a.createdAt || 0).getTime();
+      const dateB = new Date(b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
+  }
   return base;
 });
 
@@ -407,6 +418,11 @@ const highlight = (text: string) => {
   const query = (searchQuery.value || '').toLowerCase().trim();
   if (!query || !text) return text;
   return text.replace(new RegExp(`(${query})`, 'gi'), '<mark class="highlight-text">$1</mark>');
+};
+
+const resetSort = () => {
+  pagination.value.sortBy = null;
+  pagination.value.descending = false;
 };
 
 const openLink = (url: string) => { if (typeof window !== 'undefined') window.open(url, '_blank'); };

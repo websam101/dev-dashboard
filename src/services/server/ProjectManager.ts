@@ -93,13 +93,12 @@ export class ProjectManager {
     const projects: ProjectInfo[] = [];
     try {
       const entries = await fs.readdir(rootPath, { withFileTypes: true });
+      // Sequential processing per folder to prevent process spawning bursts
       for (const entry of entries) {
         if (entry.isDirectory()) {
           const fullPath = path.join(rootPath, entry.name);
-          const [git, techs] = await Promise.all([
-            this.getGitInfo(fullPath),
-            this.detectTechs(fullPath)
-          ]);
+          const git = await this.getGitInfo(fullPath);
+          const techs = await this.detectTechs(fullPath);
 
           if (techs.length > 0 || git) {
             projects.push({
@@ -129,27 +128,46 @@ export class ProjectManager {
     await git.push();
   }
 
-  async syncAll(projects: ProjectInfo[]): Promise<ProjectInfo[]> {
-    // 1. Throttle: If we synced in the last 2 seconds, return previous results
+  async syncAll(projects: ProjectInfo[], deep = false): Promise<ProjectInfo[]> {
+    // 1. Throttle: If we synced in the last 10 seconds, return previous results
     const now = Date.now();
-    if (this.isSyncing || (now - this.lastSyncTime < 2000)) {
+    if (this.isSyncing || (now - this.lastSyncTime < 10000)) {
       return this.lastSyncResults.length > 0 ? this.lastSyncResults : projects;
     }
 
     this.isSyncing = true;
     try {
-      const updated: ProjectInfo[] = [];
-      // Use chunks or limited concurrency if project list is huge
-      // For now, we'll keep simple Promise.all but be mindful
-      const tasks = projects.map(async (p) => {
+      const activePorts = await this.getActivePorts();
+      const now = Date.now();
+      // Strictly on-demand deep sync: only if deep=true
+      const shouldDeep = deep;
+      
+      const results: ProjectInfo[] = [];
+      
+      // Sequential processing to avoid spawning 100+ git processes at once
+      for (const p of projects) {
+        const projectPorts: number[] = [];
+        if (p.managedPorts) {
+          for (const port of p.managedPorts) {
+            if (activePorts.has(port)) projectPorts.push(port);
+          }
+        }
+
+        if (!shouldDeep && p.git && p.techs.length > 0) {
+          results.push({ ...p, ports: projectPorts });
+          continue;
+        }
+
+        // Only do the heavy lifting sequentially
         const [git, techs] = await Promise.all([
           this.getGitInfo(p.path),
           this.detectTechs(p.path)
         ]);
-        return { ...p, git, techs };
-      });
+        
+        results.push({ ...p, git, techs, ports: projectPorts });
+      }
 
-      this.lastSyncResults = await Promise.all(tasks);
+      this.lastSyncResults = results;
       this.lastSyncTime = Date.now();
       return this.lastSyncResults;
     } finally {

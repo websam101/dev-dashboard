@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { api } from '../boot/api';
 import { IndexedDbAdapter } from "../services/db/adapter/IndexedDbAdapter";
-import { Dark } from 'quasar';
+import { Dark, debounce } from 'quasar';
 import { watch } from 'vue';
 
 export interface Settings {
@@ -39,16 +39,18 @@ export const useSettingsStore = defineStore("settings", {
       // 1. Load settings first to avoid unnecessary immediate saves of default values
       await this.loadSettings();
 
-      // 2. Setup internal watch for Dark Mode (UI side-effect)
+      // 2. Apply theme immediately after loading (before setting up watch)
+      Dark.set(this.settings.darkMode);
+
+      // 3. Setup internal watch for Dark Mode (UI side-effect)
       watch(() => this.settings.darkMode, (isDark) => {
         Dark.set(isDark);
-        void this.saveSettings(); // Auto-save on change
-      }, { immediate: true });
+        void this.debouncedSave(); // Auto-save on change
+      });
 
-      // 3. Setup internal watch for Locale (Persistence side-effect)
-      // Note: App.vue handles the actual i18n.locale.value sync
+      // 4. Setup internal watch for Locale (Persistence side-effect)
       watch(() => this.settings.locale, () => {
-        void this.saveSettings(); // Auto-save on change
+        void this.debouncedSave(); // Auto-save on change
       });
 
       this.initialized = true;
@@ -83,10 +85,12 @@ export const useSettingsStore = defineStore("settings", {
         this.loading = false;
       }
     },
+    debouncedSave: debounce(function(this: any) {
+      void this.saveSettings();
+    }, 1000),
     async saveSettings() {
       if (!process.env.CLIENT) return;
 
-      // Use a lock-like mechanism if needed, but for settings, a simple debounce or immediate is usually fine
       try {
         const plainSettings = clean(this.settings);
         

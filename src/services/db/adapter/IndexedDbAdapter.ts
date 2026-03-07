@@ -162,6 +162,15 @@ export class IndexedDbAdapter {
     await this.db!.put("projects", project);
   }
 
+  async bulkAddProjects(projects: Project[]): Promise<void> {
+    await this.connect();
+    const tx = this.db!.transaction("projects", "readwrite");
+    for (const p of projects) {
+      void tx.store.put(p);
+    }
+    await tx.done;
+  }
+
   async getProjects(): Promise<Project[]> {
     await this.connect();
     return await this.db!.getAll("projects");

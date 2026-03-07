@@ -35,8 +35,8 @@ export class SystemMonitor {
   async getStats(): Promise<SystemStats> {
     const now = Date.now();
     
-    // 1. Return cached stats if fetched within the last 2 seconds
-    if (this.lastStats && (now - this.lastFetchTime < 2000)) {
+    // 1. Return cached stats if fetched within the last 5 seconds
+    if (this.lastStats && (now - this.lastFetchTime < 5000)) {
       return this.lastStats;
     }
 

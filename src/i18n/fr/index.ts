@@ -159,6 +159,7 @@ export default {
     pinToFav: 'Épingler à la barre',
     removeBookmark: 'Supprimer le signet',
     removeConfirm: 'Supprimer définitivement {title} ?',
+    assignedToProjects: 'Assigné à {count} projet(s)',
     deleteSelectedHint: 'Supprimer toutes les ressources sélectionnées',
     deleteSelectedConfirm: 'Supprimer définitivement {count} ressources sélectionnées ?',
     noMatches: 'Aucun signet ne correspond à "{query}"',
@@ -196,6 +197,7 @@ export default {
     exportHint: 'Exporter vers un fichier JSON',
     importHint: 'Importer depuis un fichier JSON',
     openLinkHint: 'Ouvrir ce lien dans un nouvel onglet',
+    sortResetHint: 'Clic pour trier, Clic-droit pour réinitialiser',
     autoFetch: 'Récupération auto du titre/description'
   },
   settings: {

@@ -37,7 +37,7 @@
           </template>
         </q-input>
         
-        <q-btn outline color="primary" icon="mdi-refresh" :loading="projectsStore.loading" @click="projectsStore.syncAll" size="sm" class="text-weight-bold" :aria-label="$t('common.refresh')">
+        <q-btn outline color="primary" icon="mdi-refresh" :loading="projectsStore.isSyncing" @click="projectsStore.syncAll(true)" size="sm" class="text-weight-bold" :aria-label="$t('common.refresh')">
           <q-tooltip>{{ $t('common.refresh') }}</q-tooltip>
         </q-btn>
         <q-btn color="primary" icon="mdi-history" @click="scanAllRoots" :disable="!settingsStore.settings.scanRoots?.length" size="sm" class="text-weight-bold shadow-1" unelevated :aria-label="$t('projects.scanAllRoots')">
@@ -113,18 +113,18 @@
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
           <div class="row items-center no-wrap">
-            <q-checkbox
-              :model-value="props.row.favorite"
-              @update:model-value="projectsStore.toggleFavorite(props.row.id)"
+            <q-btn
+              flat
+              round
               dense
-              color="amber-10"
-              icon="mdi-star-outline"
-              checked-icon="mdi-star"
+              :icon="props.row.favorite ? 'mdi-star' : 'mdi-star-outline'"
+              :color="props.row.favorite ? 'amber-10' : 'grey-5'"
               size="sm"
               class="q-mr-xs"
+              @click="projectsStore.toggleFavorite(props.row.id)"
             >
               <q-tooltip>{{ props.row.favorite ? $t('bookmarks.unpinHint') : $t('bookmarks.pinHint') }}</q-tooltip>
-            </q-checkbox>
+            </q-btn>
             <q-icon name="mdi-folder" color="primary" class="q-mr-sm" size="18px" />
             <div class="text-weight-bolder text-wcag">{{ props.row.name }}</div>
             <q-icon v-if="props.row.git?.isDirty" name="mdi-pencil-box-multiple" color="warning" class="q-ml-xs" size="16px">

@@ -159,6 +159,7 @@ export default {
     pinToFav: 'Pin to Fav Bar',
     removeBookmark: 'Remove bookmark',
     removeConfirm: 'Permanently delete {title}?',
+    assignedToProjects: 'Assigned to {count} project(s)',
     deleteSelectedHint: 'Delete all selected resources',
     deleteSelectedConfirm: 'Permanently delete {count} selected resources?',
     noMatches: 'No bookmarks matching "{query}"',
@@ -196,6 +197,7 @@ export default {
     exportHint: 'Export your library to a JSON file',
     importHint: 'Import a library from a JSON file',
     openLinkHint: 'Open this link in a new tab',
+    sortResetHint: 'Click to sort, Right-click to reset sort',
     autoFetch: 'Auto-fetch title and description'
   },
   settings: {

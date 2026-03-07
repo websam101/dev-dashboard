@@ -45,9 +45,9 @@ describe('Projects Store', () => {
   it('loads projects from local and syncs with backend', async () => {
     const store = useProjectsStore()
     const mockLocalProjects = [
-      { id: '1', name: 'Local', path: '/path' }
+      { id: '1', name: 'Local', path: '/path', description: '' }
     ]
-    const mockRemoteProjects = [{ id: '1', name: 'Remote', path: '/path', techs: ['vue'], git: {}, ports: [] }]
+    const mockRemoteProjects = [{ id: '1', name: 'Remote', path: '/path', description: '', techs: ['vue'], git: {}, ports: [] }]
     
     mockDb.getProjects.mockResolvedValue(mockLocalProjects as any)
     vi.mocked(api.get).mockResolvedValue({ data: mockRemoteProjects })
@@ -64,7 +64,7 @@ describe('Projects Store', () => {
 
   it('toggles favorite status', async () => {
     const store = useProjectsStore()
-    store.projects = [{ id: '1', name: 'P1', path: '/p1', techs: [], ports: [], managedPorts: [], favorite: false }]
+    store.projects = [{ id: '1', name: 'P1', path: '/p1', description: '', techs: [], ports: [], managedPorts: [], favorite: false }]
     
     await store.toggleFavorite('1')
     expect(store.projects[0]!.favorite).toBe(true)
@@ -74,7 +74,7 @@ describe('Projects Store', () => {
 
   it('forcePushToBackend calls sync endpoint', async () => {
     const store = useProjectsStore()
-    store.projects = [{ id: '1', name: 'P1', path: '/p1', techs: [], ports: [], managedPorts: [] }]
+    store.projects = [{ id: '1', name: 'P1', path: '/p1', description: '', techs: [], ports: [], managedPorts: [] }]
 
     await store.forcePushToBackend()
 
@@ -83,9 +83,9 @@ describe('Projects Store', () => {
 
   it('forcePullFromBackend clears and replaces local projects', async () => {
     const store = useProjectsStore()
-    const mockRemote = [{ id: 'rem1', name: 'Remote', path: '/rem' }]
+    const mockRemote = [{ id: 'rem1', name: 'Remote', path: '/rem', description: '' }]
     
-    mockDb.getProjects.mockResolvedValue([{ id: 'old', name: 'Old' }] as any)
+    mockDb.getProjects.mockResolvedValue([{ id: 'old', name: 'Old', path: '/old', description: '', techs: [], ports: [] }] as any)
     vi.mocked(api.get).mockResolvedValue({ data: mockRemote })
 
     await store.forcePullFromBackend()

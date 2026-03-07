@@ -5,7 +5,8 @@
   >
     <q-header
       flat
-      class="bg-transparent text-wcag q-py-sm"
+      bordered
+      :class="$q.dark.isActive ? 'bg-transparent text-wcag q-py-sm' : 'q-py-xs bg-gradient-primary text-white shadow-2'"
     >
       <q-toolbar class="q-px-md">
         <q-btn
@@ -13,6 +14,7 @@
           dense
           round
           icon="mdi-menu"
+          :color="$q.dark.isActive ? 'primary' : 'white'"
           :aria-label="$t('nav.toggleMenu')"
           @click="toggleLeftDrawer"
           class="shadow-glow-primary"
@@ -26,6 +28,11 @@
             width="120px"
             alt="Logo"
             class="q-mr-sm cursor-pointer"
+            no-spinner
+            no-native-menu
+            no-transition
+            fetchpriority="high"
+            loading="eager"
             @click="$router.push('/')"
           />
         </q-toolbar-title>
@@ -35,7 +42,7 @@
           round
           dense
           icon="mdi-bell-outline"
-          color="primary"
+          :color="$q.dark.isActive ? 'primary' : 'white'"
           :aria-label="$t('nav.notifications')"
         >
           <q-tooltip>{{ $t('nav.notifications') }}</q-tooltip>
