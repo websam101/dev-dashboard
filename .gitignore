@@ -24,10 +24,17 @@ yarn-error.log*
 
 # Editor directories and files
 .idea
+.vscode
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 
 # local .env files
+.data
 .env.local*
+.env
+
+# Project specific exclusions
+/conductor
+/docs/*.json

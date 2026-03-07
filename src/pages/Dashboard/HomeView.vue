@@ -4,10 +4,10 @@
       <!-- System Overview Mini-Header -->
       <div class="col-12">
         <div class="row items-center q-gutter-x-md q-mb-xs">
-          <div class="text-h5 text-wcag-bold tracking-tight">{{ $t('dashboard.title') }}</div>
+          <h1 class="text-h5 text-wcag-bold tracking-tight q-ma-none">{{ $t('dashboard.title') }}</h1>
           <q-badge :color="backendOnline ? 'positive' : 'negative'" class="text-weight-bolder" size="sm">
             <q-icon :name="backendOnline ? 'cloud_done' : 'cloud_off'" class="q-mr-xs" />
-            {{ backendOnline ? 'OS OK' : 'OFFLINE' }}
+            {{ backendOnline ? $t('dashboard.backendOnlineShort') : $t('dashboard.backendOfflineShort') }}
           </q-badge>
           <q-space />
           <div class="text-wcag-caption text-caption text-weight-bold">
@@ -25,94 +25,136 @@
               <q-card-section class="q-pa-sm">
                 <div class="row items-center no-wrap">
                   <q-icon name="memory" color="primary" size="18px" class="q-mr-xs" />
-                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">CPU</div>
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">{{ $t('dashboard.cpu') }}</div>
                 </div>
                 <div class="text-weight-bolder text-wcag-bold text-subtitle2">{{ systemStore.stats?.cpuLoad || 0 }}%</div>
-                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">({{ systemStore.stats?.cpuCores || '-' }} cores)</div>
-                <q-linear-progress :value="(systemStore.stats?.cpuLoad || 0) / 100" color="primary" class="q-mt-xs" style="height: 3px" />
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">({{ systemStore.stats?.cpuCores || '-' }} {{ $t('dashboard.cores') }})</div>
+                <q-linear-progress 
+                  :value="(systemStore.stats?.cpuLoad || 0) / 100" 
+                  color="primary" 
+                  class="q-mt-xs" 
+                  style="height: 3px" 
+                  :aria-label="$t('dashboard.cpu')"
+                />
+                <q-tooltip>{{ $t('dashboard.cpuTooltip', { load: systemStore.stats?.cpuLoad || 0, cores: systemStore.stats?.cpuCores || '-' }) }}</q-tooltip>
               </q-card-section>
             </q-card>
           </div>
 
           <!-- RAM -->
           <div class="col-12 col-sm-4 col-md-2">
-            <q-card bordered flat class="compact-resource-card border-ram">
+            <q-card bordered flat class="resource-card border-ram compact-resource-card">
               <q-card-section class="q-pa-sm">
                 <div class="row items-center no-wrap">
                   <q-icon name="mdi-memory" color="secondary" size="18px" class="q-mr-xs" />
-                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">RAM</div>
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">{{ $t('dashboard.ram') }}</div>
                 </div>
                 <div class="text-weight-bolder text-wcag-bold text-subtitle2">
                   {{ systemStore.stats?.memUsed || '0' }}/{{ systemStore.stats?.memTotal || '0' }} GB
                 </div>
-                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">{{ systemStore.stats?.memPercent || 0 }}% used</div>
-                <q-linear-progress :value="(systemStore.stats?.memPercent || 0) / 100" color="secondary" class="q-mt-xs" style="height: 3px" />
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">{{ systemStore.stats?.memPercent || 0 }}% {{ $t('dashboard.used') }}</div>
+                <q-linear-progress 
+                  :value="(systemStore.stats?.memPercent || 0) / 100" 
+                  color="secondary" 
+                  class="q-mt-xs" 
+                  style="height: 3px" 
+                  :aria-label="$t('dashboard.ram')"
+                />
+                <q-tooltip>{{ $t('dashboard.ramTooltip', { used: systemStore.stats?.memUsed || '0', total: systemStore.stats?.memTotal || '0' }) }}</q-tooltip>
               </q-card-section>
             </q-card>
           </div>
 
           <!-- DISK -->
           <div class="col-12 col-sm-4 col-md-2">
-            <q-card bordered flat class="compact-resource-card border-disk">
+            <q-card bordered flat class="resource-card border-disk compact-resource-card">
               <q-card-section class="q-pa-sm">
                 <div class="row items-center no-wrap">
                   <q-icon name="storage" color="accent" size="18px" class="q-mr-xs" />
-                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">DISK</div>
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">{{ $t('dashboard.disk') }}</div>
                 </div>
                 <div class="text-weight-bolder text-wcag-bold text-subtitle2">
                   {{ systemStore.stats?.diskUsed || '0' }}/{{ systemStore.stats?.diskTotal || '0' }} GB
                 </div>
-                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">{{ systemStore.stats?.diskPercent || 0 }}% used</div>
-                <q-linear-progress :value="(systemStore.stats?.diskPercent || 0) / 100" color="accent" class="q-mt-xs" style="height: 3px" />
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">{{ systemStore.stats?.diskPercent || 0 }}% {{ $t('dashboard.used') }}</div>
+                <q-linear-progress 
+                  :value="(systemStore.stats?.diskPercent || 0) / 100" 
+                  color="accent" 
+                  class="q-mt-xs" 
+                  style="height: 3px" 
+                  :aria-label="$t('dashboard.disk')"
+                />
+                <q-tooltip>{{ $t('dashboard.diskTooltip', { used: systemStore.stats?.diskUsed || '0', total: systemStore.stats?.diskTotal || '0' }) }}</q-tooltip>
               </q-card-section>
             </q-card>
           </div>
 
           <!-- LOAD -->
           <div class="col-12 col-sm-4 col-md-2">
-            <q-card bordered flat class="compact-resource-card border-load">
+            <q-card bordered flat class="resource-card border-load compact-resource-card">
               <q-card-section class="q-pa-sm">
                 <div class="row items-center no-wrap">
                   <q-icon name="speed" color="warning" size="18px" class="q-mr-xs" />
-                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">LOAD (1/5/15)</div>
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">{{ $t('dashboard.loadHeader') }}</div>
                 </div>
                 <div class="text-weight-bolder text-wcag-bold text-subtitle2">
                   {{ formatFullLoad(systemStore.stats?.loadAvg) }}
                 </div>
-                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">System Averages</div>
-                <q-linear-progress :value="((systemStore.stats?.loadAvg?.[0] || 0) * 10) / 100" color="warning" class="q-mt-xs" style="height: 3px" />
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">{{ $t('dashboard.loadAvg') }}</div>
+                <q-linear-progress 
+                  :value="Math.min(((systemStore.stats?.loadAvg?.[0] || 0) * 10), 100) / 100" 
+                  color="warning" 
+                  class="q-mt-xs" 
+                  style="height: 3px" 
+                  :aria-label="$t('dashboard.loadHeader')"
+                />
+                <q-tooltip>{{ $t('dashboard.loadTooltip') }}</q-tooltip>
               </q-card-section>
             </q-card>
           </div>
 
           <!-- NET -->
           <div class="col-12 col-sm-4 col-md-2">
-            <q-card bordered flat class="compact-resource-card border-net">
+            <q-card bordered flat class="resource-card border-net compact-resource-card">
               <q-card-section class="q-pa-sm">
                 <div class="row items-center no-wrap">
                   <q-icon name="lan" color="info" size="18px" class="q-mr-xs" />
-                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">NET (SINCE BOOT)</div>
+                  <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">{{ $t('dashboard.netHeader') }}</div>
                 </div>
                 <div class="text-weight-bolder text-wcag-bold text-subtitle2 no-wrap ellipsis">
                   <span class="text-positive">{{ formatNet(systemStore.stats?.netSent) }}</span> / <span class="text-info">{{ formatNet(systemStore.stats?.netRecv) }}</span>
                 </div>
-                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">Sent / Recv</div>
-                <q-linear-progress :value="0.5" color="info" class="q-mt-xs" style="height: 3px" />
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">{{ $t('dashboard.sentRecv') }}</div>
+                <q-linear-progress 
+                  :value="0.5" 
+                  color="info" 
+                  class="q-mt-xs" 
+                  style="height: 3px" 
+                  :aria-label="$t('dashboard.netHeader')"
+                />
+                <q-tooltip>{{ $t('dashboard.netTooltip') }}</q-tooltip>
               </q-card-section>
             </q-card>
           </div>
 
-          <!-- STATUS -->
+          <!-- INFO -->
           <div class="col-12 col-sm-4 col-md-2">
-            <q-card bordered flat class="compact-resource-card border-info">
+            <q-card bordered flat class="resource-card border-info compact-resource-card">
               <q-card-section class="q-pa-sm">
                 <div class="row items-center no-wrap">
                   <q-icon name="info" color="success" size="18px" class="q-mr-xs" />
                   <div class="text-overline text-wcag-bold opacity-70" style="font-size: 0.6rem">INFO</div>
                 </div>
                 <div class="text-weight-bolder text-wcag-bold text-subtitle2">{{ systemStore.stats?.platform || '-' }}</div>
-                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">Uptime: {{ systemStore.stats?.uptime ? formatUptime(systemStore.stats.uptime) : '-' }}</div>
-                <q-linear-progress :value="1" color="success" class="q-mt-xs" style="height: 3px" />
+                <div class="text-caption text-wcag-caption" style="font-size: 0.7rem">{{ $t('dashboard.uptimeLabel') }}: {{ systemStore.stats?.uptime ? formatUptime(systemStore.stats.uptime) : '-' }}</div>
+                <q-linear-progress 
+                  :value="1" 
+                  color="success" 
+                  class="q-mt-xs" 
+                  style="height: 3px" 
+                  :aria-label="$t('dashboard.uptimeLabel')"
+                />
+                <q-tooltip>{{ systemStore.stats?.platform || '-' }} | {{ systemStore.stats?.uptime ? formatUptime(systemStore.stats.uptime) : '-' }}</q-tooltip>
               </q-card-section>
             </q-card>
           </div>
@@ -129,9 +171,10 @@
               to="/projects"
             >
               <q-icon name="terminal" size="20px" class="q-mr-sm" />
-              <div class="text-weight-bolder">{{ totalProjects }} Projects</div>
+              <div class="text-weight-bolder">{{ totalProjects }} {{ $t('nav.projects') }}</div>
               <q-space />
               <q-icon name="chevron_right" />
+              <q-tooltip>{{ $t('dashboard.manageProjects') }}</q-tooltip>
             </q-btn>
           </div>
           <div class="col-12 col-sm-6">
@@ -141,9 +184,10 @@
               to="/bookmarks"
             >
               <q-icon name="bookmark" size="20px" class="q-mr-sm" />
-              <div class="text-weight-bolder">{{ totalBookmarks }} Bookmarks</div>
+              <div class="text-weight-bolder">{{ totalBookmarks }} {{ $t('bookmarks.title') }}</div>
               <q-space />
               <q-icon name="chevron_right" />
+              <q-tooltip>{{ $t('dashboard.viewLibrary') }}</q-tooltip>
             </q-btn>
           </div>
         </div>
@@ -169,7 +213,9 @@
               </div>
             </q-item-section>
             <q-item-section side>
-              <q-btn flat round dense icon="mdi-microsoft-visual-studio-code" size="sm" color="primary" @click.stop="openVsCode(project.path)" />
+              <q-btn flat round dense icon="mdi-microsoft-visual-studio-code" size="sm" color="primary" @click.stop="openVsCode(project.path)" :aria-label="$t('projects.openVsCode')">
+                <q-tooltip>{{ $t('projects.openVsCode') }}</q-tooltip>
+              </q-btn>
             </q-item-section>
           </q-item>
           
@@ -188,7 +234,7 @@ import { useSystemStore } from '../../stores/systemStore';
 import { useProjectsStore } from '../../stores/projectsStore';
 import { useBookmarksStore } from '../../stores/bookmarksStore';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { api } from '../../boot/axios';
+import { api } from '../../boot/api';
 
 const systemStore = useSystemStore();
 const projectsStore = useProjectsStore();
@@ -250,17 +296,17 @@ onUnmounted(() => { if (statsInterval) clearInterval(statsInterval); });
   background: var(--dd-card-bg)
   
 .border-cpu
-  border-left-color: var(--dd-primary) !important
+  border-left-color: var(--dd-c6) !important
 .border-ram
-  border-left-color: var(--dd-secondary) !important
+  border-left-color: var(--dd-c2) !important
 .border-disk
-  border-left-color: var(--dd-accent) !important
+  border-left-color: var(--dd-c3) !important
 .border-load
   border-left-color: var(--dd-warning) !important
 .border-net
-  border-left-color: var(--dd-info) !important
+  border-left-color: var(--dd-c1) !important
 .border-info
-  border-left-color: var(--dd-success) !important
+  border-left-color: var(--dd-c5) !important
 
 .action-btn-small
   height: 44px

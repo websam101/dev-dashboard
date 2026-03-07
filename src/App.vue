@@ -10,25 +10,23 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
-import { Dark } from 'quasar';
 import { useSettingsStore } from './stores/settingsStore';
+import { useI18n } from 'vue-i18n';
 
 const settingsStore = useSettingsStore();
+const { locale } = useI18n();
 const isReady = ref(false);
 
-// Apply dark mode whenever it changes in the store
-watch(() => settingsStore.settings.darkMode, (isDark) => {
-  Dark.set(isDark);
+// Ensure i18n locale stays in sync with settings store globally
+watch(() => settingsStore.settings.locale, (val) => {
+  if (val) locale.value = val;
 }, { immediate: true });
 
 onMounted(async () => {
   try {
-    // 1. Load settings from IDB (Async)
-    await settingsStore.loadSettings();
-    // 2. Apply theme immediately after load
-    Dark.set(settingsStore.settings.darkMode);
+    // init() now setups the reactive watch for dark mode and loads settings
+    await settingsStore.init();
   } finally {
-    // 3. Signal that UI is ready for hydration
     isReady.value = true;
   }
 });

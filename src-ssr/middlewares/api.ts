@@ -113,6 +113,24 @@ export default defineSsrMiddleware(async ({ app, resolve }) => {
     })();
   });
 
+  app.post('/api/projects/update', (req, res) => {
+    void (async () => {
+      try {
+        const project = req.body as ProjectInfo;
+        const idx = db.data.projects.findIndex(p => p.id === project.id);
+        if (idx >= 0) {
+          db.data.projects[idx] = { ...db.data.projects[idx], ...project };
+          await db.write();
+          res.json(db.data.projects[idx]);
+        } else {
+          res.status(404).json({ error: 'Project not found' });
+        }
+      } catch (e) {
+        res.status(500).json({ error: String(e) });
+      }
+    })();
+  });
+
   app.post('/api/projects/remove', (req, res) => {
     void (async () => {
       const { id } = req.body as { id: string };

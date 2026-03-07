@@ -1,202 +1,164 @@
 <template>
-  <q-page class="q-pa-lg">
-    <div class="row q-mb-xl">
-      <div class="col-12">
-        <div class="text-h4 text-weight-bold q-mb-xs">{{ $t('settings.title') }}</div>
-        <div class="text-subtitle1 opacity-70">{{ $t('settings.caption') }}</div>
-      </div>
-    </div>
-
-    <div class="row q-col-gutter-lg">
-      <!-- Appearance Section -->
-      <div class="col-12 col-md-6">
-        <q-card bordered flat class="rounded-borders">
-          <q-card-section>
-            <div class="text-h6 q-mb-md row items-center">
-              <q-icon name="palette" color="primary" class="q-mr-sm" />
-              {{ $t('settings.appearance') }}
+  <q-page class="q-pa-md">
+    <div class="row q-col-gutter-md justify-center">
+      <div class="col-12 col-md-8 col-lg-6">
+        <q-card flat bordered class="rounded-borders shadow-1">
+          <q-card-section class="bg-gradient-primary text-white q-py-sm">
+            <div class="row items-center">
+              <q-icon name="mdi-palette" color="white" class="q-mr-sm" size="24px" />
+              <div class="text-h6 text-weight-bolder">{{ $t('settings.title') }}</div>
             </div>
-            
-            <q-list>
+          </q-card-section>
+
+          <q-card-section class="q-pa-md">
+            <!-- Appearance -->
+            <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.appearance') }}</div>
+            <q-list bordered separator class="rounded-borders q-mb-lg">
               <q-item tag="label" v-ripple>
                 <q-item-section>
-                  <q-item-label>{{ $t('settings.darkMode') }}</q-item-label>
-                  <q-item-label caption>{{ $t('settings.darkModeCaption') }}</q-item-label>
+                  <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.darkMode') }}</q-item-label>
+                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.darkModeDesc') }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-toggle v-model="settingsStore.settings.darkMode" color="primary" @update:model-value="saveSettings" />
+                  <q-toggle v-model="settingsStore.settings.darkMode" color="primary" />
                 </q-item-section>
+                <q-tooltip>{{ $t('settings.darkModeHint') }}</q-tooltip>
               </q-item>
 
-              <q-item>
+              <q-item tag="label" v-ripple>
                 <q-item-section>
-                  <q-item-label>{{ $t('settings.language') }}</q-item-label>
-                  <q-item-label caption>{{ $t('settings.languageCaption') }}</q-item-label>
+                  <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.language') }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
                   <q-select
-                    v-model="locale"
-                    :options="languageOptions"
+                    v-model="settingsStore.settings.locale"
+                    :options="localeOptions"
                     dense
                     outlined
                     emit-value
                     map-options
-                    style="min-width: 150px"
-                    @update:model-value="onLanguageChange"
+                    options-dense
+                    style="min-width: 120px"
                   />
                 </q-item-section>
+                <q-tooltip>{{ $t('settings.languageHint') }}</q-tooltip>
               </q-item>
             </q-list>
-          </q-card-section>
-        </q-card>
-      </div>
 
-      <!-- Automation Section -->
-      <div class="col-12 col-md-6">
-        <q-card bordered flat class="rounded-borders">
-          <q-card-section>
-            <div class="text-h6 q-mb-md row items-center">
-              <q-icon name="settings_suggest" color="secondary" class="q-mr-sm" />
-              {{ $t('settings.automation') }}
-            </div>
-            
-            <q-list>
+            <!-- Automation -->
+            <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.automation') }}</div>
+            <q-list bordered separator class="rounded-borders q-mb-lg">
               <q-item tag="label" v-ripple>
                 <q-item-section>
-                  <q-item-label>{{ $t('settings.autoCheckPorts') }}</q-item-label>
-                  <q-item-label caption>{{ $t('settings.autoCheckPortsCaption') }}</q-item-label>
+                  <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.autoCheckPorts') }}</q-item-label>
+                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.autoCheckPortsDesc') }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-toggle v-model="settingsStore.settings.autoCheckPorts" color="secondary" @update:model-value="saveSettings" />
+                  <q-toggle v-model="settingsStore.settings.autoCheckPorts" color="secondary" />
                 </q-item-section>
+                <q-tooltip>{{ $t('settings.autoCheckPortsHint') }}</q-tooltip>
               </q-item>
             </q-list>
-          </q-card-section>
-        </q-card>
-      </div>
 
-      <!-- Workspace Section -->
-      <div class="col-12">
-        <q-card bordered flat class="rounded-borders">
-          <q-card-section>
-            <div class="text-h6 q-mb-sm row items-center">
-              <q-icon name="workspaces" color="accent" class="q-mr-sm" />
-              {{ $t('settings.scanRoots') }}
-            </div>
-            <div class="text-caption opacity-70 q-mb-lg">{{ $t('settings.scanRootsCaption') }}</div>
-
-            <div class="row q-gutter-md items-center q-mb-lg">
+            <!-- Managed Roots -->
+            <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.scanRoots') }}</div>
+            <div class="row q-gutter-sm q-mb-md">
               <q-input 
                 v-model="newRoot" 
                 :placeholder="$t('settings.rootPathPlaceholder')" 
-                outlined 
                 dense 
-                class="col" 
+                outlined 
+                class="col"
                 @keyup.enter="addRoot"
               />
-              <q-btn v-if="isElectron" outline color="secondary" icon="folder" @click="browseFolder" />
-              <q-btn color="primary" :label="$t('settings.addRoot')" @click="addRoot" :disable="!newRoot" />
+              <q-btn v-if="isElectron" outline color="secondary" icon="mdi-folder" @click="browseFolder" :aria-label="$t('settings.browseFolderHint')">
+                <q-tooltip>{{ $t('settings.browseFolderHint') }}</q-tooltip>
+              </q-btn>
+              <q-btn color="primary" :label="$t('settings.addRoot')" @click="addRoot" :disable="!newRoot">
+                <q-tooltip>{{ $t('settings.addRootHint') }}</q-tooltip>
+              </q-btn>
             </div>
 
-            <q-list bordered separator v-if="settingsStore.settings.scanRoots?.length">
-              <q-item v-for="root in settingsStore.settings.scanRoots" :key="root">
+            <q-list bordered separator class="rounded-borders bg-root-list" v-if="settingsStore.settings.scanRoots?.length">
+              <q-item v-for="root in settingsStore.settings.scanRoots" :key="root" dense class="q-py-sm">
                 <q-item-section avatar>
-                  <q-icon name="folder" color="grey-7" />
+                  <q-icon name="mdi-folder" color="primary" />
                 </q-item-section>
                 <q-item-section>
-                  <q-item-label>{{ root }}</q-item-label>
+                  <q-item-label class="text-wcag text-weight-medium ellipsis" style="max-width: 400px">{{ root }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-btn flat round dense icon="delete" color="negative" @click="removeRoot(root)" />
+                  <q-btn flat round dense icon="mdi-delete" color="negative" size="sm" @click="removeRoot(root)" :aria-label="$t('common.remove')">
+                    <q-tooltip>{{ $t('common.remove') }}</q-tooltip>
+                  </q-btn>
                 </q-item-section>
               </q-item>
             </q-list>
-            
-            <div v-else class="text-center q-pa-lg opacity-50 italic">
+            <div v-else class="text-center q-pa-md text-wcag-caption italic border-dashed rounded-borders">
               {{ $t('settings.noRoots') }}
             </div>
           </q-card-section>
+
+          <q-card-actions align="right" class="q-pa-md border-top">
+            <q-btn 
+              color="primary" 
+              :label="$t('common.save')" 
+              unelevated 
+              :loading="settingsStore.loading" 
+              @click="settingsStore.saveSettings" 
+              class="text-weight-bolder"
+            >
+              <q-tooltip>{{ $t('settings.saveAllHint') }}</q-tooltip>
+            </q-btn>
+          </q-card-actions>
         </q-card>
       </div>
     </div>
-
-    <!-- Save Indicator -->
-    <q-inner-loading :showing="settingsStore.loading">
-      <q-spinner-cube size="50px" color="primary" />
-      <div class="q-mt-sm">{{ $t('settings.saving') }}</div>
-    </q-inner-loading>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { useQuasar } from 'quasar';
-import { useI18n } from 'vue-i18n';
 
-const $q = useQuasar();
 const settingsStore = useSettingsStore();
-const { locale, t } = useI18n();
 
 const newRoot = ref('');
+const isElectron = computed(() => !!(window as any).electronApi);
 
-const languageOptions = [
+const localeOptions = [
   { label: 'English', value: 'en-US' },
   { label: 'Français', value: 'fr' }
 ];
-
-const isElectron = computed(() => typeof window !== 'undefined' && !!(window as any).electronApi);
-
-const onLanguageChange = (val: string) => {
-  locale.value = val;
-  // We should ideally persist this in settingsStore too if we want it global
-};
-
-const saveSettings = async () => {
-  await settingsStore.saveSettings();
-  $q.notify({
-    message: t('settings.settingsSaved'),
-    color: 'positive',
-    icon: 'cloud_done',
-    position: 'bottom-right',
-    timeout: 1000
-  });
-};
 
 const addRoot = () => {
   if (newRoot.value && !settingsStore.settings.scanRoots.includes(newRoot.value)) {
     settingsStore.settings.scanRoots.push(newRoot.value);
     newRoot.value = '';
-    void saveSettings();
   }
 };
 
 const removeRoot = (root: string) => {
   settingsStore.settings.scanRoots = settingsStore.settings.scanRoots.filter(r => r !== root);
-  void saveSettings();
 };
 
 const browseFolder = async () => {
-  if (typeof window !== 'undefined' && (window as any).electronApi) {
-    const path = await (window as any).electronApi.selectFolder();
-    if (path && !settingsStore.settings.scanRoots.includes(path)) {
-      settingsStore.settings.scanRoots.push(path);
-      void saveSettings();
-    }
-  }
+  const path = await (window as any).electronApi.selectFolder();
+  if (path) newRoot.value = path;
 };
 
 onMounted(() => {
-  void settingsStore.loadSettings();
+  // Global settings already loaded in App.vue
 });
 </script>
 
 <style lang="sass" scoped>
-.rounded-borders
-  border-radius: 12px
+.border-dashed
+  border: 2px dashed var(--dd-border)
 
-.opacity-70
-  opacity: 0.7
-.opacity-50
-  opacity: 0.5
+.bg-root-list
+  background: #fff
+  
+.body--dark .bg-root-list
+  background: rgba(0, 0, 0, 0.2)
 </style>

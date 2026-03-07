@@ -1,41 +1,38 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header bordered class="q-py-xs shadow-1">
-      <q-toolbar>
+  <q-layout view="lHh Lpr lFf" class="bg-mesh">
+    <q-header flat class="bg-transparent text-wcag q-py-sm">
+      <q-toolbar class="q-px-md">
         <q-btn
           flat
           dense
           round
           icon="mdi-menu"
-          :aria-label="$t('layout.menu')"
+          :aria-label="$t('nav.toggleMenu')"
           @click="toggleLeftDrawer"
-          color="primary"
-        />
+          class="shadow-glow-primary"
+        >
+          <q-tooltip>{{ $t('nav.toggleMenu') }}</q-tooltip>
+        </q-btn>
 
-        <q-toolbar-title class="text-weight-bolder row items-center text-primary" style="font-size: 1.4rem; letter-spacing: -0.5px">
+        <q-toolbar-title class="row items-center no-wrap">
           <q-icon name="mdi-console" class="q-mr-sm" color="primary" size="32px" />
-          {{ $t('layout.appTitle') }}
+          <div class="text-h5 text-wcag-bold tracking-tight">DEV DASHBOARD</div>
         </q-toolbar-title>
 
-        <q-btn flat round dense icon="mdi-bell-outline" color="primary">
-          <q-badge color="negative" floating rounded dot v-if="systemStore.notifications.length > 0" />
-          <q-menu class="border-accent shadow-10">
-            <q-list style="min-width: 320px" class="q-pa-sm">
-              <div class="row items-center justify-between q-pa-md border-bottom q-mb-sm">
-                <div class="text-h6 text-weight-bolder text-wcag-bold">{{ $t('layout.recentActivity') }}</div>
-                <q-btn 
-                  flat 
-                  dense 
-                  color="primary" 
-                  :label="$t('layout.clearAll')" 
-                  size="sm" 
-                  @click="systemStore.clearNotifications" 
-                  v-if="systemStore.notifications.length > 0" 
-                  class="text-weight-bolder"
-                />
-              </div>
+        <q-btn flat round dense icon="mdi-bell-outline" color="primary" :aria-label="$t('nav.notifications')">
+          <q-tooltip>{{ $t('nav.notifications') }}</q-tooltip>
+          <q-badge v-if="systemStore.notifications.length" floating color="negative" rounded size="xs" />
+          <q-menu class="rounded-borders shadow-2" style="width: 350px">
+            <q-list bordered separator>
+              <q-item-label header class="row items-center q-py-sm">
+                <span class="text-weight-bolder">{{ $t('nav.recentActivity') }}</span>
+                <q-space />
+                <q-btn flat round dense icon="mdi-close-circle-outline" size="sm" color="grey-7" @click="systemStore.clearNotifications()" :aria-label="$t('nav.clearAll')">
+                  <q-tooltip>{{ $t('nav.clearAll') }}</q-tooltip>
+                </q-btn>
+              </q-item-label>
               
-              <q-item v-for="notif in systemStore.notifications" :key="notif.id" class="q-py-md rounded-borders q-mb-xs">
+              <q-item v-for="notif in systemStore.notifications" :key="notif.id" class="q-py-sm">
                 <q-item-section avatar>
                   <q-avatar :color="notif.color + '-transparent'" :text-color="notif.color" size="40px">
                     <q-icon :name="'mdi-' + (notif.icon === 'search' ? 'magnify' : (notif.icon === 'history' ? 'history' : 'check'))" size="20px" />
@@ -43,12 +40,12 @@
                 </q-item-section>
                 <q-item-section>
                   <q-item-label class="text-weight-bold text-wcag">{{ notif.message }}</q-item-label>
-                  <q-item-label caption class="text-wcag-caption text-weight-medium">{{ notif.time }}</q-item-label>
+                  <q-item-label caption class="text-wcag-caption">{{ notif.time }}</q-item-label>
                 </q-item-section>
               </q-item>
-              
-              <q-item v-if="systemStore.notifications.length === 0" class="text-center q-pa-xl">
-                <q-item-section class="text-wcag-caption italic opacity-60">{{ $t('layout.noNotifications') }}</q-item-section>
+
+              <q-item v-if="!systemStore.notifications.length" class="text-center q-pa-md text-wcag-caption italic">
+                {{ $t('nav.noNotifications') }}
               </q-item>
             </q-list>
           </q-menu>
@@ -60,34 +57,32 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
-      :width="280"
-      class="nav-drawer"
+      class="bg-glass border-right"
+      :width="240"
     >
       <q-list class="q-mt-lg">
-        <q-item-label header class="text-uppercase q-mb-md text-weight-bolder text-wcag-caption" style="font-size: 0.7rem; letter-spacing: 2px;">
-          {{ $t('layout.menu') }}
-        </q-item-label>
-
         <q-item
-          v-for="link in navLinks"
-          :key="link.titleKey"
+          v-for="link in essentialLinks"
+          :key="link.title"
           clickable
           v-ripple
           :to="link.link"
-          exact
-          active-class="active-nav-item"
+          :exact="link.link === '/'"
           class="q-mb-sm rounded-borders q-mx-md nav-item"
+          active-class="bg-gradient-primary text-white shadow-glow-primary active-nav"
         >
           <q-item-section avatar>
             <q-icon :name="link.icon" size="24px" />
           </q-item-section>
-
           <q-item-section>
-            <q-item-label class="text-weight-bolder">{{ $t(link.titleKey) }}</q-item-label>
-            <q-item-label caption class="text-wcag-caption text-weight-medium">{{ $t(link.captionKey) }}</q-item-label>
+            <q-item-label class="text-weight-bolder tracking-wide" style="font-size: 0.9rem">{{ $t(link.title) }}</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
+
+      <div class="absolute-bottom q-pa-md text-center text-wcag-caption opacity-50" style="font-size: 0.7rem">
+        v0.0.1 | LOCAL FIRST
+      </div>
     </q-drawer>
 
     <q-page-container>
@@ -101,60 +96,50 @@ import { ref } from 'vue';
 import { useSystemStore } from '../stores/systemStore';
 
 const systemStore = useSystemStore();
-
-const navLinks = [
-  {
-    titleKey: 'nav.dashboard',
-    captionKey: 'nav.dashboardCaption',
-    icon: 'mdi-view-dashboard',
-    link: '/',
-  },
-  {
-    titleKey: 'nav.projects',
-    captionKey: 'nav.projectsCaption',
-    icon: 'mdi-code-braces',
-    link: '/projects',
-  },
-  {
-    titleKey: 'nav.bookmarks',
-    captionKey: 'nav.bookmarksCaption',
-    icon: 'mdi-bookmark-multiple',
-    link: '/bookmarks',
-  },
-  {
-    titleKey: 'nav.settings',
-    captionKey: 'nav.settingsCaption',
-    icon: 'mdi-cog',
-    link: '/settings',
-  },
-]
-
 const leftDrawerOpen = ref(false);
 
-function toggleLeftDrawer () {
+const essentialLinks = [
+  { title: 'nav.dashboard', icon: 'mdi-view-dashboard', link: '/' },
+  { title: 'nav.projects', icon: 'mdi-folder-multiple', link: '/projects' },
+  { title: 'nav.bookmarks', icon: 'mdi-bookmark-multiple', link: '/bookmarks' },
+  { title: 'nav.settings', icon: 'mdi-cog', link: '/settings' },
+];
+
+function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .nav-item
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
   color: var(--dd-text-secondary)
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)
-  &:hover
+  border: 1px solid transparent
+  
+  &:hover:not(.active-nav)
+    background: rgba(var(--dd-primary), 0.05)
     color: var(--dd-primary)
-    background: var(--dd-primary-glow)
+    border-color: var(--dd-border)
+    transform: translateX(4px)
 
-.active-nav-item
-  color: var(--dd-primary) !important
-  background: var(--dd-primary-glow) !important
-  border-right: 4px solid var(--dd-primary)
-  border-top-right-radius: 0
-  border-bottom-right-radius: 0
+.active-nav
+  // Text color is handled by .bg-gradient-primary in app.sass
+  // but we ensure it overrides any local secondary text colors
+  .q-item__label
+    color: inherit !important
+  .q-icon
+    color: inherit !important
 
-.nav-drawer
-  border-right: 1px solid var(--dd-border)
+.tracking-wide
+  letter-spacing: 0.5px
 
-.q-header
+.tracking-tight
+  letter-spacing: -1.5px
+
+.bg-glass
   background: var(--dd-card-bg) !important
-  backdrop-filter: blur(12px)
+  backdrop-filter: blur(10px)
+
+.border-right
+  border-right: 1px solid var(--dd-border) !important
 </style>

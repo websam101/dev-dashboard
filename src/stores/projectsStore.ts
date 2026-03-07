@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from '../boot/axios';
+import { api } from '../boot/api';
 import { IndexedDbAdapter } from '../services/db/adapter/IndexedDbAdapter';
 
 export interface Project {
@@ -46,19 +46,24 @@ export const useProjectsStore = defineStore('projects', {
 
         try {
           const response = await api.get('/api/projects');
-          if (Array.isArray(response.data) && response.data.length > 0) {
-            this.projects = response.data;
-            for (const p of this.projects) {
+          if (Array.isArray(response.data)) {
+            const remoteProjects = response.data;
+            
+            for (const rp of remoteProjects) {
+              const localMatch = this.projects.find(p => p.id === rp.id);
+              const merged = {
+                ...rp,
+                managedPorts: rp.managedPorts || localMatch?.managedPorts || []
+              };
+              
+              const idx = this.projects.findIndex(p => p.id === rp.id);
+              if (idx >= 0) this.projects[idx] = merged;
+              else this.projects.push(merged);
+
               await db.addProject(clean({
-                id: p.id,
-                name: p.name,
-                path: p.path,
-                description: '',
-                ports: p.ports || [],
-                techs: p.techs,
-                git: p.git,
-                managedPorts: (p as any).managedPorts || []
-              } as any));
+                ...merged,
+                description: ''
+              }));
             }
           }
         } catch (e) {
@@ -77,18 +82,22 @@ export const useProjectsStore = defineStore('projects', {
       try {
         const response = await api.post('/api/projects/scan', { rootPath });
         if (Array.isArray(response.data)) {
-          this.projects = response.data;
-          for (const p of this.projects) {
+          const remoteProjects = response.data;
+          for (const p of remoteProjects) {
+            const localMatch = this.projects.find(lp => lp.id === p.id);
+            const merged = {
+              ...p,
+              managedPorts: p.managedPorts || localMatch?.managedPorts || []
+            };
+            
+            const idx = this.projects.findIndex(lp => lp.id === p.id);
+            if (idx >= 0) this.projects[idx] = merged;
+            else this.projects.push(merged);
+
             await db.addProject(clean({
-              id: p.id,
-              name: p.name,
-              path: p.path,
-              description: '',
-              ports: p.ports || [],
-              techs: p.techs,
-              git: p.git,
-              managedPorts: (p as any).managedPorts || []
-            } as any));
+              ...merged,
+              description: ''
+            }));
           }
         }
       } catch (e) {
@@ -116,7 +125,8 @@ export const useProjectsStore = defineStore('projects', {
         if (!project.managedPorts) project.managedPorts = [];
         if (!project.managedPorts.includes(port)) {
           project.managedPorts.push(port);
-          await db.addProject(clean(project as any));
+          await db.addProject(clean({ ...project, description: '' }));
+          void api.post('/api/projects/update', clean(project)).catch(() => {});
         }
       }
     },
@@ -125,7 +135,8 @@ export const useProjectsStore = defineStore('projects', {
       const project = this.projects.find(p => p.id === projectId);
       if (project && project.managedPorts) {
         project.managedPorts = project.managedPorts.filter(p => p !== port);
-        await db.addProject(clean(project as any));
+        await db.addProject(clean({ ...project, description: '' }));
+        void api.post('/api/projects/update', clean(project)).catch(() => {});
       }
     },
     async openVsCode(path: string) {
@@ -153,17 +164,16 @@ export const useProjectsStore = defineStore('projects', {
         const response = await api.post('/api/projects/sync-all');
         const remoteProjects = Array.isArray(response.data) ? response.data : [];
         
-        // Merge managed ports from local to synced data
         this.projects = remoteProjects.map((rp: any) => {
           const local = this.projects.find(p => p.id === rp.id);
           return {
             ...rp,
-            managedPorts: local?.managedPorts || []
+            managedPorts: rp.managedPorts || local?.managedPorts || []
           };
         });
 
         for (const p of this.projects) {
-          await db.addProject(clean(p as any));
+          await db.addProject(clean({ ...p, description: '' }));
         }
       } finally {
         this.loading = false;

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { IndexedDbAdapter } from '../services/db/adapter/IndexedDbAdapter';
 import type { BookmarkCollection } from '../services/db/adapter/IndexedDbAdapter';
-import { api } from '../boot/axios';
+import { api } from '../boot/api';
 
 export interface Bookmark {
   id: string;
@@ -184,6 +184,8 @@ export const useBookmarksStore = defineStore('bookmarks', {
       try {
         const now = new Date().toISOString();
         const newBookmark: Bookmark = {
+          favorite: false,
+          projectIds: ['global'],
           ...bookmark,
           id: Date.now().toString(),
           createdAt: now

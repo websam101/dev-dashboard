@@ -18,6 +18,7 @@ export interface ProjectInfo {
     url?: string | undefined;
   } | undefined;
   ports: number[];
+  managedPorts?: number[];
 }
 
 export class ProjectManager {

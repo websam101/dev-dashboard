@@ -12,7 +12,9 @@
         indicator-color="primary"
         align="left"
       >
-        <q-tab name="all" icon="apps" :label="$t('bookmarks.allResources')" class="text-weight-bold" />
+        <q-tab name="all" icon="apps" :label="$t('bookmarks.allResources')" class="text-weight-bold">
+          <q-tooltip>{{ $t('bookmarks.allResourcesHint') }}</q-tooltip>
+        </q-tab>
         <q-tab
           v-for="col in sortedCollections"
           :key="col.id"
@@ -20,15 +22,19 @@
           :label="col.name"
           class="text-weight-bold"
         />
-        <q-tab name="unassigned" icon="question_mark" :label="$t('bookmarks.unassigned')" class="text-weight-bold" />
+        <q-tab name="unassigned" icon="question_mark" :label="$t('bookmarks.unassigned')" class="text-weight-bold">
+          <q-tooltip>{{ $t('bookmarks.unassignedHint') }}</q-tooltip>
+        </q-tab>
         
         <q-separator vertical class="q-mx-sm opacity-20" />
         
-        <q-btn flat round dense icon="settings" color="primary" @click="showManageCollections = true" size="sm" />
+        <q-btn flat round dense icon="settings" color="primary" @click="showManageCollections = true" size="sm" :aria-label="$t('bookmarks.manageCollections')">
+          <q-tooltip>{{ $t('bookmarks.manageCollections') }}</q-tooltip>
+        </q-btn>
       </q-tabs>
     </div>
 
-    <!-- Restored Compact Favorites Bar -->
+    <!-- Restored Compact Favorites Bar (Context-Aware) -->
     <div v-if="sortedFavorites.length > 0" class="row items-center q-mb-md q-pa-xs rounded-borders border-primary-light fav-bar shadow-1">
       <div class="text-overline text-wcag-bold q-mx-md opacity-70" style="font-size: 0.6rem">PINNED</div>
       <div class="row no-wrap q-gutter-x-xs scroll hide-scrollbar overflow-hidden">
@@ -48,6 +54,7 @@
             <FaviconRenderer :url="fav.url" />
           </q-avatar>
           <div class="ellipsis" style="max-width: 120px">{{ fav.title }}</div>
+          <q-tooltip>{{ fav.url }}</q-tooltip>
         </q-chip>
       </div>
     </div>
@@ -69,6 +76,7 @@
         <template v-slot:prepend>
           <q-icon name="work" color="primary" size="xs" />
         </template>
+        <q-tooltip>{{ $t('bookmarks.projectContextHint') }}</q-tooltip>
       </q-select>
 
       <q-input
@@ -100,15 +108,22 @@
         <template v-slot:prepend>
           <q-icon name="sort" size="xs" color="primary" />
         </template>
+        <q-tooltip>{{ $t('bookmarks.sortHint') }}</q-tooltip>
       </q-select>
 
       <q-space />
 
       <div class="row q-gutter-x-xs">
-        <q-btn flat dense icon="download" color="primary" @click="exportData" size="sm" />
-        <q-btn flat dense icon="upload" color="primary" @click="triggerImport" size="sm" />
+        <q-btn flat dense icon="download" color="primary" @click="exportData" size="sm" :aria-label="$t('bookmarks.exportHint')">
+          <q-tooltip>{{ $t('bookmarks.exportHint') }}</q-tooltip>
+        </q-btn>
+        <q-btn flat dense icon="upload" color="primary" @click="triggerImport" size="sm" :aria-label="$t('bookmarks.importHint')">
+          <q-tooltip>{{ $t('bookmarks.importHint') }}</q-tooltip>
+        </q-btn>
         <q-separator vertical class="q-mx-xs opacity-20" />
-        <q-btn color="primary" unelevated icon="add" :label="$t('bookmarks.newBookmark')" @click="openAddDialog" size="sm" class="text-weight-bold" />
+        <q-btn color="primary" unelevated icon="add" :label="$t('bookmarks.newBookmark')" @click="openAddDialog" size="sm" class="text-weight-bold">
+          <q-tooltip>{{ $t('bookmarks.newBookmarkHint') }}</q-tooltip>
+        </q-btn>
       </div>
     </div>
 
@@ -117,8 +132,12 @@
       <div v-if="selectedRows.length > 0" class="q-mb-sm q-pa-xs rounded-borders bg-gradient-primary text-white row items-center shadow-2">
         <div class="text-weight-bolder q-mx-md">{{ selectedRows.length }} Selected</div>
         <q-space />
-        <q-btn flat dense icon="delete" :label="$t('common.delete')" class="text-weight-bold" @click="confirmDeleteMultiple" />
-        <q-btn flat round dense icon="close" @click="selectedRows = []" class="q-ml-sm" />
+        <q-btn flat dense icon="delete" :label="$t('common.delete')" class="text-weight-bold" @click="confirmDeleteMultiple">
+          <q-tooltip>{{ $t('bookmarks.deleteSelectedHint') }}</q-tooltip>
+        </q-btn>
+        <q-btn flat round dense icon="close" @click="selectedRows = []" class="q-ml-sm" :aria-label="$t('common.cancel')">
+          <q-tooltip>{{ $t('common.cancel') }}</q-tooltip>
+        </q-btn>
       </div>
     </q-slide-transition>
 
@@ -139,6 +158,16 @@
       class="compact-table rounded-borders shadow-1"
       binary-state-sort
     >
+      <!-- Header Selection Override -->
+      <template v-slot:header-selection="scope">
+        <q-checkbox v-model="scope.selected" dense :aria-label="$t('common.selectAll')" />
+      </template>
+
+      <!-- Body Selection Override -->
+      <template v-slot:body-selection="scope">
+        <q-checkbox v-model="scope.selected" dense :aria-label="$t('common.selectItem')" />
+      </template>
+
       <!-- RESOURCE Column (Icon, Fav, Title) -->
       <template v-slot:body-cell-title="props">
         <q-td :props="props">
@@ -152,12 +181,16 @@
               checked-icon="star"
               size="sm"
               class="q-mr-xs"
-            />
+              :aria-label="props.row.favorite ? $t('bookmarks.unpinHint') : $t('bookmarks.pinHint')"
+            >
+              <q-tooltip>{{ props.row.favorite ? $t('bookmarks.unpinHint') : $t('bookmarks.pinHint') }}</q-tooltip>
+            </q-checkbox>
             <q-avatar rounded size="20px" class="q-mr-sm shadow-1">
               <FaviconRenderer :url="props.row.url" />
             </q-avatar>
             <div class="text-weight-bold text-wcag ellipsis cursor-pointer" @click="openViewDialog(props.row)">
               <span v-html="highlight(props.row.title)" />
+              <q-tooltip>{{ $t('bookmarks.viewDetails') }}</q-tooltip>
             </div>
           </div>
         </q-td>
@@ -168,6 +201,7 @@
         <q-td :props="props">
           <div class="text-primary text-weight-bold ellipsis cursor-pointer hover-underline" @click="openLink(props.row.url)" style="max-width: 300px">
             <span v-html="highlight(props.row.url)" />
+            <q-tooltip>{{ $t('bookmarks.openLinkHint') }}</q-tooltip>
           </div>
         </q-td>
       </template>
@@ -187,9 +221,15 @@
       <template v-slot:body-cell-actions="props">
         <q-td :props="props" class="text-right">
           <div class="row items-center justify-end q-gutter-x-xs">
-            <q-btn flat round dense icon="visibility" size="sm" color="primary" @click="openViewDialog(props.row)" />
-            <q-btn flat round dense icon="edit" size="sm" color="secondary" @click="openEditDialog(props.row)" />
-            <q-btn flat round dense icon="delete_outline" size="sm" color="negative" @click="confirmRemove(props.row)" />
+            <q-btn flat round dense icon="visibility" size="sm" color="primary" @click="openViewDialog(props.row)" :aria-label="$t('bookmarks.viewDetails')">
+              <q-tooltip>{{ $t('bookmarks.viewDetails') }}</q-tooltip>
+            </q-btn>
+            <q-btn flat round dense icon="edit" size="sm" color="secondary" @click="openEditDialog(props.row)" :aria-label="$t('common.edit')">
+              <q-tooltip>{{ $t('common.edit') }}</q-tooltip>
+            </q-btn>
+            <q-btn flat round dense icon="delete_outline" size="sm" color="negative" @click="confirmRemove(props.row)" :aria-label="$t('common.remove')">
+              <q-tooltip>{{ $t('common.remove') }}</q-tooltip>
+            </q-btn>
           </div>
         </q-td>
       </template>
@@ -201,12 +241,16 @@
         <q-card-section class="row items-center q-py-sm border-bottom">
           <div class="text-subtitle1 text-weight-bolder">{{ $t('bookmarks.manageCollections') }}</div>
           <q-space />
-          <q-btn icon="close" flat round dense v-close-popup size="sm" />
+          <q-btn icon="close" flat round dense v-close-popup size="sm" :aria-label="$t('common.close')">
+            <q-tooltip>{{ $t('common.close') }}</q-tooltip>
+          </q-btn>
         </q-card-section>
         <q-card-section class="q-pa-md">
           <div class="row q-gutter-sm q-mb-md">
             <q-input v-model="newCollectionName" :label="$t('bookmarks.newCollection')" dense outlined class="col" @keyup.enter="addCollection" />
-            <q-btn color="primary" icon="add" @click="addCollection" :disable="!newCollectionName" size="sm" />
+            <q-btn color="primary" icon="add" @click="addCollection" :disable="!newCollectionName" size="sm" :aria-label="$t('bookmarks.addCollectionHint')">
+              <q-tooltip>{{ $t('bookmarks.addCollectionHint') }}</q-tooltip>
+            </q-btn>
           </div>
           <q-list bordered separator>
             <q-item v-for="col in sortedCollections" :key="col.id" dense>
@@ -216,8 +260,12 @@
               <q-item-section v-else class="text-weight-bold">{{ col.name }}</q-item-section>
               <q-item-section side>
                 <div class="row q-gutter-x-xs">
-                  <q-btn flat round dense :icon="editingCollectionId === col.id ? 'check' : 'edit'" :color="editingCollectionId === col.id ? 'positive' : 'primary'" size="sm" @click="editingCollectionId === col.id ? saveRenamedCollection() : startRenaming(col)" />
-                  <q-btn flat round dense icon="delete" color="negative" size="sm" @click="confirmDeleteCollection(col)" />
+                  <q-btn flat round dense :icon="editingCollectionId === col.id ? 'check' : 'edit'" :color="editingCollectionId === col.id ? 'positive' : 'primary'" size="sm" @click="editingCollectionId === col.id ? saveRenamedCollection() : startRenaming(col)" :aria-label="editingCollectionId === col.id ? $t('common.save') : $t('common.edit')">
+                    <q-tooltip>{{ editingCollectionId === col.id ? $t('common.save') : $t('common.edit') }}</q-tooltip>
+                  </q-btn>
+                  <q-btn flat round dense icon="delete" color="negative" size="sm" @click="confirmDeleteCollection(col)" :aria-label="$t('common.remove')">
+                    <q-tooltip>{{ $t('common.remove') }}</q-tooltip>
+                  </q-btn>
                 </div>
               </q-item-section>
             </q-item>
@@ -239,7 +287,9 @@
               {{ viewingBookmark?.url }}
             </div>
           </div>
-          <q-btn icon="close" flat round dense v-close-popup size="sm" />
+          <q-btn icon="close" flat round dense v-close-popup size="sm" :aria-label="$t('common.close')">
+            <q-tooltip>{{ $t('common.close') }}</q-tooltip>
+          </q-btn>
         </q-card-section>
         <q-card-section class="q-pa-md">
           <div class="bg-grey-2 q-pa-sm rounded-borders text-wcag" style="white-space: pre-wrap">
@@ -247,7 +297,9 @@
           </div>
         </q-card-section>
         <q-card-actions align="right" class="q-pa-sm border-top">
-          <q-btn flat :label="$t('common.edit')" color="primary" size="sm" @click="switchToEditFromView" />
+          <q-btn flat :label="$t('common.edit')" color="primary" size="sm" @click="switchToEditFromView">
+            <q-tooltip>{{ $t('common.edit') }}</q-tooltip>
+          </q-btn>
           <q-btn unelevated :label="$t('common.ok')" color="primary" size="sm" v-close-popup />
         </q-card-actions>
       </q-card>
@@ -257,7 +309,7 @@
     <q-dialog v-model="showDialog" backdrop-filter="blur(4px)">
       <q-card style="min-width: 500px">
         <q-card-section class="q-py-sm border-bottom">
-          <div class="text-subtitle1 text-weight-bolder">{{ isEditing ? 'Edit Resource' : 'New Resource' }}</div>
+          <div class="text-subtitle1 text-weight-bolder">{{ isEditing ? $t('bookmarks.editResource') : $t('bookmarks.newResource') }}</div>
         </q-card-section>
         <q-card-section class="q-gutter-sm q-pt-md">
           <q-input v-model="editingBookmark.url" label="URL" dense filled @keyup.enter="fetchMetadata" />
@@ -269,8 +321,8 @@
           <q-input v-model="editingBookmark.description" label="Description" dense filled type="textarea" />
         </q-card-section>
         <q-card-actions align="right" class="q-pb-md q-px-md border-top">
-          <q-btn flat label="Cancel" color="primary" v-close-popup size="sm" />
-          <q-btn color="primary" label="Save" unelevated @click="saveBookmark" size="sm" />
+          <q-btn flat :label="$t('common.cancel')" color="primary" v-close-popup size="sm" />
+          <q-btn color="primary" :label="$t('common.save')" unelevated @click="saveBookmark" size="sm" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -285,7 +337,7 @@ import { useI18n } from 'vue-i18n';
 import FaviconRenderer from '../../components/FaviconRenderer.vue';
 import FormattedText from '../../components/FormattedText.vue';
 import type { Bookmark } from '../../stores/bookmarksStore';
-import { api } from '../../boot/axios';
+import { api } from '../../boot/api';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();
@@ -309,10 +361,10 @@ const viewingBookmark = ref<Bookmark | null>(null);
 const selectedRows = ref<Bookmark[]>([]);
 
 const columns: any[] = [
-  { name: 'title', label: 'RESOURCE', align: 'left', sortable: true },
-  { name: 'url', label: 'URL', align: 'left', sortable: true },
-  { name: 'tags', label: 'TAGS', align: 'left' },
-  { name: 'actions', label: '', align: 'right' }
+  { name: 'title', label: t('bookmarks.colResource'), align: 'left', sortable: true },
+  { name: 'url', label: t('bookmarks.colUrl'), align: 'left', sortable: true },
+  { name: 'tags', label: t('bookmarks.colTags'), align: 'left' },
+  { name: 'actions', label: t('common.actions'), align: 'right' }
 ];
 
 const editingBookmark = ref<Omit<Bookmark, 'id' | 'createdAt'> & { id?: string; createdAt?: string }>({
@@ -331,8 +383,12 @@ const collectionOptions = computed(() => [{ label: t('bookmarks.unassigned'), va
 const sortedCollections = computed(() => [...bookmarksStore.collections].sort((a, b) => a.name.localeCompare(b.name)));
 
 const sortedFavorites = computed(() => {
-  const list = bookmarksStore.favorites;
-  if (selectedProject.value !== 'global') return list.filter(b => b.projectIds?.includes(selectedProject.value) || b.projectIds?.includes('global'));
+  let list = bookmarksStore.favorites;
+  if (activeCollection.value !== 'all') {
+    if (activeCollection.value === 'unassigned') list = list.filter(b => !b.collectionId);
+    else list = list.filter(b => b.collectionId === activeCollection.value);
+  }
+  if (selectedProject.value !== 'global') list = list.filter(b => b.projectIds?.includes(selectedProject.value) || b.projectIds?.includes('global'));
   return list;
 });
 
@@ -364,20 +420,8 @@ const saveBookmark = async () => {
   showDialog.value = false;
 };
 
-const confirmRemove = (b: Bookmark) => {
-  $q.dialog({ title: 'Remove', message: `Delete ${b.title}?`, cancel: true, dark: true }).onOk(() => {
-    void bookmarksStore.deleteBookmark(b.id);
-  });
-};
-
-const confirmDeleteMultiple = () => {
-  $q.dialog({ title: 'Confirm Delete', message: `Remove ${selectedRows.value.length} bookmarks?`, cancel: true, dark: true }).onOk(() => {
-    void (async () => {
-      for (const b of selectedRows.value) await bookmarksStore.deleteBookmark(b.id);
-      selectedRows.value = [];
-    })();
-  });
-};
+const confirmRemove = (b: Bookmark) => { $q.dialog({ title: t('common.remove'), message: t('bookmarks.removeConfirm', { title: b.title }), cancel: true, dark: true }).onOk(() => { void bookmarksStore.deleteBookmark(b.id); }); };
+const confirmDeleteMultiple = () => { $q.dialog({ title: t('common.confirmDelete'), message: t('bookmarks.deleteSelectedConfirm', { count: selectedRows.value.length }), cancel: true, dark: true }).onOk(() => { void (async () => { for (const b of selectedRows.value) await bookmarksStore.deleteBookmark(b.id); selectedRows.value = []; })(); }); };
 
 const tagOptions = ref<string[]>([]);
 const filterTags = (val: string, update: any) => update(() => { tagOptions.value = val === '' ? bookmarksStore.allTags : bookmarksStore.allTags.filter(v => v.toLowerCase().includes(val.toLowerCase())); });
@@ -385,15 +429,7 @@ const filterTags = (val: string, update: any) => update(() => { tagOptions.value
 const startRenaming = (col: any) => { editingCollectionId.value = col.id; editingName.value = col.name; };
 const saveRenamedCollection = async () => { if (editingCollectionId.value) await bookmarksStore.updateCollection({ id: editingCollectionId.value, name: editingName.value }); editingCollectionId.value = null; };
 const addCollection = async () => { if (newCollectionName.value) await bookmarksStore.addCollection(newCollectionName.value); newCollectionName.value = ''; };
-const confirmDeleteCollection = (col: any) => { 
-  $q.dialog({ title: 'Delete', message: `Remove ${col.name}?`, cancel: true, dark: true })
-    .onOk(() => {
-      void (async () => {
-        await bookmarksStore.deleteCollection(col.id); 
-        if (activeCollection.value === col.id) activeCollection.value = 'all';
-      })();
-    }); 
-};
+const confirmDeleteCollection = (col: any) => { $q.dialog({ title: t('common.delete'), message: t('bookmarks.removeCollectionConfirm', { name: col.name }), cancel: true, dark: true }).onOk(() => { void (async () => { await bookmarksStore.deleteCollection(col.id); if (activeCollection.value === col.id) activeCollection.value = 'all'; })(); }); };
 
 const fetchMetadata = async () => {
   const res = await api.post('/api/utils/fetch-metadata', { url: editingBookmark.value.url }).catch(() => null);
@@ -419,8 +455,8 @@ const handleFileImport = (e: any) => {
         const imported = JSON.parse(event.target.result);
         const bToImport = Array.isArray(imported) ? imported : (imported.bookmarks || []);
         for (const b of bToImport) await bookmarksStore.addBookmark(b);
-        $q.notify({ message: 'Import Success', color: 'positive' });
-      } catch { $q.notify({ message: 'Import Failed', color: 'negative' }); }
+        $q.notify({ message: t('common.importSuccess'), color: 'positive' });
+      } catch { $q.notify({ message: t('common.importFailed'), color: 'negative' }); }
     })();
   };
   reader.readAsText(file);
@@ -447,7 +483,7 @@ onMounted(() => {
     letter-spacing: 1px
     
   :deep(td)
-    font-size: 0.85rem
+    font-size: 0.8rem
     border-bottom: 1px solid var(--dd-border)
 
 .body--dark .compact-table

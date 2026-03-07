@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { api } from '../boot/axios';
+import { api } from '../boot/api';
 
 export interface SystemStats {
   cpuLoad: number;

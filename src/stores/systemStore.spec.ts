@@ -1,9 +1,9 @@
 import { setActivePinia, createPinia } from 'pinia'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useSystemStore } from './systemStore'
-import { api } from '../boot/axios'
+import { api } from '../boot/api';
 
-vi.mock('../boot/axios', () => ({
+vi.mock('../boot/api', () => ({
   api: {
     get: vi.fn()
   }
