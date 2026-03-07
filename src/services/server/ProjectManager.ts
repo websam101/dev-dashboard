@@ -22,6 +22,10 @@ export interface ProjectInfo {
 }
 
 export class ProjectManager {
+  private isSyncing = false;
+  private lastSyncResults: ProjectInfo[] = [];
+  private lastSyncTime = 0;
+
   async getGitInfo(projectPath: string): Promise<ProjectInfo['git']> {
     try {
       const git: SimpleGit = simpleGit(projectPath);
@@ -72,7 +76,6 @@ export class ProjectManager {
   }
 
   async getActivePorts(): Promise<Map<number, number>> {
-    // Returns Map<Port, PID>
     const ports = new Map<number, number>();
     try {
       const network = await si.networkConnections();
@@ -90,8 +93,6 @@ export class ProjectManager {
     const projects: ProjectInfo[] = [];
     try {
       const entries = await fs.readdir(rootPath, { withFileTypes: true });
-      const activePorts = await this.getActivePorts();
-
       for (const entry of entries) {
         if (entry.isDirectory()) {
           const fullPath = path.join(rootPath, entry.name);
@@ -100,7 +101,6 @@ export class ProjectManager {
             this.detectTechs(fullPath)
           ]);
 
-          // Simple heuristic: if it has techs or is a git repo, it's a project
           if (techs.length > 0 || git) {
             projects.push({
               id: Buffer.from(fullPath).toString('base64'),
@@ -108,7 +108,7 @@ export class ProjectManager {
               path: fullPath,
               techs,
               git,
-              ports: [] // Will be populated by correlating with running processes if needed
+              ports: []
             });
           }
         }
@@ -130,18 +130,30 @@ export class ProjectManager {
   }
 
   async syncAll(projects: ProjectInfo[]): Promise<ProjectInfo[]> {
-    const updated: ProjectInfo[] = [];
-    for (const p of projects) {
-      const [git, techs] = await Promise.all([
-        this.getGitInfo(p.path),
-        this.detectTechs(p.path)
-      ]);
-      updated.push({
-        ...p,
-        git,
-        techs
-      });
+    // 1. Throttle: If we synced in the last 2 seconds, return previous results
+    const now = Date.now();
+    if (this.isSyncing || (now - this.lastSyncTime < 2000)) {
+      return this.lastSyncResults.length > 0 ? this.lastSyncResults : projects;
     }
-    return updated;
+
+    this.isSyncing = true;
+    try {
+      const updated: ProjectInfo[] = [];
+      // Use chunks or limited concurrency if project list is huge
+      // For now, we'll keep simple Promise.all but be mindful
+      const tasks = projects.map(async (p) => {
+        const [git, techs] = await Promise.all([
+          this.getGitInfo(p.path),
+          this.detectTechs(p.path)
+        ]);
+        return { ...p, git, techs };
+      });
+
+      this.lastSyncResults = await Promise.all(tasks);
+      this.lastSyncTime = Date.now();
+      return this.lastSyncResults;
+    } finally {
+      this.isSyncing = false;
+    }
   }
 }

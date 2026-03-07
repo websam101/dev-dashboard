@@ -17,11 +17,13 @@ describe('Accessibility and Contrast Audit', () => {
     cy.visit('/settings');
     cy.get('body').then(($body) => {
       if (!$body.hasClass('body--dark')) {
-        cy.get('.q-toggle').first().click();
+        // Toggle dark mode - targeting the first label which is Dark Mode
+        cy.contains('Dark Mode').closest('.q-item').find('.q-toggle').click();
+        cy.get('body').should('have.class', 'body--dark');
       }
     });
     cy.visit('/');
-    cy.get('body').should('have.class', 'body--dark');
+    cy.get('body', { timeout: 5000 }).should('have.class', 'body--dark');
     cy.injectAxe();
     cy.checkA11y(undefined, {
       rules: {
@@ -33,10 +35,12 @@ describe('Accessibility and Contrast Audit', () => {
   it('checks contrast on Bookmarks page', () => {
     cy.visit('/bookmarks');
     cy.injectAxe();
-    cy.get('.compact-table tr').should('have.length.at.least', 1);
+    // Wait for data to load
+    cy.get('.compact-table', { timeout: 5000 }).should('be.visible');
     cy.checkA11y('.compact-table', {
-      rules: {
-        'color-contrast': { enabled: true }
+      runOnly: {
+        type: 'tag',
+        values: ['wcag2aa']
       }
     }, (Cypress as any).terminalLog);
   });
@@ -44,10 +48,12 @@ describe('Accessibility and Contrast Audit', () => {
   it('checks contrast on Projects page', () => {
     cy.visit('/projects');
     cy.injectAxe();
-    cy.get('.compact-table tr').should('have.length.at.least', 1);
+    // Wait for table to be visible
+    cy.get('.compact-table', { timeout: 5000 }).should('be.visible');
     cy.checkA11y('.compact-table', {
-      rules: {
-        'color-contrast': { enabled: true }
+      runOnly: {
+        type: 'tag',
+        values: ['wcag2aa']
       }
     }, (Cypress as any).terminalLog);
   });

@@ -6,10 +6,12 @@
   --dd-bg-mesh: radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.05) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(126, 34, 206, 0.05) 0px, transparent 50%)
   --dd-card-bg: #FFFFFF
   --dd-text-primary: #0F172A
-  --dd-text-secondary: #334155 // Darkened from #475569 for better contrast
-  --dd-link: #1E40AF
-  --dd-link-hover: #1D4ED8
+  // Maximum Contrast Secondary Text (Slate-900)
+  --dd-text-secondary: #1A202C
+  --dd-link: #0D47A1
+  --dd-link-hover: #1565C0
   
+  // Professional Deep Colors for Light Mode
   --dd-primary: #0D47A1
   --dd-secondary: #00695C
   --dd-accent: #7B1FA2
@@ -23,28 +25,14 @@
   --dd-highlight-bg: #FFE082
   --dd-highlight-text: #000000
 
-  // Gradients Light
-  .bg-gradient-primary
-    background: linear-gradient(135deg, #0D47A1 0%, #2563EB 100%) !important
-    color: #FFFFFF !important
-  
-  .bg-gradient-secondary
-    background: linear-gradient(135deg, #00695C 0%, #059669 100%) !important
-    color: #FFFFFF !important
-
-  // 6-Color Palette
-  --dd-c1: #0284C7
-  --dd-c1-bg: #E0F2FE
-  --dd-c2: #059669
-  --dd-c2-bg: #D1FAE5
-  --dd-c3: #7C3AED
-  --dd-c3-bg: #EDE9FE
-  --dd-c4: #EA580C
-  --dd-c4-bg: #FFEDD5
-  --dd-c5: #DB2777
-  --dd-c5-bg: #FCE7F3
-  --dd-c6: #2563EB
-  --dd-c6-bg: #DBEAFE
+  // Standard Quasar Mapping
+  --q-primary: #0D47A1
+  --q-secondary: #00695C
+  --q-accent: #7B1FA2
+  --q-positive: #2E7D32
+  --q-negative: #C62828
+  --q-info: #0277BD
+  --q-warning: #F57F17
 
 .body--dark
   color-scheme: dark
@@ -52,45 +40,34 @@
   --dd-bg-mesh: radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(192, 132, 252, 0.1) 0px, transparent 50%)
   --dd-card-bg: #1E293B
   --dd-text-primary: #F1F5F9
-  --dd-text-secondary: #CBD5E1 // Lightened from #94A3B8 for better contrast
-  --dd-link: #90CAF9
-  --dd-link-hover: #BBDEFB
+  --dd-text-secondary: #E2E8F0
   
-  --dd-primary: #90CAF9
-  --dd-secondary: #80CBC4
-  --dd-accent: #CE93D8
-  --dd-success: #81C784
-  --dd-warning: #FFD54F
-  --dd-danger: #E57373
-  --dd-info: #4FC3F7
+  // NEON / HIGH-VIBRANCY COLORS for Dark Mode
+  // Using accent weights (A100/A200) for maximum pop
+  --dd-primary: #82B1FF
+  --dd-secondary: #64FFDA
+  --dd-success: #69F0AE
+  --dd-accent: #EA80FC
+  --dd-warning: #FFFF00
+  --dd-danger: #FF5252
+  --dd-info: #40C4FF
   
-  --dd-border: rgba(241, 245, 249, 0.15)
-  --dd-primary-glow: rgba(144, 202, 249, 0.2)
-  --dd-highlight-bg: #FFD54F
+  --dd-link: #82B1FF
+  --dd-link-hover: #448AFF
+  --dd-primary-glow: rgba(130, 177, 255, 0.25)
+  
+  --dd-border: rgba(241, 245, 249, 0.2)
+  --dd-highlight-bg: #FFFF00
   --dd-highlight-text: #000000
 
-  // Gradients Dark
-  .bg-gradient-primary
-    background: linear-gradient(135deg, #90CAF9 0%, #60A5FA 100%) !important
-    color: #0F172A !important
-  
-  .bg-gradient-secondary
-    background: linear-gradient(135deg, #80CBC4 0%, #34D399 100%) !important
-    color: #0F172A !important
-
-  // 6-Color Palette Dark
-  --dd-c1: #38BDF8
-  --dd-c1-bg: rgba(56, 189, 248, 0.15)
-  --dd-c2: #34D399
-  --dd-c2-bg: rgba(52, 211, 153, 0.15)
-  --dd-c3: #A78BFA
-  --dd-c3-bg: rgba(167, 139, 250, 0.15)
-  --dd-c4: #FB923C
-  --dd-c4-bg: rgba(251, 146, 60, 0.15)
-  --dd-c5: #F472B6
-  --dd-c5-bg: rgba(244, 114, 182, 0.15)
-  --dd-c6: #60A5FA
-  --dd-c6-bg: rgba(96, 165, 250, 0.15)
+  // Override Quasar Brand Colors for Dark Mode
+  --q-primary: #82B1FF
+  --q-secondary: #64FFDA
+  --q-positive: #69F0AE
+  --q-warning: #FFFF00
+  --q-negative: #FF5252
+  --q-accent: #EA80FC
+  --q-info: #40C4FF
 
 // Global Styles
 body
@@ -132,6 +109,35 @@ body
     .body--dark &
       color: #000000 !important
 
+// Palette Constants (Referenced by Deterministic Coloring)
+:root
+  --dd-c1: #0284C7
+  --dd-c1-bg: #E0F2FE
+  --dd-c2: #059669
+  --dd-c2-bg: #D1FAE5
+  --dd-c3: #7C3AED
+  --dd-c3-bg: #EDE9FE
+  --dd-c4: #EA580C
+  --dd-c4-bg: #FFEDD5
+  --dd-c5: #DB2777
+  --dd-c5-bg: #FCE7F3
+  --dd-c6: #2563EB
+  --dd-c6-bg: #DBEAFE
+
+.body--dark
+  --dd-c1: #40C4FF
+  --dd-c1-bg: rgba(64, 196, 255, 0.15)
+  --dd-c2: #64FFDA
+  --dd-c2-bg: rgba(100, 255, 218, 0.15)
+  --dd-c3: #EA80FC
+  --dd-c3-bg: rgba(234, 128, 252, 0.15)
+  --dd-c4: #FFAB40
+  --dd-c4-bg: rgba(255, 171, 64, 0.15)
+  --dd-c5: #FF4081
+  --dd-c5-bg: rgba(255, 64, 129, 0.15)
+  --dd-c6: #448AFF
+  --dd-c6-bg: rgba(68, 138, 255, 0.15)
+
 // Utility Classes
 .text-wcag
   color: var(--dd-text-primary) !important
@@ -142,8 +148,10 @@ body
   font-weight: 700
 
 .text-wcag-caption
-  color: var(--dd-text-secondary) !important
+  color: #2D3748 !important // Darkened for Light Mode
   font-weight: 500
+  .body--dark &
+    color: #E2E8F0 !important // Re-brightened for Dark Mode accessibility
 
 .highlight-text
   background: var(--dd-highlight-bg)
@@ -163,3 +171,24 @@ body
 
 .shadow-glow-primary
   box-shadow: 0 4px 14px 0 var(--dd-primary-glow)
+
+a
+  color: var(--dd-link)
+  text-decoration: none
+  transition: color 0.2s ease
+  &:hover
+    color: var(--dd-link-hover)
+    text-decoration: underline
+
+// High Contrast Gradients
+.bg-gradient-primary
+  background: linear-gradient(135deg, var(--dd-primary) 0%, #2962FF 100%) !important
+  color: #FFFFFF !important
+  .body--dark &
+    color: #0F172A !important
+
+.bg-gradient-secondary
+  background: linear-gradient(135deg, var(--dd-secondary) 0%, #00BFA5 100%) !important
+  color: #FFFFFF !important
+  .body--dark &
+    color: #0F172A !important

@@ -4,7 +4,7 @@
       <!-- System Overview Mini-Header -->
       <div class="col-12">
         <div class="row items-center q-gutter-x-md q-mb-xs">
-          <h1 class="text-h5 text-wcag-bold tracking-tight q-ma-none">{{ $t('dashboard.title') }}</h1>
+          <h1 class="text-h5 text-wcag-bold tracking-tight q-my-none">{{ $t('dashboard.title') }}</h1>
           <q-badge :color="backendOnline ? 'positive' : 'negative'" class="text-weight-bolder" size="sm">
             <q-icon :name="backendOnline ? 'cloud_done' : 'cloud_off'" class="q-mr-xs" />
             {{ backendOnline ? $t('dashboard.backendOnlineShort') : $t('dashboard.backendOfflineShort') }}
@@ -193,11 +193,11 @@
         </div>
       </div>
 
-      <!-- Recent Activity -->
+      <!-- Favorite Projects (Replaces Recent Activity) -->
       <div class="col-12">
-        <div class="text-overline text-wcag-bold q-mb-xs q-mt-md">{{ $t('dashboard.recentProjects') }}</div>
+        <div class="text-overline text-wcag-bold q-mb-xs q-mt-md">{{ $t('dashboard.favoriteProjects') }}</div>
         <q-list bordered separator class="rounded-borders bg-card shadow-1">
-          <q-item v-for="project in recentProjects" :key="project.id" clickable v-ripple @click="openVsCode(project.path)" dense class="q-py-xs">
+          <q-item v-for="project in favoriteProjects" :key="project.id" clickable v-ripple @click="openVsCode(project.path)" dense class="q-py-xs">
             <q-item-section avatar>
               <q-icon name="folder" color="primary" size="20px" />
             </q-item-section>
@@ -219,8 +219,8 @@
             </q-item-section>
           </q-item>
           
-          <q-item v-if="recentProjects.length === 0" class="text-center q-pa-md">
-            <q-item-section class="text-wcag-caption italic">{{ $t('dashboard.noProjects') }}</q-item-section>
+          <q-item v-if="favoriteProjects.length === 0" class="text-center q-pa-md">
+            <q-item-section class="text-wcag-caption italic">{{ $t('dashboard.noFavorites') }}</q-item-section>
           </q-item>
         </q-list>
       </div>
@@ -244,7 +244,7 @@ const settingsStore = useSettingsStore();
 const backendOnline = ref(false);
 let statsInterval: ReturnType<typeof setInterval> | undefined;
 
-const recentProjects = computed(() => projectsStore.projects.slice(0, 5));
+const favoriteProjects = computed(() => projectsStore.projects.filter(p => p.favorite));
 const totalProjects = computed(() => projectsStore.projects.length);
 const totalBookmarks = computed(() => bookmarksStore.bookmarks.length);
 

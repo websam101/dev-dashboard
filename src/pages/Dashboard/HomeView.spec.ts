@@ -1,69 +1,104 @@
 import { mount } from '@vue/test-utils'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import HomeView from './HomeView.vue'
-import { createTestingPinia } from '@pinia/testing'
-import { useSystemStore } from '../../stores/systemStore'
+import { createPinia, setActivePinia } from 'pinia'
 import { useProjectsStore } from '../../stores/projectsStore'
 import { useBookmarksStore } from '../../stores/bookmarksStore'
+import { useSystemStore } from '../../stores/systemStore'
+import { api } from '../../boot/api'
 
+// Mock dependencies
 vi.mock('../../boot/api', () => ({
   api: {
-    get: vi.fn(() => Promise.resolve({ data: { success: true } })),
-    post: vi.fn(() => Promise.resolve({ data: { success: true } }))
+    get: vi.fn(),
+    post: vi.fn()
   },
   default: {
-    get: vi.fn(() => Promise.resolve({ data: { success: true } })),
-    post: vi.fn(() => Promise.resolve({ data: { success: true } }))
+    get: vi.fn(),
+    post: vi.fn()
   }
 }))
 
 describe('HomeView', () => {
-  let wrapper: any
-
   beforeEach(() => {
+    setActivePinia(createPinia())
     vi.resetAllMocks()
-    wrapper = mount(HomeView, {
-      global: {
-        plugins: [createTestingPinia({ createSpy: vi.fn })]
-      }
-    })
+    vi.mocked(api.get).mockResolvedValue({ data: { status: 'ok' } })
+    vi.mocked(api.post).mockResolvedValue({ data: {} })
   })
 
-  it('mounts and calls load actions', () => {
-    const systemStore = useSystemStore()
+  it('mounts and calls load actions', async () => {
     const projectsStore = useProjectsStore()
     const bookmarksStore = useBookmarksStore()
+    const systemStore = useSystemStore()
     
-    expect(systemStore.fetchStats).toHaveBeenCalled()
-    expect(projectsStore.loadProjects).toHaveBeenCalled()
+    vi.spyOn(projectsStore, 'loadProjects').mockResolvedValue(undefined)
+    vi.spyOn(bookmarksStore, 'loadBookmarks').mockResolvedValue(undefined)
+    vi.spyOn(systemStore, 'fetchStats').mockResolvedValue(undefined)
+
+    mount(HomeView, {
+      global: {
+        stubs: ['router-link', 'q-page', 'q-card', 'q-card-section', 'q-icon', 'q-linear-progress', 'q-tooltip', 'q-badge', 'q-btn', 'q-list', 'q-item', 'q-item-section', 'q-spinner-dots', 'q-spinner-grid']
+      }
+    })
+
+    // Give it a tick for onMounted to finish its async parts
+    await vi.waitFor(() => {
+      expect(projectsStore.loadProjects).toHaveBeenCalled()
+    })
+    
     expect(bookmarksStore.loadBookmarks).toHaveBeenCalled()
+    expect(systemStore.fetchStats).toHaveBeenCalled()
   })
 
-  it('calculates totals and recent projects', () => {
+  it('calculates totals and favorite projects', () => {
     const projectsStore = useProjectsStore()
     const bookmarksStore = useBookmarksStore()
     
     projectsStore.projects = [
-      { id: '1', name: 'P1', techs: [] },
-      { id: '2', name: 'P2', techs: [] },
-      { id: '3', name: 'P3', techs: [] },
-      { id: '4', name: 'P4', techs: [] }
-    ] as any
-    bookmarksStore.bookmarks = [{ id: '1', title: 'B1' }] as any
+      { id: '1', name: 'P1', path: 'p1', techs: [], ports: [], favorite: true },
+      { id: '2', name: 'P2', path: 'p2', techs: [], ports: [], favorite: false },
+      { id: '3', name: 'P3', path: 'p3', techs: [], ports: [], favorite: true },
+      { id: '4', name: 'P4', path: 'p4', techs: [], ports: [], favorite: false }
+    ]
+    bookmarksStore.bookmarks = [{ id: 'b1', title: 'B1', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
 
-    expect(wrapper.vm.totalProjects).toBe(4)
-    expect(wrapper.vm.recentProjects).toHaveLength(4)
-    expect(wrapper.vm.totalBookmarks).toBe(1)
+    const wrapper = mount(HomeView, {
+      global: {
+        stubs: ['router-link', 'q-page', 'q-card', 'q-card-section', 'q-icon', 'q-linear-progress', 'q-tooltip', 'q-badge', 'q-btn', 'q-list', 'q-item', 'q-item-section', 'q-spinner-grid']
+      }
+    })
+
+    const vm = wrapper.vm as any
+    expect(vm.totalProjects).toBe(4)
+    expect(vm.favoriteProjects).toHaveLength(2)
+    expect(vm.totalBookmarks).toBe(1)
   })
 
   it('formats uptime correctly', () => {
-    expect(wrapper.vm.formatUptime(3600)).toBe('1h 0m')
-    expect(wrapper.vm.formatUptime(24 * 3600 + 3600)).toBe('25h 0m')
+    const wrapper = mount(HomeView, {
+      global: {
+        stubs: ['router-link', 'q-page', 'q-card', 'q-card-section', 'q-icon', 'q-linear-progress', 'q-tooltip', 'q-badge', 'q-btn', 'q-list', 'q-item', 'q-item-section', 'q-spinner-grid']
+      }
+    })
+
+    const vm = wrapper.vm as any
+    expect(vm.formatUptime(3661)).toBe('1h 1m')
+    expect(vm.formatUptime(60)).toBe('0h 1m')
   })
 
   it('opens VS Code via store', async () => {
     const projectsStore = useProjectsStore()
-    wrapper.vm.openVsCode('/test/path')
-    expect(projectsStore.openVsCode).toHaveBeenCalledWith('/test/path')
+    const spy = vi.spyOn(projectsStore, 'openVsCode').mockResolvedValue(undefined)
+    
+    const wrapper = mount(HomeView, {
+      global: {
+        stubs: ['router-link', 'q-page', 'q-card', 'q-card-section', 'q-icon', 'q-linear-progress', 'q-tooltip', 'q-badge', 'q-btn', 'q-list', 'q-item', 'q-item-section', 'q-spinner-grid']
+      }
+    })
+
+    const vm = wrapper.vm as any
+    await vm.openVsCode('/test/path')
+    expect(spy).toHaveBeenCalledWith('/test/path')
   })
 })

@@ -6,11 +6,13 @@ import { api } from '../boot/api'
 // Hoist the mock data so it's available inside vi.mock
 const { mockDb } = vi.hoisted(() => ({
   mockDb: {
-    getBookmarks: vi.fn().mockResolvedValue([]),
-    getCollections: vi.fn().mockResolvedValue([]),
+    getBookmarks: vi.fn(),
+    getCollections: vi.fn(),
     addBookmark: vi.fn().mockResolvedValue(undefined),
     deleteBookmark: vi.fn().mockResolvedValue(undefined),
-    addCollection: vi.fn().mockResolvedValue(undefined)
+    addCollection: vi.fn().mockResolvedValue(undefined),
+    updateCollection: vi.fn().mockResolvedValue(undefined),
+    deleteCollection: vi.fn().mockResolvedValue(undefined)
   }
 }))
 
@@ -18,7 +20,7 @@ const { mockDb } = vi.hoisted(() => ({
 vi.mock('../boot/api', () => ({
   api: {
     get: vi.fn(),
-    post: vi.fn()
+    post: vi.fn().mockResolvedValue({ data: {} })
   }
 }))
 
@@ -34,6 +36,10 @@ describe('Bookmarks Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.resetAllMocks()
+    vi.mocked(api.get).mockResolvedValue({ data: [] })
+    vi.mocked(api.post).mockResolvedValue({ data: {} })
+    mockDb.getCollections.mockResolvedValue([])
+    mockDb.getBookmarks.mockResolvedValue([])
   })
 
   it('initializes with empty bookmarks', () => {
@@ -45,7 +51,6 @@ describe('Bookmarks Store', () => {
     const store = useBookmarksStore()
     const mockLocal = [{ id: '1', title: 'L', url: 'u' }]
     mockDb.getBookmarks.mockResolvedValue(mockLocal as any)
-    vi.mocked(api.get).mockResolvedValue({ data: [] })
 
     await store.loadBookmarks()
 
@@ -59,7 +64,6 @@ describe('Bookmarks Store', () => {
   it('adds bookmark with correct structure', async () => {
     const store = useBookmarksStore()
     const newB = { title: 'N', url: 'u', tags: ['T'] }
-    vi.mocked(api.post).mockResolvedValue({ data: {} })
 
     await store.addBookmark(newB)
 
@@ -73,11 +77,73 @@ describe('Bookmarks Store', () => {
   it('deletes bookmark', async () => {
     const store = useBookmarksStore()
     store.bookmarks = [{ id: '1', title: 'B', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
-    vi.mocked(api.post).mockResolvedValue({ data: {} })
 
     await store.deleteBookmark('1')
 
     expect(store.bookmarks).toHaveLength(0)
     expect(mockDb.deleteBookmark).toHaveBeenCalledWith('1')
+  })
+
+  it('toggles favorite status', async () => {
+    const store = useBookmarksStore()
+    store.bookmarks = [{ id: '1', title: 'B', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
+    
+    await store.toggleFavorite('1')
+    expect(store.bookmarks[0]!.favorite).toBe(true)
+    expect(mockDb.addBookmark).toHaveBeenCalled()
+  })
+
+  it('performs importSnapshot correctly (clears and replaces)', async () => {
+    const store = useBookmarksStore()
+    const oldBookmarks = [{ id: 'old', title: 'Old', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
+    const oldCollections = [{ id: 'cold', name: 'OldCol' }]
+    
+    // Set initial state
+    store.bookmarks = [...oldBookmarks]
+    store.collections = [...oldCollections]
+    
+    // Mock existing data returned by DB
+    mockDb.getBookmarks.mockResolvedValue(oldBookmarks as any)
+    mockDb.getCollections.mockResolvedValue(oldCollections as any)
+
+    const newSnapshot = {
+      bookmarks: [{ id: 'new', title: 'New', url: 'u', tags: [], createdAt: '' }],
+      collections: [{ id: 'cnew', name: 'NewCol' }]
+    }
+
+    await store.importSnapshot(newSnapshot as any)
+
+    expect(mockDb.deleteBookmark).toHaveBeenCalledWith('old')
+    expect(mockDb.deleteCollection).toHaveBeenCalledWith('cold')
+    expect(mockDb.addBookmark).toHaveBeenCalledWith(expect.objectContaining({ id: 'new' }))
+    expect(mockDb.addCollection).toHaveBeenCalledWith(expect.objectContaining({ id: 'cnew' }))
+  })
+
+  it('forcePushToBackend calls sync endpoints', async () => {
+    const store = useBookmarksStore()
+    store.bookmarks = [{ id: '1', title: 'B', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
+    store.collections = [{ id: 'c1', name: 'C1' }]
+
+    await store.forcePushToBackend()
+
+    expect(api.post).toHaveBeenCalledWith('/api/collections/sync', expect.any(Array))
+    expect(api.post).toHaveBeenCalledWith('/api/bookmarks/sync', expect.any(Array))
+  })
+
+  it('forcePullFromBackend fetches and imports', async () => {
+    const store = useBookmarksStore()
+    vi.mocked(api.get).mockImplementation(async (url) => {
+      if (url === '/api/collections') return { data: [{ id: 'rc', name: 'RC' }] }
+      if (url === '/api/bookmarks') return { data: [{ id: 'rb', title: 'RB', url: 'u' }] }
+      return { data: [] }
+    })
+
+    const importSpy = vi.spyOn(store, 'importSnapshot')
+    await store.forcePullFromBackend()
+
+    expect(importSpy).toHaveBeenCalledWith(expect.objectContaining({
+      collections: expect.arrayContaining([expect.objectContaining({ name: 'RC' })]),
+      bookmarks: expect.arrayContaining([expect.objectContaining({ title: 'RB' })])
+    }))
   })
 })

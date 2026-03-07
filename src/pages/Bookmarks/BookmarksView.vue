@@ -237,8 +237,8 @@
 
     <!-- Manage Collections Dialog -->
     <q-dialog v-model="showManageCollections" backdrop-filter="blur(4px)">
-      <q-card style="min-width: 400px">
-        <q-card-section class="row items-center q-py-sm border-bottom">
+      <q-card style="min-width: 400px" class="bg-dialog">
+        <q-card-section class="row items-center q-py-sm border-bottom bg-dialog-header">
           <div class="text-subtitle1 text-weight-bolder">{{ $t('bookmarks.manageCollections') }}</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup size="sm" :aria-label="$t('common.close')">
@@ -276,8 +276,8 @@
 
     <!-- View Details Dialog -->
     <q-dialog v-model="showViewDialog" backdrop-filter="blur(8px)">
-      <q-card style="min-width: 500px">
-        <q-card-section class="row items-start q-pa-md border-bottom bg-grey-1">
+      <q-card style="min-width: 500px" class="bg-dialog">
+        <q-card-section class="row items-start q-pa-md border-bottom bg-dialog-header">
           <q-avatar rounded size="40px" class="q-mr-md shadow-1">
             <FaviconRenderer :url="viewingBookmark?.url || ''" />
           </q-avatar>
@@ -292,7 +292,7 @@
           </q-btn>
         </q-card-section>
         <q-card-section class="q-pa-md">
-          <div class="bg-grey-2 q-pa-sm rounded-borders text-wcag" style="white-space: pre-wrap">
+          <div class="bg-dialog-content q-pa-sm rounded-borders text-wcag" style="white-space: pre-wrap">
             <FormattedText :text="viewingBookmark?.description || ''" />
           </div>
         </q-card-section>
@@ -307,8 +307,8 @@
 
     <!-- Add/Edit Dialog -->
     <q-dialog v-model="showDialog" backdrop-filter="blur(4px)">
-      <q-card style="min-width: 500px">
-        <q-card-section class="q-py-sm border-bottom">
+      <q-card style="min-width: 500px" class="bg-dialog">
+        <q-card-section class="q-py-sm border-bottom bg-dialog-header">
           <div class="text-subtitle1 text-weight-bolder">{{ isEditing ? $t('bookmarks.editResource') : $t('bookmarks.newResource') }}</div>
         </q-card-section>
         <q-card-section class="q-gutter-sm q-pt-md">
@@ -453,8 +453,10 @@ const handleFileImport = (e: any) => {
     void (async () => {
       try {
         const imported = JSON.parse(event.target.result);
-        const bToImport = Array.isArray(imported) ? imported : (imported.bookmarks || []);
-        for (const b of bToImport) await bookmarksStore.addBookmark(b);
+        const bookmarks = Array.isArray(imported) ? imported : (imported.bookmarks || []);
+        const collections = Array.isArray(imported) ? [] : (imported.collections || []);
+        
+        await bookmarksStore.importSnapshot({ bookmarks, collections });
         $q.notify({ message: t('common.importSuccess'), color: 'positive' });
       } catch { $q.notify({ message: t('common.importFailed'), color: 'negative' }); }
     })();
@@ -511,4 +513,18 @@ onMounted(() => {
   transition: transform 0.2s ease
   &:hover
     transform: scale(1.05)
+
+.bg-dialog
+  background: var(--dd-card-bg) !important
+  color: var(--dd-text-primary)
+
+.bg-dialog-header
+  background: rgba(var(--dd-primary), 0.05)
+  .body--dark &
+    background: rgba(255, 255, 255, 0.03)
+
+.bg-dialog-content
+  background: rgba(0, 0, 0, 0.03)
+  .body--dark &
+    background: rgba(255, 255, 255, 0.05)
 </style>

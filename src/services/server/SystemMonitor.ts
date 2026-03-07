@@ -18,6 +18,10 @@ export interface SystemStats {
 }
 
 export class SystemMonitor {
+  private lastStats: SystemStats | null = null;
+  private lastFetchTime = 0;
+  private isFetching = false;
+
   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, fallback: T): Promise<T> {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
     const timeoutPromise = new Promise<T>((resolve) => {
@@ -29,27 +33,38 @@ export class SystemMonitor {
   }
 
   async getStats(): Promise<SystemStats> {
-    const totalMem = os.totalmem();
-    const freeMem = os.freemem();
-    const usedMem = totalMem - freeMem;
-    const memPercent = Math.round((usedMem / totalMem) * 100);
-    const platform = process.platform;
-    const uptime = Math.round(os.uptime());
-    const cpuCores = os.cpus().length;
+    const now = Date.now();
     
-    // On Windows, os.loadavg() is [0,0,0]. 
-    // We'll try to get si.currentLoad() which has some load info or use CPU as proxy
-    let loadAvg = os.loadavg();
+    // 1. Return cached stats if fetched within the last 2 seconds
+    if (this.lastStats && (now - this.lastFetchTime < 2000)) {
+      return this.lastStats;
+    }
 
+    // 2. If already fetching, wait a bit or return last stats to avoid overlap
+    if (this.isFetching && this.lastStats) {
+      return this.lastStats;
+    }
+
+    this.isFetching = true;
     try {
-      const cpu = await this.withTimeout(si.currentLoad(), 2000, { currentLoad: 0, avgLoad: 0 } as si.Systeminformation.CurrentLoadData);
-      const disk = await this.withTimeout(si.fsSize(), 2000, [] as si.Systeminformation.FsSizeData[]);
-      const net = await this.withTimeout(si.networkStats(), 2000, [] as si.Systeminformation.NetworkStatsData[]);
+      const totalMem = os.totalmem();
+      const freeMem = os.freemem();
+      const usedMem = totalMem - freeMem;
+      const memPercent = Math.round((usedMem / totalMem) * 100);
+      const platform = process.platform;
+      const uptime = Math.round(os.uptime());
+      const cpuCores = os.cpus().length;
+      
+      let loadAvg = os.loadavg();
 
-      // If loadAvg is all zeros (Windows), use SI's currentLoad as a proxy for the 1m load
+      const [cpu, disk, net] = await Promise.all([
+        this.withTimeout(si.currentLoad(), 2000, { currentLoad: 0, avgLoad: 0 } as si.Systeminformation.CurrentLoadData),
+        this.withTimeout(si.fsSize(), 2000, [] as si.Systeminformation.FsSizeData[]),
+        this.withTimeout(si.networkStats(), 2000, [] as si.Systeminformation.NetworkStatsData[])
+      ]);
+
       if (platform === 'win32' && loadAvg.every(v => v === 0)) {
         const current = (cpu.currentLoad || 0) / 100 * cpuCores;
-        // Mocking 5m and 15m based on current for UI consistency on Windows
         loadAvg = [
           Math.round(current * 100) / 100,
           Math.round(current * 0.8 * 100) / 100,
@@ -70,7 +85,7 @@ export class SystemMonitor {
         });
       }
 
-      return {
+      this.lastStats = {
         cpuLoad: Math.round(cpu.currentLoad || 0),
         cpuCores,
         memTotal: Math.round(totalMem / (1024 ** 3) * 100) / 100,
@@ -85,22 +100,40 @@ export class SystemMonitor {
         uptime,
         platform
       };
+      
+      this.lastFetchTime = Date.now();
+      return this.lastStats;
     } catch (e) {
-      return {
-        cpuLoad: 0,
-        cpuCores,
-        memTotal: Math.round(totalMem / (1024 ** 3) * 100) / 100,
-        memUsed: Math.round(usedMem / (1024 ** 3) * 100) / 100,
-        memPercent: memPercent,
-        diskTotal: 0, 
-        diskUsed: 0, 
-        diskPercent: 0,
-        loadAvg: [0, 0, 0],
-        netSent: 0,
-        netRecv: 0,
-        uptime,
-        platform
-      };
+      if (this.lastStats) return this.lastStats;
+      
+      // Attempt to return at least synchronous native stats on total failure
+      try {
+        const totalMem = os.totalmem();
+        const freeMem = os.freemem();
+        return {
+          cpuLoad: 0,
+          cpuCores: os.cpus().length,
+          memTotal: Math.round(totalMem / (1024 ** 3) * 100) / 100,
+          memUsed: Math.round((totalMem - freeMem) / (1024 ** 3) * 100) / 100,
+          memPercent: Math.round(((totalMem - freeMem) / totalMem) * 100),
+          diskTotal: 0,
+          diskUsed: 0,
+          diskPercent: 0,
+          loadAvg: os.loadavg(),
+          netSent: 0,
+          netRecv: 0,
+          uptime: Math.round(os.uptime()),
+          platform: process.platform
+        };
+      } catch {
+        return {
+          cpuLoad: 0, cpuCores: 0, memTotal: 0, memUsed: 0, memPercent: 0,
+          diskTotal: 0, diskUsed: 0, diskPercent: 0, loadAvg: [0, 0, 0],
+          netSent: 0, netRecv: 0, uptime: 0, platform: process.platform
+        };
+      }
+    } finally {
+      this.isFetching = false;
     }
   }
 }

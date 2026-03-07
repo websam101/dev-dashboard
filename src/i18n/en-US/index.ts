@@ -72,9 +72,10 @@ export default {
     savedBookmarks: 'Saved Bookmarks',
     manageProjects: 'Manage Projects Hub',
     viewLibrary: 'View Resource Library',
-    recentProjects: 'Recent Projects',
+    favoriteProjects: 'Favorite Projects',
     viewAll: 'View All',
     noProjects: 'No projects tracked. Scan your workspace to begin.',
+    noFavorites: 'No favorite projects yet. Mark them in the Projects Hub.',
     scanDirectory: 'Scan Directory',
     backendOnline: 'OS Backend: Online',
     backendOffline: 'OS Backend: Offline',
@@ -221,6 +222,10 @@ export default {
     noRoots: 'No scan roots configured.',
     saving: 'Saving...',
     saveAllHint: 'Save all configuration changes',
-    settingsSaved: 'Settings saved'
+    settingsSaved: 'Settings saved',
+    devTools: 'Developer Tools (DEV ONLY)',
+    pushLocalToBackend: 'Push Local to Backend',
+    pullBackendToLocal: 'Pull Backend to Local',
+    syncHint: 'Manually synchronize local IndexedDB with the shared backend JSON.'
   }
 };

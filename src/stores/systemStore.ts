@@ -29,15 +29,21 @@ export const useSystemStore = defineStore('system', {
   state: () => ({
     stats: null as SystemStats | null,
     notifications: [] as Notification[],
-    loading: false
+    loading: false,
+    isFetching: false
   }),
   actions: {
     async fetchStats() {
+      if (this.isFetching) return;
+      
+      this.isFetching = true;
       try {
         const response = await api.get('/api/system/stats');
         this.stats = response.data;
       } catch (e) {
         console.error('Failed to fetch system stats', e);
+      } finally {
+        this.isFetching = false;
       }
     },
     addNotification(notif: Omit<Notification, 'id' | 'time'>) {

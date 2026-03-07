@@ -26,3 +26,12 @@ function terminalLog(violations: any) {
 }
 
 (Cypress as any).terminalLog = terminalLog;
+
+// Ignore ResizeObserver loop limit exceeded error (common in Vue/Quasar testing)
+Cypress.on('uncaught:exception', (err) => {
+  if (err.message.includes('ResizeObserver loop completed with undelivered notifications') || 
+      err.message.includes('ResizeObserver loop limit exceeded')) {
+    return false;
+  }
+  return true;
+});

@@ -56,6 +56,7 @@ export interface Project {
   techs: string[];
   git?: any;
   managedPorts?: number[];
+  favorite?: boolean;
 }
 
 export interface PortRecord {

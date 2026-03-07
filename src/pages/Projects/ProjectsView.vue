@@ -113,6 +113,18 @@
       <template v-slot:body-cell-name="props">
         <q-td :props="props">
           <div class="row items-center no-wrap">
+            <q-checkbox
+              :model-value="props.row.favorite"
+              @update:model-value="projectsStore.toggleFavorite(props.row.id)"
+              dense
+              color="amber-10"
+              icon="mdi-star-outline"
+              checked-icon="mdi-star"
+              size="sm"
+              class="q-mr-xs"
+            >
+              <q-tooltip>{{ props.row.favorite ? $t('bookmarks.unpinHint') : $t('bookmarks.pinHint') }}</q-tooltip>
+            </q-checkbox>
             <q-icon name="mdi-folder" color="primary" class="q-mr-sm" size="18px" />
             <div class="text-weight-bolder text-wcag">{{ props.row.name }}</div>
             <q-icon v-if="props.row.git?.isDirty" name="mdi-pencil-box-multiple" color="warning" class="q-ml-xs" size="16px">
@@ -544,6 +556,7 @@ onMounted(() => {
 
 .body--dark .compact-table
   :deep(th)
+    color: var(--dd-text-primary)
     background: rgba(255,255,255,0.03)
 
 .hover-scale

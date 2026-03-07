@@ -3,24 +3,39 @@ import { SystemMonitor } from './SystemMonitor'
 import os from 'node:os'
 import si from 'systeminformation'
 
-vi.mock('node:os', () => ({
-  default: {
-    freemem: vi.fn(),
+const { mockHandlers } = vi.hoisted(() => ({
+  mockHandlers: {
     totalmem: vi.fn(),
+    freemem: vi.fn(),
     uptime: vi.fn(),
-    cpus: vi.fn().mockReturnValue([
-      { model: 'Intel', speed: 2400, times: { user: 0, nice: 0, sys: 0, idle: 0, irq: 0 } },
-      { model: 'Intel', speed: 2400, times: { user: 0, nice: 0, sys: 0, idle: 0, irq: 0 } }
-    ]),
-    loadavg: vi.fn().mockReturnValue([0.5, 0.5, 0.5])
+    cpus: vi.fn(),
+    loadavg: vi.fn()
+  }
+}))
+
+vi.mock('node:os', () => ({
+  totalmem: mockHandlers.totalmem,
+  freemem: mockHandlers.freemem,
+  uptime: mockHandlers.uptime,
+  cpus: mockHandlers.cpus,
+  loadavg: mockHandlers.loadavg,
+  default: {
+    totalmem: mockHandlers.totalmem,
+    freemem: mockHandlers.freemem,
+    uptime: mockHandlers.uptime,
+    cpus: mockHandlers.cpus,
+    loadavg: mockHandlers.loadavg
   }
 }))
 
 vi.mock('systeminformation', () => ({
+  currentLoad: vi.fn(),
+  fsSize: vi.fn(),
+  networkStats: vi.fn().mockResolvedValue([{ tx_bytes: 1024, rx_bytes: 2048 }]),
   default: {
     currentLoad: vi.fn(),
     fsSize: vi.fn(),
-    networkStats: vi.fn().mockResolvedValue([{ tx_bytes: 1024, rx_bytes: 2048 }])
+    networkStats: vi.fn()
   }
 }))
 
@@ -30,15 +45,16 @@ describe('SystemMonitor', () => {
   beforeEach(() => {
     monitor = new SystemMonitor()
     vi.resetAllMocks()
-    // Default OS mocks
-    vi.mocked(os.totalmem).mockReturnValue(16 * 1024 ** 3)
-    vi.mocked(os.freemem).mockReturnValue(8 * 1024 ** 3)
-    vi.mocked(os.uptime).mockReturnValue(3600)
-    vi.mocked(os.cpus).mockReturnValue([
+    
+    // Setup default mock values
+    mockHandlers.totalmem.mockReturnValue(16 * 1024 ** 3)
+    mockHandlers.freemem.mockReturnValue(8 * 1024 ** 3)
+    mockHandlers.uptime.mockReturnValue(3600)
+    mockHandlers.cpus.mockReturnValue([
       { model: 'Intel', speed: 2400, times: { user: 0, nice: 0, sys: 0, idle: 0, irq: 0 } },
       { model: 'Intel', speed: 2400, times: { user: 0, nice: 0, sys: 0, idle: 0, irq: 0 } }
     ])
-    vi.mocked(os.loadavg).mockReturnValue([0.5, 0.5, 0.5])
+    mockHandlers.loadavg.mockReturnValue([0.5, 0.5, 0.5])
   })
 
   it('gets basic stats when systeminformation works', async () => {
