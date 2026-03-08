@@ -415,7 +415,9 @@ const filteredFavorites = computed(() => {
     if (activeCollection.value === 'unassigned') list = list.filter(b => !b.collectionId);
     else list = list.filter(b => b.collectionId === activeCollection.value);
   }
-  if (selectedProject.value !== 'global') list = list.filter(b => b.projectIds?.includes(selectedProject.value) || b.projectIds?.includes('global'));
+  if (selectedProject.value !== 'global') {
+    list = list.filter(b => b.projectIds?.includes(selectedProject.value));
+  }
   if (query) {
     list = list.filter(b => b.title.toLowerCase().includes(query) || b.url.toLowerCase().includes(query) || b.tags.some(t => t.toLowerCase().includes(query)));
   }
@@ -425,7 +427,9 @@ const filteredFavorites = computed(() => {
 const filteredBookmarks = computed(() => {
   const query = (searchQuery.value || '').toLowerCase().trim();
   let base = [...bookmarksStore.byCollection(activeCollection.value)];
-  if (selectedProject.value !== 'global') base = base.filter(b => b.projectIds?.includes(selectedProject.value) || b.projectIds?.includes('global'));
+  if (selectedProject.value !== 'global') {
+    base = base.filter(b => b.projectIds?.includes(selectedProject.value));
+  }
   if (query) base = base.filter(b => b.title.toLowerCase().includes(query) || b.url.toLowerCase().includes(query) || b.tags.some(t => t.toLowerCase().includes(query)));
   
   // Default sort is newest to oldest if no table sort is active

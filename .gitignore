@@ -5,6 +5,7 @@ node_modules
 # Quasar core related directories
 .quasar
 /dist
+/dist-*
 /quasar.config.*.temporary.compiled*
 
 # Cordova related directories and files
@@ -33,6 +34,12 @@ yarn-error.log*
 # local .env files
 .env.local*
 .env
+
+# Package manager files
+node_modules
+pnpm-lock.yaml
+pnpm-workspace.yaml
+*.pnpm-debug.log*
 
 # Project specific exclusions
 /conductor
