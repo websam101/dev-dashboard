@@ -1,0 +1,8 @@
+{
+  "track_id": "port_warning_20250523",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2025-05-23T23:00:00Z",
+  "updated_at": "2025-05-23T23:00:00Z",
+  "description": "Add warning in port checker if a port is already managed by a project."
+}
