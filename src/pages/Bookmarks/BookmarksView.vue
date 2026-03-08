@@ -1,39 +1,60 @@
 <template>
   <q-page class="q-pa-md">
-    <!-- Top Level Collection Selector & Actions (Redesigned Header) -->
-    <div class="row items-center justify-between q-mb-lg q-pa-sm rounded-borders bg-glass shadow-1">
-      <div class="row items-center">
-        <div class="header-accent-line q-mr-md"></div>
-        <q-tabs
-          v-model="activeCollection"
-          dense
-          no-caps
-          inline-label
-          class="tabs-container-modern overflow-hidden"
-          active-color="primary"
-          indicator-color="primary"
-          align="left"
-        >
-          <q-tab name="all" icon="apps" :label="$t('bookmarks.allResources')" class="text-weight-bold">
-            <q-tooltip>{{ $t('bookmarks.allResourcesHint') }}</q-tooltip>
-          </q-tab>
-          <q-tab
-            v-for="col in sortedCollections"
-            :key="col.id"
-            :name="col.id"
-            :label="col.name"
-            class="text-weight-bold"
-          />
-          <q-tab name="unassigned" icon="question_mark" :label="$t('bookmarks.unassigned')" class="text-weight-bold">
-            <q-tooltip>{{ $t('bookmarks.unassignedHint') }}</q-tooltip>
-          </q-tab>
-        </q-tabs>
-        
-        <q-btn flat round dense icon="settings" color="primary" @click="showManageCollections = true" size="sm" class="q-ml-sm" :aria-label="$t('bookmarks.manageCollections')">
-          <q-tooltip>{{ $t('bookmarks.manageCollections') }}</q-tooltip>
-        </q-btn>
-      </div>
+    <!-- Collection Filter Row (Top Level Hierarchy) -->
+    <div class="row items-center q-mb-md q-gutter-x-sm">
+      <div class="header-accent-line q-mr-sm" style="height: 24px"></div>
+      <div class="text-overline text-wcag-bold opacity-70 q-mr-sm" style="font-size: 0.6rem">COLLECTIONS</div>
+      <q-tabs
+        v-model="activeCollection"
+        dense
+        no-caps
+        inline-label
+        class="tabs-container-modern col scroll"
+        active-color="primary"
+        indicator-color="primary"
+        align="left"
+        outside-arrows
+        mobile-arrows
+      >
+        <q-tab name="all" icon="apps" :label="$t('bookmarks.allResources')" class="text-weight-bold">
+          <q-tooltip>{{ $t('bookmarks.allResourcesHint') }}</q-tooltip>
+        </q-tab>
+        <q-tab
+          v-for="col in sortedCollections"
+          :key="col.id"
+          :name="col.id"
+          :label="col.name"
+          class="text-weight-bold"
+        />
+        <q-tab name="unassigned" icon="question_mark" :label="$t('bookmarks.unassigned')" class="text-weight-bold">
+          <q-tooltip>{{ $t('bookmarks.unassignedHint') }}</q-tooltip>
+        </q-tab>
+      </q-tabs>
+      
+      <q-btn 
+        outline
+        color="primary" 
+        icon="settings" 
+        @click="showManageCollections = true" 
+        size="sm" 
+        class="rounded-borders"
+        :aria-label="$t('bookmarks.manageCollections')"
+      >
+        <q-tooltip>{{ $t('bookmarks.manageCollections') }}</q-tooltip>
+      </q-btn>
+    </div>
 
+    <!-- Main Header (Secondary Actions & Context) -->
+    <div class="row items-center justify-between q-mb-md q-pa-sm rounded-borders bg-glass shadow-1">
+      <div class="row items-center">
+        <div>
+          <h1 class="text-h5 text-wcag-bold q-ma-none line-height-1">{{ $t('bookmarks.title') }}</h1>
+          <div class="text-wcag-caption opacity-70 text-weight-medium">
+            {{ bookmarksStore.bookmarks.length }} {{ $t('dashboard.savedBookmarks').toLowerCase() }}
+          </div>
+        </div>
+      </div>
+      
       <div class="row q-gutter-x-md items-center">
         <!-- Search & Context Group -->
         <div class="row no-wrap shadow-1 rounded-borders overflow-hidden border-subtle">
