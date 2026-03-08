@@ -1,13 +1,13 @@
 # Implementation Plan: Comprehensive French Application Documentation
 
-## Phase 1: Localized Root and Developer Setup
-- [ ] Task: Create `README.fr.md` in the root.
-    - [ ] Translate overview, features, and tech stack.
-    - [ ] Link to `docs/fr/` documentation map.
-- [ ] Task: Create `docs/fr/dev/README.md`.
-    - [ ] Translate setup, installation, and build commands.
-    - [ ] Document Conductor workflow in French.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Localized Root and Developer Setup' (Protocol in workflow.md)
+## Phase 1: Localized Root and Developer Setup [checkpoint: 585d0b9]
+- [x] Task: Create `README.fr.md` in the root.
+    - [x] Translate overview, features, and tech stack.
+    - [x] Link to `docs/fr/` documentation map.
+- [x] Task: Create `docs/fr/dev/README.md`.
+    - [x] Translate setup, installation, and build commands.
+    - [x] Document Conductor workflow in French.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Localized Root and Developer Setup' (Protocol in workflow.md)
 
 ## Phase 2: Localized User Manual
 - [ ] Task: Create `docs/fr/user/README.md`.
