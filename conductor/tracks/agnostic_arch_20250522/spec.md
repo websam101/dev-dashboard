@@ -1,7 +1,7 @@
 # Specification: Agnostic Architecture and SPA Mode Support
 
 ## Overview
-This track aims to make the Dev Dashboard platform-agnostic by introducing a "Local-Only" (SPA/BEX) mode that functions entirely without a Node.js backend. This involves transitioning data storage from a shared `db.json` model to a strictly IndexedDB-first approach for all client modes. Additionally, a setting will be introduced to toggle system statistics for environments where they are available (SSR, Electron).
+This track aims to make the Dev Dashboard platform-agnostic by introducing a "Local-Only" (SPA/BEX) mode that functions entirely without a Node.js backend. This involves transitioning data storage from a shared `db.json` model to a strictly IndexedDB-first approach for all client modes. Additionally, a setting will be introduced to toggle system statistics for environments where they are available (SSR, Electron), and existing OS-level features will be improved.
 
 ## Functional Requirements
 1. **IndexedDB-First Storage:**
@@ -19,7 +19,12 @@ This track aims to make the Dev Dashboard platform-agnostic by introducing a "Lo
    - Allow manual entry of projects (name, "pseudo" path, and associated links) in SPA mode.
    - Support browser File System API for single-project selection/access where possible.
    - Hide the "Scan Folder" action in SPA/BEX modes.
-5. **Universal Portability:**
+5. **Port Checker Enhancement:**
+   - Fix the port checker button. It must trigger a backend check (or local check if possible) and display the result (Available/Taken) in a modal or non-intrusive notification.
+6. **Task Manager Integration:**
+   - On the homepage, replace the "Uptime/Platform" text with a "System Monitor" button.
+   - This button should trigger an OS-level command to open the native task manager (`taskmgr` on Windows, `Activity Monitor` on macOS, etc.) in supported modes (Electron/SSR).
+7. **Universal Portability:**
    - Ensure the architecture remains agnostic to support future BEX, Capacitor, and Cordova modes without code modification.
 
 ## Non-Functional Requirements
@@ -33,6 +38,8 @@ This track aims to make the Dev Dashboard platform-agnostic by introducing a "Lo
 - [ ] Turning off "System Statistics" in Settings hides the resource widgets on the Dashboard.
 - [ ] In Electron/SSR, data still syncs to `~/.dev-dashboard/db.json` when the backend is reachable.
 - [ ] "Scan Folder" button is hidden in SPA mode.
+- [ ] Port checker button provides visual feedback on whether a port is open or closed.
+- [ ] Clicking the "Task Manager" button opens the OS task manager in Electron/SSR modes.
 
 ## Out of Scope
 - Full PWA implementation (offline service workers).

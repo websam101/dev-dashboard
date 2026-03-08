@@ -7,6 +7,12 @@
     - [ ] Create `AgnosticDataService.ts` to orchestrate between local adapter and optional backend sync.
 - [ ] Task: Update `boot/api.ts` to include platform capability detection.
     - [ ] Add `hasBackend` and `hasFileSystem` flags based on `process.env.MODE` and runtime checks.
+- [ ] Task: Implement backend API for opening the system task manager.
+    - [ ] Add `openTaskManager()` to `ActionExecutor.ts` (OS-specific commands).
+    - [ ] Expose `/api/actions/open-task-manager` in SSR/Electron middlewares.
+- [ ] Task: Implement backend API for port checking.
+    - [ ] Add `checkPort(port: number)` to `SystemMonitor.ts`.
+    - [ ] Expose `/api/utils/check-port` in SSR/Electron middlewares.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Storage and API Abstraction' (Protocol in workflow.md)
 
 ## Phase 2: Store Migration and Capability Awareness
@@ -19,12 +25,17 @@
     - [ ] Update TDD tests for `projectsStore`.
 - [ ] Task: Update `systemStore.ts` to respect `showSystemStats` setting and `hasBackend` capability.
     - [ ] Update `fetchStats` to conditionally run.
+    - [ ] Add `openTaskManager` and `checkPort` actions.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Store Migration and Capability Awareness' (Protocol in workflow.md)
 
 ## Phase 3: UI Implementation and Platform Adaptation
 - [ ] Task: Implement conditional UI in `Dashboard/HomeView.vue`.
     - [ ] Wrap resource widgets in `v-if` based on `showSystemStats` and `hasBackend`.
+    - [ ] Replace "Uptime/Platform" with a "System Monitor" button that calls `openTaskManager`.
     - [ ] Implement manual project entry modal/dialog.
+- [ ] Task: Fix Port Checker UI in `Dashboard/HomeView.vue`.
+    - [ ] Connect the check button to the `systemStore.checkPort` action.
+    - [ ] Show a Quasar dialog or notification with the port status (Available/Taken).
 - [ ] Task: Update `SettingsView.vue` to include the toggle for system statistics.
 - [ ] Task: Implement "Not Supported" tooltips/states for OS actions in SPA mode.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: UI Implementation and Platform Adaptation' (Protocol in workflow.md)
