@@ -26,9 +26,21 @@ const mockQuasar = {
   }
 }
 
+export const Dark = {
+  set: vi.fn(),
+  isActive: false
+}
+
+export const debounce = (fn: any) => fn;
+
 vi.mock('quasar', () => ({
   useQuasar: () => mockQuasar,
-  defineBoot: (fn: any) => fn
+  defineBoot: (fn: any) => fn,
+  Dark: {
+    set: vi.fn(),
+    isActive: false
+  },
+  debounce: (fn: any) => fn
 }))
 
 // Mock vue-i18n
@@ -76,11 +88,5 @@ config.global.stubs = {
   'q-td': { template: '<td><slot /></td>' },
   'q-tr': { template: '<tr><slot /></tr>' },
   'q-spinner-dots': { template: '<div />' },
-  'q-spinner-grid': { template: '<div />' },
-  'q-linear-progress': { template: '<div />' },
-  'q-slide-transition': { template: '<div><slot /></div>' }
+  'q-spinner-grid': { template: '<div />' }
 }
-
-// Set environment variables
-process.env.CLIENT = 'true'
-process.env.MODE = 'spa'

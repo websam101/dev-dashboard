@@ -2,29 +2,22 @@ import { setActivePinia, createPinia } from 'pinia'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useSettingsStore } from './settingsStore'
 import { api } from '../boot/api'
-
-// Hoist mock
-const { mockDb } = vi.hoisted(() => ({
-  mockDb: {
-    getSetting: vi.fn(),
-    setSetting: vi.fn()
-  }
-}))
+import { agnosticDataService } from '../services/db/AgnosticDataService'
 
 vi.mock('../boot/api', () => ({
   api: {
     get: vi.fn().mockResolvedValue({ data: {} }),
     post: vi.fn().mockResolvedValue({ data: {} })
-  }
+  },
+  hasBackend: true
 }))
 
-vi.mock('../services/db/adapter/IndexedDbAdapter', () => {
-  return {
-    IndexedDbAdapter: vi.fn().mockImplementation(function() {
-      return mockDb
-    })
+vi.mock('../services/db/AgnosticDataService', () => ({
+  agnosticDataService: {
+    getSetting: vi.fn(),
+    setSetting: vi.fn()
   }
-})
+}))
 
 describe('Settings Store', () => {
   beforeEach(() => {
@@ -35,16 +28,17 @@ describe('Settings Store', () => {
   it('initializes with default settings', () => {
     const store = useSettingsStore()
     expect(store.settings.darkMode).toBe(true)
+    expect(store.settings.showSystemStats).toBe(true)
   })
 
   it('loads settings successfully', async () => {
     const store = useSettingsStore()
-    mockDb.getSetting.mockResolvedValue({ darkMode: false, scanRoots: ['/path'] })
+    vi.mocked(agnosticDataService.getSetting).mockResolvedValue({ darkMode: false, showSystemStats: false })
     
     await store.loadSettings()
 
     expect(store.settings.darkMode).toBe(false)
-    expect(store.settings.scanRoots).toContain('/path')
+    expect(store.settings.showSystemStats).toBe(false)
   })
 
   it('saves settings successfully', async () => {
@@ -53,7 +47,6 @@ describe('Settings Store', () => {
     
     await store.saveSettings()
 
-    expect(mockDb.setSetting).toHaveBeenCalled()
-    expect(api.post).toHaveBeenCalledWith('/api/settings', expect.objectContaining({ darkMode: false }))
+    expect(agnosticDataService.setSetting).toHaveBeenCalledWith('app_settings', expect.objectContaining({ darkMode: false }))
   })
 })

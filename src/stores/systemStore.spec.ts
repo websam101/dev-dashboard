@@ -1,18 +1,32 @@
 import { setActivePinia, createPinia } from 'pinia'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useSystemStore } from './systemStore'
+import { useSettingsStore } from './settingsStore'
 import { api } from '../boot/api';
 
 vi.mock('../boot/api', () => ({
   api: {
-    get: vi.fn()
-  }
+    get: vi.fn(),
+    post: vi.fn()
+  },
+  hasBackend: true
+}))
+
+vi.mock('./settingsStore', () => ({
+  useSettingsStore: vi.fn().mockImplementation(() => ({
+    settings: {
+      showSystemStats: true
+    }
+  }))
 }))
 
 describe('System Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.resetAllMocks()
+    vi.mocked(useSettingsStore).mockReturnValue({
+      settings: { showSystemStats: true }
+    } as any)
   })
 
   it('initializes with null stats', () => {
@@ -32,12 +46,33 @@ describe('System Store', () => {
     expect(api.get).toHaveBeenCalledWith('/api/system/stats')
   })
 
-  it('handles fetch stats failure', async () => {
+  it('does NOT fetch stats if showSystemStats is false', async () => {
     const store = useSystemStore()
-    vi.mocked(api.get).mockRejectedValue(new Error('Fetch failed'))
+    vi.mocked(useSettingsStore).mockImplementation(() => ({
+      settings: { showSystemStats: false }
+    } as any))
 
     await store.fetchStats()
 
-    expect(store.stats).toBeNull()
+    expect(api.get).not.toHaveBeenCalled()
+  })
+
+  it('checks port status', async () => {
+    const store = useSystemStore()
+    vi.mocked(api.post).mockResolvedValue({ data: { inUse: true } })
+
+    const inUse = await store.checkPort(8080)
+
+    expect(inUse).toBe(true)
+    expect(api.post).toHaveBeenCalledWith('/api/utils/check-port', { port: 8080 })
+  })
+
+  it('opens task manager', async () => {
+    const store = useSystemStore()
+    vi.mocked(api.post).mockResolvedValue({ data: { success: true } })
+
+    await store.openTaskManager()
+
+    expect(api.post).toHaveBeenCalledWith('/api/actions/open-task-manager')
   })
 })

@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { api } from '../boot/api';
-import { IndexedDbAdapter } from "../services/db/adapter/IndexedDbAdapter";
+import { agnosticDataService } from "../services/db/AgnosticDataService";
 import { Dark, debounce } from 'quasar';
 import { watch } from 'vue';
 
@@ -10,9 +10,8 @@ export interface Settings {
   portCheckInterval: number;
   scanRoots: string[];
   locale: string;
+  showSystemStats: boolean;
 }
-
-const db = new IndexedDbAdapter();
 
 // Helper to ensure we have a clean object without Vue Proxies
 const clean = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
@@ -24,7 +23,8 @@ export const useSettingsStore = defineStore("settings", {
       autoCheckPorts: true,
       portCheckInterval: 30000,
       scanRoots: [],
-      locale: 'en-US'
+      locale: 'en-US',
+      showSystemStats: true
     } as Settings,
     loading: false,
     initialized: false
@@ -40,7 +40,7 @@ export const useSettingsStore = defineStore("settings", {
       await this.loadSettings();
 
       // 2. Apply theme immediately after loading (before setting up watch)
-      Dark.set(this.settings.darkMode);
+       Dark.set(this.settings.darkMode);
 
       // 3. Setup internal watch for Dark Mode (UI side-effect)
       watch(() => this.settings.darkMode, (isDark) => {
@@ -53,6 +53,11 @@ export const useSettingsStore = defineStore("settings", {
         void this.debouncedSave(); // Auto-save on change
       });
 
+      // 5. Setup internal watch for other settings
+      watch(() => this.settings.showSystemStats, () => {
+        void this.debouncedSave();
+      });
+
       this.initialized = true;
     },
     async loadSettings() {
@@ -60,19 +65,20 @@ export const useSettingsStore = defineStore("settings", {
       
       this.loading = true;
       try {
-        // 1. Load from IndexedDB
-        const local = await db.getSetting<Settings>('app_settings');
+        // 1. Load from Agnostic Service (Local-First)
+        const local = await agnosticDataService.getSetting<Settings>('app_settings');
         if (local) {
           // Careful merge to not lose defaults if local is old
           this.settings = { ...this.settings, ...local };
         }
 
-        // 2. Optional Sync with Backend
+        // 2. Optional Sync with Backend (if supported by service)
+        // AgnosticDataService handles the orchestration, but we can still pull if needed
         try {
           const response = await api.get('/api/settings');
           if (response.data && typeof response.data === 'object' && Object.keys(response.data).length > 0) {
             this.settings = { ...this.settings, ...response.data };
-            await db.setSetting('app_settings', clean(this.settings));
+            await agnosticDataService.setSetting('app_settings', clean(this.settings));
           }
         } catch (e) {
           // Ignore sync failures
@@ -93,14 +99,9 @@ export const useSettingsStore = defineStore("settings", {
 
       try {
         const plainSettings = clean(this.settings);
-        
-        // 1. Save to IndexedDB
-        await db.setSetting('app_settings', plainSettings);
-
-        // 2. Optional Sync to Backend
-        void api.post('/api/settings', plainSettings).catch(() => {});
+        await agnosticDataService.setSetting('app_settings', plainSettings);
       } catch (e) {
-        console.error("Failed to save settings locally", e);
+        console.error("Failed to save settings", e);
       }
     }
   }

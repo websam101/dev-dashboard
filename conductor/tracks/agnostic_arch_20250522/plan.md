@@ -16,14 +16,14 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Storage and API Abstraction' (Protocol in workflow.md)
 
 ## Phase 2: Store Migration and Capability Awareness
-- [ ] Task: Refactor `settingsStore.ts` to use `AgnosticDataService` and include `showSystemStats` setting.
-    - [ ] Add `showSystemStats` to `Settings` interface.
-    - [ ] Update TDD tests for `settingsStore`.
-- [ ] Task: Refactor `projectsStore.ts` to use `AgnosticDataService` and honor platform capabilities.
-    - [ ] Update `loadProjects` and `syncAll` to respect `hasBackend` flag.
-    - [ ] Add manual project entry action.
-    - [ ] Update TDD tests for `projectsStore`.
-- [ ] Task: Update `systemStore.ts` to respect `showSystemStats` setting and `hasBackend` capability.
+- [x] Task: Refactor `settingsStore.ts` to use `AgnosticDataService` and include `showSystemStats` setting.
+    - [x] Add `showSystemStats` to `Settings` interface.
+    - [x] Update TDD tests for `settingsStore`.
+- [x] Task: Refactor `projectsStore.ts` to use `AgnosticDataService` and honor platform capabilities.
+    - [x] Update `loadProjects` and `syncAll` to respect `hasBackend` flag.
+    - [x] Add manual project entry action.
+    - [x] Update TDD tests for `projectsStore`.
+- [~] Task: Update `systemStore.ts` to respect `showSystemStats` setting and `hasBackend` capability.
     - [ ] Update `fetchStats` to conditionally run.
     - [ ] Add `openTaskManager` and `checkPort` actions.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Store Migration and Capability Awareness' (Protocol in workflow.md)

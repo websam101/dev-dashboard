@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
-import { api } from '../boot/api';
+import { api, hasBackend } from '../boot/api';
+import { useSettingsStore } from './settingsStore';
 
 export interface SystemStats {
   cpuLoad: number;
@@ -34,7 +35,8 @@ export const useSystemStore = defineStore('system', {
   }),
   actions: {
     async fetchStats() {
-      if (this.isFetching) return;
+      const settingsStore = useSettingsStore();
+      if (this.isFetching || !hasBackend || !settingsStore.settings.showSystemStats) return;
       
       this.isFetching = true;
       try {
@@ -44,6 +46,24 @@ export const useSystemStore = defineStore('system', {
         console.error('Failed to fetch system stats', e);
       } finally {
         this.isFetching = false;
+      }
+    },
+    async checkPort(port: number): Promise<boolean> {
+      if (!hasBackend) return false;
+      try {
+        const response = await api.post('/api/utils/check-port', { port });
+        return !!response.data.inUse;
+      } catch (e) {
+        console.error('Failed to check port', e);
+        return false;
+      }
+    },
+    async openTaskManager() {
+      if (!hasBackend) return;
+      try {
+        await api.post('/api/actions/open-task-manager');
+      } catch (e) {
+        console.error('Failed to open task manager', e);
       }
     },
     addNotification(notif: Omit<Notification, 'id' | 'time'>) {
