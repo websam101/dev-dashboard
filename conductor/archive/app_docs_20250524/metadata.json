@@ -1,0 +1,8 @@
+{
+  "track_id": "app_docs_20250524",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2025-05-24T00:30:00Z",
+  "updated_at": "2025-05-24T00:30:00Z",
+  "description": "Create complete application documentation (dev, user, api, modes, diagrams)."
+}
