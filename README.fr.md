@@ -52,8 +52,13 @@ Un centre de commandement robuste et agnostique pour la gestion de vos projets l
 # Installer les dépendances
 npm install
 
-# Lancer en mode développement
+# Lancer en mode développement (détecte le mode auto)
 quasar dev
+
+# Compiler pour différentes cibles
+quasar build -m electron  # Bureau
+quasar build -m ssr       # Serveur Web
+quasar build              # SPA (Statique)
 
 # Lancer la suite de tests complète
 npm run test:unit  # Vitest

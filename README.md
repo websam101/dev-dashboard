@@ -56,6 +56,11 @@ npm install
 # Start in development mode (detects mode automatically)
 quasar dev
 
+# Build for different targets
+quasar build -m electron  # Desktop
+quasar build -m ssr       # Web Server
+quasar build              # SPA (Static)
+
 # Run full test suite
 npm run test:unit  # Vitest
 npm run test:e2e   # Cypress
