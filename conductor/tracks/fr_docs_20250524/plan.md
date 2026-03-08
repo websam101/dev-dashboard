@@ -18,12 +18,12 @@
     - [x] `systeme.md`: Monitoring and Task Manager.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Localized User Manual' (Protocol in workflow.md)
 
-## Phase 3: Technical and API Documentation (French)
-- [ ] Task: Create `docs/fr/api/README.md` (mirroring `src/services/README.md`).
-    - [ ] Localize architecture diagrams and endpoint descriptions.
-- [ ] Task: Create `docs/fr/api/schema.md` (mirroring `src/services/db/README.md`).
-    - [ ] Localize data model and storage descriptions.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Technical and API Documentation' (Protocol in workflow.md)
+## Phase 3: Technical and API Documentation (French) [checkpoint: 737db52]
+- [x] Task: Create `docs/fr/api/README.md` (mirroring `src/services/README.md`).
+    - [x] Localize architecture diagrams and endpoint descriptions.
+- [x] Task: Create `docs/fr/api/schema.md` (mirroring `src/services/db/README.md`).
+    - [x] Localize data model and storage descriptions.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Technical and API Documentation' (Protocol in workflow.md)
 
 ## Phase 4: Execution Modes and Final Review
 - [ ] Task: Create `docs/fr/modes/README.md`.
