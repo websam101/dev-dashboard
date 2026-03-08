@@ -20,6 +20,11 @@ graph TD
 2. **`StorageAdapter` (Interface)** : Définit le contrat pour les opérations de base de données.
 3. **`IndexedDbAdapter.ts`** : L'implémentation par défaut pour le stockage côté navigateur.
 
+### 💾 Logique de Sauvegarde et Restauration
+L'`AgnosticDataService` fournit des méthodes pour la gestion complète de l'état de l'application :
+- **`exportAllData()`** : Regroupe toutes les données d'IndexedDB (Projets, Favoris, Collections, Paramètres) dans un bundle JSON unique et versionné.
+- **`importAllData(json)`** : Valide et remplace l'état local actuel par la sauvegarde fournie, en poussant optionnellement le nouvel état vers le backend s'il est accessible.
+
 ## 🖥️ Services Serveur (Node.js uniquement)
 
 Ces services ne sont exécutés que dans les environnements **Electron** ou **SSR** via la couche middleware.

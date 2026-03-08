@@ -20,6 +20,11 @@ graph TD
 2. **`StorageAdapter` (Interface)**: Defines the contract for database operations.
 3. **`IndexedDbAdapter.ts`**: The default implementation for browser-based storage.
 
+### 💾 Backup & Restore Logic
+The `AgnosticDataService` provides methods for full application state management:
+- **`exportAllData()`**: Aggregates all data from IndexedDB (Projects, Bookmarks, Collections, Settings) into a single, versioned JSON bundle.
+- **`importAllData(json)`**: Validates and replaces the current local state with the provided backup, optionally pushing the new state to the backend if reachable.
+
 ## 🖥️ Server Services (Node.js Only)
 
 These services are only executed in **Electron** or **SSR** environments via the middleware layer.
