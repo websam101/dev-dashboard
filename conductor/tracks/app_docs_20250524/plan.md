@@ -20,14 +20,14 @@
     - [x] Backup/Restore procedure.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: User and Feature Guides' (Protocol in workflow.md)
 
-## Phase 3: Technical Reference and API
-- [ ] Task: Create `src/services/README.md`.
-    - [ ] Agnostic Data Service architecture and diagrams.
-    - [ ] Backend API (SSR Middlewares) endpoint reference.
-- [ ] Task: Create `src/stores/README.md`.
-    - [ ] State management overview and Store interactions.
-- [ ] Task: Document Data Schema in `src/services/db/README.md`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Technical Reference and API' (Protocol in workflow.md)
+## Phase 3: Technical Reference and API [checkpoint: 4dcf033]
+- [x] Task: Create `src/services/README.md`.
+    - [x] Agnostic Data Service architecture and diagrams.
+    - [x] Backend API (SSR Middlewares) endpoint reference.
+- [x] Task: Create `src/stores/README.md`.
+    - [x] State management overview and Store interactions.
+- [x] Task: Document Data Schema in `src/services/db/README.md`.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Technical Reference and API' (Protocol in workflow.md)
 
 ## Phase 4: Platform and Deployment
 - [ ] Task: Create `docs/modes/README.md`.
