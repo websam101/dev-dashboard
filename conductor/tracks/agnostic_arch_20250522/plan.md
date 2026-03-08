@@ -28,7 +28,7 @@
     - [x] Add `openTaskManager` and `checkPort` actions.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Store Migration and Capability Awareness' (Protocol in workflow.md)
 
-## Phase 3: UI Implementation and Platform Adaptation
+## Phase 3: UI Implementation and Platform Adaptation [checkpoint: 2d584e4]
 - [x] Task: Implement conditional UI in `Dashboard/HomeView.vue`.
     - [x] Wrap resource widgets in `v-if` based on `showSystemStats` and `hasBackend`.
     - [x] Replace "Uptime/Platform" with a "System Monitor" button that calls `openTaskManager`.
@@ -37,8 +37,8 @@
     - [x] Connect the check button to the `systemStore.checkPort` action.
     - [x] Show a Quasar dialog or notification with the port status (Available/Taken).
 - [x] Task: Update `SettingsView.vue` to include the toggle for system statistics.
-- [~] Task: Implement "Not Supported" tooltips/states for OS actions in SPA mode.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: UI Implementation and Platform Adaptation' (Protocol in workflow.md)
+- [x] Task: Implement "Not Supported" tooltips/states for OS actions in SPA mode.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: UI Implementation and Platform Adaptation' (Protocol in workflow.md)
 
 ## Phase 4: Final Validation and Multi-Platform Testing
 - [ ] Task: Verify SPA mode functionality (`quasar dev`).
