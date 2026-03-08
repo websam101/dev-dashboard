@@ -1,87 +1,90 @@
 <template>
   <q-page class="q-pa-md">
-    <!-- Top Level Collection Selector (Compact) -->
-    <div class="row items-center q-mb-sm">
-      <q-tabs
-        v-model="activeCollection"
-        dense
-        no-caps
-        inline-label
-        class="rounded-borders shadow-1 q-pa-xs tabs-container overflow-hidden"
-        active-color="primary"
-        indicator-color="primary"
-        align="left"
-      >
-        <q-tab name="all" icon="apps" :label="$t('bookmarks.allResources')" class="text-weight-bold">
-          <q-tooltip>{{ $t('bookmarks.allResourcesHint') }}</q-tooltip>
-        </q-tab>
-        <q-tab
-          v-for="col in sortedCollections"
-          :key="col.id"
-          :name="col.id"
-          :label="col.name"
-          class="text-weight-bold"
-        />
-        <q-tab name="unassigned" icon="question_mark" :label="$t('bookmarks.unassigned')" class="text-weight-bold">
-          <q-tooltip>{{ $t('bookmarks.unassignedHint') }}</q-tooltip>
-        </q-tab>
+    <!-- Top Level Collection Selector & Actions (Redesigned Header) -->
+    <div class="row items-center justify-between q-mb-lg q-pa-sm rounded-borders bg-glass shadow-1">
+      <div class="row items-center">
+        <div class="header-accent-line q-mr-md"></div>
+        <q-tabs
+          v-model="activeCollection"
+          dense
+          no-caps
+          inline-label
+          class="tabs-container-modern overflow-hidden"
+          active-color="primary"
+          indicator-color="primary"
+          align="left"
+        >
+          <q-tab name="all" icon="apps" :label="$t('bookmarks.allResources')" class="text-weight-bold">
+            <q-tooltip>{{ $t('bookmarks.allResourcesHint') }}</q-tooltip>
+          </q-tab>
+          <q-tab
+            v-for="col in sortedCollections"
+            :key="col.id"
+            :name="col.id"
+            :label="col.name"
+            class="text-weight-bold"
+          />
+          <q-tab name="unassigned" icon="question_mark" :label="$t('bookmarks.unassigned')" class="text-weight-bold">
+            <q-tooltip>{{ $t('bookmarks.unassignedHint') }}</q-tooltip>
+          </q-tab>
+        </q-tabs>
         
-        <q-separator vertical class="q-mx-sm opacity-20" />
-        
-        <q-btn flat round dense icon="settings" color="primary" @click="showManageCollections = true" size="sm" :aria-label="$t('bookmarks.manageCollections')">
+        <q-btn flat round dense icon="settings" color="primary" @click="showManageCollections = true" size="sm" class="q-ml-sm" :aria-label="$t('bookmarks.manageCollections')">
           <q-tooltip>{{ $t('bookmarks.manageCollections') }}</q-tooltip>
         </q-btn>
-      </q-tabs>
-    </div>
+      </div>
 
-    <!-- Project Context & Actions (Compact Header) -->
-    <div class="row items-center q-mb-sm">
-      <q-select
-        v-model="selectedProject"
-        :options="projectOptions"
-        filled
-        dense
-        options-dense
-        emit-value
-        map-options
-        style="width: 180px"
-        color="primary"
-        class="rounded-borders q-mr-sm"
-      >
-        <template v-slot:prepend>
-          <q-icon name="work" color="primary" size="xs" />
-        </template>
-        <q-tooltip>{{ $t('bookmarks.projectContextHint') }}</q-tooltip>
-      </q-select>
+      <div class="row q-gutter-x-md items-center">
+        <!-- Search & Context Group -->
+        <div class="row no-wrap shadow-1 rounded-borders overflow-hidden border-subtle">
+          <q-select
+            v-model="selectedProject"
+            :options="projectOptions"
+            borderless
+            dense
+            options-dense
+            emit-value
+            map-options
+            style="width: 160px"
+            class="bg-input-header q-px-sm font-wcag-bold"
+          >
+            <template v-slot:prepend>
+              <q-icon name="work" color="primary" size="xs" />
+            </template>
+          </q-select>
 
-      <q-input
-        v-model="searchQuery"
-        :placeholder="searchPlaceholder"
-        dense
-        outlined
-        class="shadow-1 q-mr-sm"
-        style="width: 180px"
-        clearable
-        @clear="searchQuery = ''"
-      >
-        <template v-slot:prepend>
-          <q-icon name="search" size="xs" />
-        </template>
-      </q-input>
+          <q-separator vertical inset />
 
-      <q-space />
+          <q-input
+            v-model="searchQuery"
+            :placeholder="searchPlaceholder"
+            dense
+            borderless
+            class="bg-input-header q-px-sm"
+            style="width: 200px"
+            clearable
+            @clear="searchQuery = ''"
+          >
+            <template v-slot:prepend>
+              <q-icon name="search" size="xs" color="primary" />
+            </template>
+          </q-input>
+        </div>
 
-      <div class="row q-gutter-x-xs">
-        <q-btn flat dense icon="download" color="primary" @click="exportData" size="sm" :aria-label="$t('bookmarks.exportHint')">
-          <q-tooltip>{{ $t('bookmarks.exportHint') }}</q-tooltip>
-        </q-btn>
-        <q-btn flat dense icon="upload" color="primary" @click="triggerImport" size="sm" :aria-label="$t('bookmarks.importHint')">
-          <q-tooltip>{{ $t('bookmarks.importHint') }}</q-tooltip>
-        </q-btn>
-        <q-separator vertical class="q-mx-xs opacity-20" />
-        <q-btn color="primary" unelevated icon="add" :label="$t('bookmarks.newBookmark')" @click="openAddDialog" size="sm" class="text-weight-bold">
-          <q-tooltip>{{ $t('bookmarks.newBookmarkHint') }}</q-tooltip>
-        </q-btn>
+        <div class="row q-gutter-x-sm">
+          <q-btn-group unelevated class="shadow-1 rounded-borders overflow-hidden">
+            <q-btn flat dense icon="download" color="primary" @click="exportData" size="sm" :aria-label="$t('bookmarks.exportHint')">
+              <q-tooltip>{{ $t('bookmarks.exportHint') }}</q-tooltip>
+            </q-btn>
+            <q-btn flat dense icon="upload" color="primary" @click="triggerImport" size="sm" :aria-label="$t('bookmarks.importHint')">
+              <q-tooltip>{{ $t('bookmarks.importHint') }}</q-tooltip>
+            </q-btn>
+          </q-btn-group>
+
+          <q-btn color="primary" unelevated icon="add" :label="$q.screen.gt.sm ? $t('bookmarks.newBookmark') : ''" @click="openAddDialog" size="sm" class="text-weight-bolder shadow-1">
+            <q-tooltip>{{ $t('bookmarks.newBookmarkHint') }}</q-tooltip>
+          </q-btn>
+        </div>
       </div>
     </div>
 
@@ -543,4 +546,29 @@ onMounted(() => {
   background: rgba(0, 0, 0, 0.03)
   .body--dark &
     background: rgba(255, 255, 255, 0.05)
+
+.bg-glass
+  background: rgba(var(--dd-bg-rgb), 0.6)
+  backdrop-filter: blur(10px)
+  border: 1px solid rgba(255, 255, 255, 0.05)
+
+.header-accent-line
+  width: 4px
+  height: 32px
+  background: var(--q-primary)
+  border-radius: 4px
+
+.border-subtle
+  border: 1px solid rgba(255, 255, 255, 0.1)
+
+.bg-input-header
+  background: rgba(0, 0, 0, 0.1)
+  transition: background 0.3s ease
+  &:hover
+    background: rgba(0, 0, 0, 0.2)
+
+.tabs-container-modern
+  :deep(.q-tab__label)
+    font-size: 0.75rem
+    letter-spacing: 0.5px
 </style>
