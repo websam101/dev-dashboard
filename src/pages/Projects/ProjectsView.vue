@@ -484,8 +484,11 @@ const columns: any[] = [
 ];
 
 const techColorMap: Record<string, string> = {
-  vue: 'positive', vuejs: 'positive', react: 'info', reactjs: 'info',
-  nodejs: 'positive', node: 'positive', typescript: 'primary', ts: 'primary',
+  vue: 'positive', vuejs: 'positive', nuxt: 'green-8', react: 'info', reactjs: 'info', 
+  nextjs: 'grey-10', angular: 'red-10', svelte: 'orange-8', 
+  nestjs: 'red-8', nodejs: 'positive', node: 'positive', express: 'grey-7', fastify: 'white',
+  typescript: 'primary', ts: 'primary', vite: 'purple-6', tailwind: 'cyan-6',
+  prisma: 'blue-10', drizzle: 'orange-4', supabase: 'green-6', firebase: 'amber-8',
   python: 'warning', docker: 'primary', rust: 'orange-9', php: 'indigo-9', go: 'light-blue-7'
 };
 
@@ -519,9 +522,15 @@ const getMissingManagedPorts = (project: Project) => (project.managedPorts || []
 const getTechIcon = (tech: string) => {
   const lowTech = tech.toLowerCase();
   const icons: Record<string, string> = {
-    nodejs: 'mdi-nodejs', node: 'mdi-nodejs', vue: 'mdi-vuejs', vuejs: 'mdi-vuejs',
-    react: 'mdi-react', reactjs: 'mdi-react', quasar: 'mdi-lightning-bolt',
+    nodejs: 'mdi-nodejs', node: 'mdi-nodejs', express: 'mdi-api', fastify: 'mdi-flash',
+    vue: 'mdi-vuejs', vuejs: 'mdi-vuejs', nuxt: 'mdi-nuxt',
+    react: 'mdi-react', reactjs: 'mdi-react', nextjs: 'mdi-nextjs',
+    angular: 'mdi-angular', svelte: 'mdi-svelte',
+    quasar: 'mdi-lightning-bolt', nestjs: 'mdi-alpha-n-circle',
     typescript: 'mdi-language-typescript', ts: 'mdi-language-typescript',
+    vite: 'mdi-lightning-bolt', tailwind: 'mdi-tailwind',
+    prisma: 'mdi-database-check', drizzle: 'mdi-database-outline',
+    supabase: 'mdi-database-arrow-up', firebase: 'mdi-firebase',
     python: 'mdi-language-python', docker: 'mdi-docker', rust: 'mdi-language-rust',
     go: 'mdi-language-go', php: 'mdi-language-php'
   };

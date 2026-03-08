@@ -150,6 +150,21 @@
                 {{ $t('settings.syncHint') }}
               </div>
             </div>
+
+            <!-- Backup & Restore -->
+            <div class="q-mt-xl q-pa-md rounded-borders border-subtle bg-glass shadow-1">
+              <div class="row items-center q-mb-md">
+                <q-icon name="mdi-database-lock" color="primary" class="q-mr-sm" size="20px" />
+                <div class="text-overline text-wcag-bold">{{ $t('settings.backupRestore') }}</div>
+              </div>
+              
+              <div class="row q-gutter-sm">
+                <q-btn color="primary" :label="$t('settings.exportBackup')" icon="mdi-download" unelevated size="sm" @click="exportBackup" />
+                <q-btn outline color="secondary" :label="$t('settings.importBackup')" icon="mdi-upload" size="sm" @click="triggerImport" />
+                <input type="file" ref="backupInput" @change="importBackup" style="display: none" accept=".json" />
+              </div>
+              <div class="text-wcag-caption q-mt-sm opacity-70">{{ $t('settings.backupHint') }}</div>
+            </div>
           </q-card-section>
 
           <q-card-actions align="right" class="q-pa-md border-top">
@@ -175,8 +190,9 @@ import { ref, onMounted, computed } from 'vue';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { useBookmarksStore } from '../../stores/bookmarksStore';
 import { useProjectsStore } from '../../stores/projectsStore';
+import { agnosticDataService } from '../../services/db/AgnosticDataService';
 import { hasBackend } from '../../boot/api';
-import { useQuasar } from 'quasar';
+import { useQuasar, exportFile } from 'quasar';
 
 const $q = useQuasar();
 const settingsStore = useSettingsStore();
@@ -185,6 +201,7 @@ const projectsStore = useProjectsStore();
 
 const newRoot = ref('');
 const syncing = ref(false);
+const backupInput = ref<HTMLInputElement | null>(null);
 const isElectron = computed(() => !!(window as any).electronApi);
 const isDev = computed(() => process.env.DEV);
 
@@ -231,6 +248,58 @@ const forcePull = async () => {
   }
 };
 
+// --- Backup & Restore Logic ---
+const exportBackup = async () => {
+  try {
+    const data = await agnosticDataService.exportAllData();
+    const status = exportFile(
+      `dev-dashboard-backup-${new Date().toISOString().split('T')[0]}.json`,
+      data,
+      'application/json'
+    );
+    if (status === true) {
+      $q.notify({ message: 'Backup exported successfully', color: 'positive', icon: 'mdi-check' });
+    }
+  } catch (e) {
+    $q.notify({ message: 'Backup failed', color: 'negative', icon: 'mdi-alert' });
+  }
+};
+
+const triggerImport = () => {
+  backupInput.value?.click();
+};
+
+const importBackup = async (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+
+  $q.dialog({
+    title: 'Confirm Restore',
+    message: 'This will overwrite ALL current local data (Projects, Bookmarks, Settings). Continue?',
+    cancel: true,
+    persistent: true,
+    dark: true
+  }).onOk(async () => {
+    try {
+      const text = await file.text();
+      await agnosticDataService.importAllData(text);
+      
+      // Reload stores to reflect new data
+      await Promise.all([
+        settingsStore.loadSettings(),
+        projectsStore.loadProjects(true),
+        bookmarksStore.loadBookmarks()
+      ]);
+
+      $q.notify({ message: 'Restore complete! Lab updated.', color: 'positive', icon: 'mdi-check' });
+    } catch (e) {
+      $q.notify({ message: 'Import failed: Invalid file', color: 'negative', icon: 'mdi-alert' });
+    } finally {
+      if (backupInput.value) backupInput.value.value = '';
+    }
+  });
+};
+
 onMounted(() => {
   // Global settings already loaded in App.vue
 });
@@ -248,4 +317,11 @@ onMounted(() => {
 
 .dev-tools-section
   background: rgba(var(--dd-warning), 0.05)
+
+.border-subtle
+  border: 1px solid rgba(255, 255, 255, 0.1)
+
+.bg-glass
+  background: rgba(var(--dd-bg-rgb), 0.6)
+  backdrop-filter: blur(10px)
 </style>

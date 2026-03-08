@@ -62,6 +62,59 @@ export class AgnosticDataService {
     }
   }
 
+  // --- Full Backup & Restore ---
+  async exportAllData(): Promise<string> {
+    const projects = await this.local.getProjects();
+    const bookmarks = await this.local.getBookmarks();
+    const collections = await this.local.getCollections();
+    const settings = await this.local.getSetting('app_settings');
+
+    const bundle = {
+      version: 1,
+      timestamp: new Date().toISOString(),
+      data: {
+        projects,
+        bookmarks,
+        collections,
+        settings
+      }
+    };
+
+    return JSON.stringify(bundle, null, 2);
+  }
+
+  async importAllData(json: string): Promise<void> {
+    const bundle = JSON.parse(json);
+    if (!bundle.data) throw new Error('Invalid backup file');
+
+    const { projects, bookmarks, collections, settings } = bundle.data;
+
+    // Clear and restore locally
+    if (collections) {
+      for (const c of await this.local.getCollections()) await this.local.deleteCollection(c.id);
+      for (const c of collections) await this.local.addCollection(c);
+    }
+    if (bookmarks) {
+      for (const b of await this.local.getBookmarks()) await this.local.deleteBookmark(b.id);
+      for (const b of bookmarks) await this.local.addBookmark(b);
+    }
+    if (projects) {
+      for (const p of await this.local.getProjects()) await this.local.deleteProject(p.id);
+      for (const p of projects) await this.local.addProject(p);
+    }
+    if (settings) {
+      await this.local.setSetting('app_settings', settings);
+    }
+
+    // If we have a backend, push the state
+    if (this.hasBackend) {
+      if (projects) await api.post('/api/projects/sync', projects).catch(() => {});
+      if (bookmarks) await api.post('/api/bookmarks/sync', bookmarks).catch(() => {});
+      if (collections) await api.post('/api/collections/sync', collections).catch(() => {});
+      if (settings) await api.post('/api/settings', settings).catch(() => {});
+    }
+  }
+
   // --- Utils ---
   private clean<T>(obj: T): T {
     return JSON.parse(JSON.stringify(obj));

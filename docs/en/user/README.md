@@ -6,7 +6,7 @@ Welcome to the Dev Dashboard. This guide will help you understand and master all
 1. [Dashboard Overview](#dashboard-overview)
 2. [Project Hub](./projects.md)
 3. [Resource Manager (Bookmarks)](./bookmarks.md)
-4. [System Monitoring](#system-monitoring)
+4. [System Monitoring](./system.md)
 5. [Settings & Configuration](#settings)
 6. [Backup & Restore](#backup--restore)
 

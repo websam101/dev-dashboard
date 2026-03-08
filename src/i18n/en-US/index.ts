@@ -239,6 +239,10 @@ export default {
     devTools: 'Developer Tools (DEV ONLY)',
     pushLocalToBackend: 'Push Local to Backend',
     pullBackendToLocal: 'Pull Backend to Local',
-    syncHint: 'Manually synchronize local IndexedDB with the shared backend JSON.'
+    syncHint: 'Manually synchronize local IndexedDB with the shared backend JSON.',
+    backupRestore: 'Backup & Restore',
+    exportBackup: 'Export Full Backup',
+    importBackup: 'Restore from Backup',
+    backupHint: 'Export or import your entire lab configuration (Projects, Bookmarks, and Settings) as a single JSON file.'
   }
 };

@@ -61,4 +61,4 @@ The application can be built for different targets:
 
 ---
 
-_Refer to the [API Reference](../../src/services/README.md) for deeper architectural details._
+_Refer to the [API Reference](../api/README.md) for deeper architectural details._

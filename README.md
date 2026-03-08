@@ -42,10 +42,10 @@ A robust, platform-agnostic development command center for managing local projec
 
 ## 📖 Documentation Map
 
-- [**Developer Guide**](./docs/dev/README.md): Setup, Workflow (Conductor), Testing, and Building.
-- [**User Guide**](./docs/user/README.md): Detailed feature walkthroughs and configuration.
-- [**API Reference**](./src/services/README.md): Agnostic services and backend endpoint documentation.
-- [**Modes & Deployment**](./docs/modes/README.md): Detailed comparison of Electron, SSR, and SPA capabilities.
+- [**Developer Guide**](./docs/en/dev/README.md): Setup, Workflow (Conductor), Testing, and Building.
+- [**User Guide**](./docs/en/user/README.md): Detailed feature walkthroughs and configuration.
+- [**API Reference**](./docs/en/api/README.md): Agnostic services and backend endpoint documentation.
+- [**Modes & Deployment**](./docs/en/modes/README.md): Detailed comparison of Electron, SSR, and SPA capabilities.
 
 ## 📦 Quick Start
 

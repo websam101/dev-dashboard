@@ -57,15 +57,36 @@ export class ProjectManager {
     const techs: string[] = [];
     try {
       const files = await fs.readdir(projectPath);
+      
       if (files.includes('package.json')) {
         techs.push('nodejs');
         const pkg = JSON.parse(await fs.readFile(path.join(projectPath, 'package.json'), 'utf-8'));
         const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+        
+        // Frameworks
         if (deps.vue) techs.push('vue');
+        if (deps.nuxt || files.includes('nuxt.config.js') || files.includes('nuxt.config.ts')) techs.push('nuxt');
         if (deps.react) techs.push('react');
+        if (deps.next || files.includes('next.config.js') || files.includes('next.config.mjs')) techs.push('nextjs');
+        if (deps['@angular/core']) techs.push('angular');
+        if (deps.svelte) techs.push('svelte');
         if (deps.quasar) techs.push('quasar');
+        
+        // Backend
+        if (deps['@nestjs/core'] || files.includes('nest-cli.json')) techs.push('nestjs');
+        if (deps.express) techs.push('express');
+        if (deps.fastify) techs.push('fastify');
+        
+        // Tools & Libs
         if (deps.typescript) techs.push('typescript');
+        if (deps.vite) techs.push('vite');
+        if (deps.tailwindcss || files.includes('tailwind.config.js') || files.includes('tailwind.config.ts')) techs.push('tailwind');
+        if (deps.prisma || files.includes('prisma')) techs.push('prisma');
+        if (deps.drizzle || deps['drizzle-orm']) techs.push('drizzle');
+        if (deps.supabase || deps['@supabase/supabase-js']) techs.push('supabase');
+        if (deps.firebase || deps['firebase-admin']) techs.push('firebase');
       }
+      
       if (files.includes('requirements.txt') || files.includes('pyproject.toml')) techs.push('python');
       if (files.includes('go.mod')) techs.push('go');
       if (files.includes('Cargo.toml')) techs.push('rust');
