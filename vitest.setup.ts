@@ -23,6 +23,27 @@ const mockQuasar = {
   dark: {
     set: vi.fn(),
     isActive: false
+  },
+  screen: {
+    gt: {
+      xs: true,
+      sm: true,
+      md: true,
+      lg: true,
+      xl: true
+    },
+    lt: {
+      xs: false,
+      sm: false,
+      md: false,
+      lg: false,
+      xl: false
+    },
+    xs: false,
+    sm: false,
+    md: true,
+    lg: false,
+    xl: false
   }
 }
 
@@ -40,7 +61,8 @@ vi.mock('quasar', () => ({
     set: vi.fn(),
     isActive: false
   },
-  debounce: (fn: any) => fn
+  debounce: (fn: any) => fn,
+  exportFile: vi.fn().mockReturnValue(true)
 }))
 
 // Mock vue-i18n
@@ -86,7 +108,12 @@ config.global.stubs = {
   'q-checkbox': { template: '<input type="checkbox" />' },
   'q-table': { template: '<table><slot /></table>' },
   'q-td': { template: '<td><slot /></td>' },
+  'q-th': { template: '<th><slot /></th>' },
   'q-tr': { template: '<tr><slot /></tr>' },
   'q-spinner-dots': { template: '<div />' },
-  'q-spinner-grid': { template: '<div />' }
+  'q-spinner-grid': { template: '<div />' },
+  'q-btn-group': { template: '<div><slot /></div>' },
+  'q-slide-transition': { template: '<div><slot /></div>' },
+  'q-menu': { template: '<div><slot /></div>' },
+  'q-dialog': { template: '<div><slot /></div>' }
 }
