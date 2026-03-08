@@ -17,6 +17,18 @@
             {{ backendOnline ? $t('dashboard.backendOnlineShort') : $t('dashboard.backendOfflineShort') }}
           </q-badge>
           <q-space />
+          <q-btn
+            v-if="hasBackend && settingsStore.settings.showSystemStats"
+            flat
+            dense
+            round
+            color="primary"
+            icon="monitor"
+            @click="systemStore.openTaskManager()"
+            class="q-mr-sm"
+          >
+            <q-tooltip>{{ $t('dashboard.openTaskManager') }}</q-tooltip>
+          </q-btn>
           <div class="text-wcag-caption text-caption text-weight-bold">
             {{ systemStore.stats?.platform }} | {{ systemStore.stats?.uptime ? formatUptime(systemStore.stats.uptime) :
               '-' }}
@@ -25,7 +37,10 @@
       </div>
 
       <!-- Detailed but Compact System Resources -->
-      <div class="col-12">
+      <div
+        class="col-12 q-mb-lg"
+        v-if="hasBackend && settingsStore.settings.showSystemStats"
+      >
         <div class="row q-col-gutter-sm">
           <!-- CPU -->
           <div class="col-12 col-sm-4 col-md-2">
@@ -276,7 +291,7 @@
 
       <!-- Quick Actions Small -->
       <div class="col-12">
-        <div class="row q-col-gutter-sm">
+        <div class="row q-col-gutter-md">
           <div class="col-12 col-sm-6">
             <q-btn
               unelevated
@@ -375,10 +390,11 @@
                     icon="mdi-microsoft-visual-studio-code"
                     size="sm"
                     color="primary"
+                    :disable="!hasBackend"
                     @click.stop="openVsCode(project.path)"
                     :aria-label="$t('projects.openVsCode')"
                   >
-                    <q-tooltip>{{ $t('projects.openVsCode') }}</q-tooltip>
+                    <q-tooltip>{{ hasBackend ? $t('projects.openVsCode') : $t('common.notSupported') }}</q-tooltip>
                   </q-btn>
                 </q-item-section>
               </q-item>
@@ -481,7 +497,7 @@ import { useSystemStore } from '../../stores/systemStore';
 import { useProjectsStore } from '../../stores/projectsStore';
 import { useBookmarksStore } from '../../stores/bookmarksStore';
 import { useSettingsStore } from '../../stores/settingsStore';
-import { api } from '../../boot/api';
+import { api, hasBackend } from '../../boot/api';
 import FaviconRenderer from '../../components/FaviconRenderer.vue';
 
 const systemStore = useSystemStore();

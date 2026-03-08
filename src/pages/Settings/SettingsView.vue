@@ -58,48 +58,61 @@
                 </q-item-section>
                 <q-tooltip>{{ $t('settings.autoCheckPortsHint') }}</q-tooltip>
               </q-item>
+
+              <q-item tag="label" v-ripple v-if="hasBackend">
+                <q-item-section>
+                  <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.showSystemStats') }}</q-item-label>
+                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.showSystemStatsDesc') }}</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-toggle v-model="settingsStore.settings.showSystemStats" color="accent" />
+                </q-item-section>
+                <q-tooltip>{{ $t('settings.showSystemStatsHint') }}</q-tooltip>
+              </q-item>
             </q-list>
 
             <!-- Managed Roots -->
-            <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.scanRoots') }}</div>
-            <div class="row q-gutter-sm q-mb-md">
-              <q-input 
-                v-model="newRoot" 
-                :placeholder="$t('settings.rootPathPlaceholder')" 
-                dense 
-                outlined 
-                class="col"
-                @keyup.enter="addRoot"
-              />
-              <q-btn v-if="isElectron" outline color="secondary" icon="mdi-folder" @click="browseFolder" :aria-label="$t('settings.browseFolderHint')">
-                <q-tooltip>{{ $t('settings.browseFolderHint') }}</q-tooltip>
-              </q-btn>
-              <q-btn color="primary" :label="$t('settings.addRoot')" @click="addRoot" :disable="!newRoot">
-                <q-tooltip>{{ $t('settings.addRootHint') }}</q-tooltip>
-              </q-btn>
+            <div v-if="hasBackend">
+              <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.scanRoots') }}</div>
+              <div class="row q-gutter-sm q-mb-md">
+                <q-input 
+                  v-model="newRoot" 
+                  :placeholder="$t('settings.rootPathPlaceholder')" 
+                  dense 
+                  outlined 
+                  class="col"
+                  @keyup.enter="addRoot"
+                />
+                <q-btn v-if="isElectron" outline color="secondary" icon="mdi-folder" @click="browseFolder" :aria-label="$t('settings.browseFolderHint')">
+                  <q-tooltip>{{ $t('settings.browseFolderHint') }}</q-tooltip>
+                </q-btn>
+                <q-btn color="primary" :label="$t('settings.addRoot')" @click="addRoot" :disable="!newRoot">
+                  <q-tooltip>{{ $t('settings.addRootHint') }}</q-tooltip>
+                </q-btn>
+              </div>
+
+              <q-list bordered separator class="rounded-borders bg-root-list q-mb-lg" v-if="settingsStore.settings.scanRoots?.length">
+                <q-item v-for="root in settingsStore.settings.scanRoots" :key="root" dense class="q-py-sm">
+                  <q-item-section avatar>
+                    <q-icon name="mdi-folder" color="primary" />
+                  </q-item-section>
+                  <q-item-section>
+                    <q-item-label class="text-wcag text-weight-medium ellipsis" style="max-width: 400px">{{ root }}</q-item-label>
+                  </q-item-section>
+                  <q-item-section side>
+                    <q-btn flat round dense icon="mdi-delete" color="negative" size="sm" @click="removeRoot(root)" :aria-label="$t('common.remove')">
+                      <q-tooltip>{{ $t('common.remove') }}</q-tooltip>
+                    </q-btn>
+                  </q-item-section>
+                </q-item>
+              </q-list>
+              <div v-else class="text-center q-pa-md text-wcag-caption italic border-dashed rounded-borders q-mb-lg">
+                {{ $t('settings.noRoots') }}
+              </div>
             </div>
 
-            <q-list bordered separator class="rounded-borders bg-root-list q-mb-lg" v-if="settingsStore.settings.scanRoots?.length">
-              <q-item v-for="root in settingsStore.settings.scanRoots" :key="root" dense class="q-py-sm">
-                <q-item-section avatar>
-                  <q-icon name="mdi-folder" color="primary" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label class="text-wcag text-weight-medium ellipsis" style="max-width: 400px">{{ root }}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-btn flat round dense icon="mdi-delete" color="negative" size="sm" @click="removeRoot(root)" :aria-label="$t('common.remove')">
-                    <q-tooltip>{{ $t('common.remove') }}</q-tooltip>
-                  </q-btn>
-                </q-item-section>
-              </q-item>
-            </q-list>
-            <div v-else class="text-center q-pa-md text-wcag-caption italic border-dashed rounded-borders q-mb-lg">
-              {{ $t('settings.noRoots') }}
-            </div>
-
-            <!-- DEV TOOLS (Hidden in Production) -->
-            <div v-if="isDev" class="dev-tools-section q-mt-xl q-pa-md rounded-borders border-dashed">
+            <!-- DEV TOOLS (Hidden in Production or if no backend) -->
+            <div v-if="isDev && hasBackend" class="dev-tools-section q-mt-xl q-pa-md rounded-borders border-dashed">
               <div class="row items-center q-mb-md">
                 <q-icon name="mdi-bug" color="warning" class="q-mr-sm" size="20px" />
                 <div class="text-overline text-wcag-bold">{{ $t('settings.devTools') }}</div>
@@ -160,6 +173,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { useBookmarksStore } from '../../stores/bookmarksStore';
 import { useProjectsStore } from '../../stores/projectsStore';
+import { hasBackend } from '../../boot/api';
 import { useQuasar } from 'quasar';
 
 const $q = useQuasar();

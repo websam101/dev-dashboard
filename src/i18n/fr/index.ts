@@ -28,7 +28,11 @@ export default {
     importSuccess: 'Importation réussie',
     importFailed: 'Échec de l\'importation',
     selectAll: 'Tout sélectionner',
-    selectItem: 'Sélectionner l\'élément'
+    selectItem: 'Sélectionner l\'élément',
+    busy: 'Occupé',
+    free: 'Libre',
+    notSupported: 'Non supporté dans ce mode',
+    saved: 'Enregistré'
   },
   layout: {
     menu: 'Menu',
@@ -81,7 +85,8 @@ export default {
     backendOffline: 'Backend OS: Hors ligne',
     backendOnlineShort: 'OS OK',
     backendOfflineShort: 'HORS LIGNE',
-    syncing: 'Synchronisation en cours...'
+    syncing: 'Synchronisation en cours...',
+    openTaskManager: 'Ouvrir le gestionnaire de tâches'
   },
   projects: {
     title: 'Centre de Projets',
@@ -89,6 +94,8 @@ export default {
     scanAllRoots: 'Scanner toutes les racines',
     manualScan: 'Scan manuel',
     manualScanHint: 'Scanner récursivement un répertoire spécifique',
+    addManual: 'Ajouter un projet',
+    addManualHint: 'Ajouter manuellement un projet au tableau de bord',
     managedRoots: 'Racines gérées',
     uncommittedChanges: 'Changements non validés',
     gitPull: 'Git Pull',
@@ -214,6 +221,9 @@ export default {
     autoCheckPorts: 'Vérification auto des ports',
     autoCheckPortsDesc: 'Scanner périodiquement les ports actifs',
     autoCheckPortsHint: 'Activer/Désactiver le scan en arrière-plan',
+    showSystemStats: 'Afficher les statistiques système',
+    showSystemStatsDesc: 'Afficher l\'utilisation du CPU, de la RAM et du disque sur le tableau de bord',
+    showSystemStatsHint: 'Basculer la visibilité des moniteurs de ressources système',
     workspace: 'Espace de travail',
     scanRoots: 'Racines de scan gérées',
     scanRootsCaption: 'Répertoires inclus dans les scans complets',

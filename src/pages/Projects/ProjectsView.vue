@@ -40,11 +40,41 @@
         <q-btn outline color="primary" icon="mdi-refresh" :loading="projectsStore.isSyncing" @click="projectsStore.syncAll(true)" size="sm" class="text-weight-bold" :aria-label="$t('common.refresh')">
           <q-tooltip>{{ $t('common.refresh') }}</q-tooltip>
         </q-btn>
-        <q-btn color="primary" icon="mdi-history" @click="scanAllRoots" :disable="!settingsStore.settings.scanRoots?.length" size="sm" class="text-weight-bold shadow-1" unelevated :aria-label="$t('projects.scanAllRoots')">
+        <q-btn
+          v-if="hasBackend"
+          color="primary"
+          icon="mdi-history"
+          @click="scanAllRoots"
+          :disable="!settingsStore.settings.scanRoots?.length"
+          size="sm"
+          class="text-weight-bold shadow-1"
+          unelevated
+          :aria-label="$t('projects.scanAllRoots')"
+        >
           <q-tooltip>{{ $t('projects.scanAllRoots') }}</q-tooltip>
         </q-btn>
-        <q-btn color="accent" icon="mdi-plus" :label="$t('projects.manualScan')" @click="showScanDialog = true" size="sm" class="text-weight-bold shadow-1" unelevated>
+        <q-btn
+          v-if="hasBackend"
+          color="accent"
+          icon="mdi-magnify-scan"
+          :label="$t('projects.manualScan')"
+          @click="showScanDialog = true"
+          size="sm"
+          class="text-weight-bold shadow-1"
+          unelevated
+        >
           <q-tooltip>{{ $t('projects.manualScanHint') }}</q-tooltip>
+        </q-btn>
+        <q-btn
+          color="secondary"
+          icon="mdi-plus"
+          :label="$t('projects.addManual')"
+          @click="showAddDialog = true"
+          size="sm"
+          class="text-weight-bold shadow-1"
+          unelevated
+        >
+          <q-tooltip>{{ $t('projects.addManualHint') }}</q-tooltip>
         </q-btn>
       </div>
     </div>
@@ -204,28 +234,31 @@
       <template v-slot:body-cell-actions="props">
         <q-td :props="props" class="text-right">
           <div class="row items-center justify-end q-gutter-x-xs">
-            <q-btn flat round dense icon="mdi-microsoft-visual-studio-code" size="sm" color="primary" @click="projectsStore.openVsCode(props.row.path)" :aria-label="$t('projects.openVsCode')">
-              <q-tooltip>{{ $t('projects.openVsCode') }}</q-tooltip>
+            <q-btn flat round dense icon="mdi-microsoft-visual-studio-code" size="sm" color="primary" :disable="!hasBackend" @click="projectsStore.openVsCode(props.row.path)" :aria-label="$t('projects.openVsCode')">
+              <q-tooltip>{{ hasBackend ? $t('projects.openVsCode') : $t('common.notSupported') }}</q-tooltip>
             </q-btn>
-            <q-btn flat round dense icon="mdi-console" size="sm" color="secondary" @click="projectsStore.openTerminal(props.row.path)" :aria-label="$t('projects.openTerminal')">
-              <q-tooltip>{{ $t('projects.openTerminal') }}</q-tooltip>
+            <q-btn flat round dense icon="mdi-console" size="sm" color="secondary" :disable="!hasBackend" @click="projectsStore.openTerminal(props.row.path)" :aria-label="$t('projects.openTerminal')">
+              <q-tooltip>{{ hasBackend ? $t('projects.openTerminal') : $t('common.notSupported') }}</q-tooltip>
             </q-btn>
             <q-btn flat round dense icon="mdi-dots-vertical" size="sm" color="grey-7" :aria-label="$t('common.moreActions')">
               <q-tooltip>{{ $t('common.moreActions') }}</q-tooltip>
               <q-menu dense>
                 <q-list style="min-width: 180px">
-                  <q-item v-if="props.row.git" clickable v-close-popup @click="handleGitPull(props.row)">
-                    <q-item-section side><q-icon name="mdi-download" size="xs" color="positive" /></q-item-section>
+                  <q-item v-if="props.row.git" clickable v-close-popup @click="handleGitPull(props.row)" :disable="!hasBackend">
+                    <q-item-section side><q-icon name="mdi-download" size="xs" :color="hasBackend ? 'positive' : 'grey'" /></q-item-section>
                     <q-item-section>{{ $t('projects.gitPull') }}</q-item-section>
+                    <q-tooltip v-if="!hasBackend">{{ $t('common.notSupported') }}</q-tooltip>
                   </q-item>
-                  <q-item v-if="props.row.git" clickable v-close-popup @click="handleGitPush(props.row)">
-                    <q-item-section side><q-icon name="mdi-upload" size="xs" color="primary" /></q-item-section>
+                  <q-item v-if="props.row.git" clickable v-close-popup @click="handleGitPush(props.row)" :disable="!hasBackend">
+                    <q-item-section side><q-icon name="mdi-upload" size="xs" :color="hasBackend ? 'primary' : 'grey'" /></q-item-section>
                     <q-item-section>{{ $t('projects.gitPush') }}</q-item-section>
+                    <q-tooltip v-if="!hasBackend">{{ $t('common.notSupported') }}</q-tooltip>
                   </q-item>
                   <q-separator v-if="props.row.git" />
-                  <q-item clickable v-close-popup @click="projectsStore.openFolder(props.row.path)">
+                  <q-item clickable v-close-popup @click="projectsStore.openFolder(props.row.path)" :disable="!hasBackend">
                     <q-item-section side><q-icon name="mdi-folder-open" size="xs" /></q-item-section>
                     <q-item-section>{{ $t('projects.openExplorer') }}</q-item-section>
+                    <q-tooltip v-if="!hasBackend">{{ $t('common.notSupported') }}</q-tooltip>
                   </q-item>
                   <q-separator />
                   <q-item clickable v-close-popup @click="confirmDelete(props.row)" class="text-negative">
@@ -328,6 +361,24 @@
       </q-card>
     </q-dialog>
 
+    <!-- Add Project Dialog -->
+    <q-dialog v-model="showAddDialog" backdrop-filter="blur(4px)">
+      <q-card style="min-width: 400px" class="rounded-borders">
+        <q-card-section class="bg-gradient-secondary text-white q-py-sm">
+          <div class="text-subtitle1 text-weight-bolder">{{ $t('projects.addManual') }}</div>
+        </q-card-section>
+        <q-card-section class="q-gutter-sm q-pt-md">
+          <q-input v-model="newProject.name" :label="$t('projects.colName')" dense filled autofocus />
+          <q-input v-model="newProject.path" :label="$t('projects.colPath')" dense filled />
+          <q-input v-model="newProject.description" :label="$t('common.description')" dense filled type="textarea" />
+        </q-card-section>
+        <q-card-actions align="right" class="q-pb-md q-px-md">
+          <q-btn flat :label="$t('common.cancel')" color="primary" v-close-popup size="sm" />
+          <q-btn color="secondary" :label="$t('common.add')" unelevated @click="addManualProject" v-close-popup size="sm" :disable="!newProject.name || !newProject.path" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <!-- Delete Confirmation -->
     <q-dialog v-model="showDeleteDialog">
       <q-card style="min-width: 300px">
@@ -349,7 +400,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useProjectsStore } from '../../stores/projectsStore';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { useSystemStore } from '../../stores/systemStore';
-import { api } from '../../boot/api';
+import { api, hasBackend } from '../../boot/api';
 import type { Project } from '../../stores/projectsStore';
 import { useQuasar } from 'quasar';
 import { useI18n } from 'vue-i18n';
@@ -362,6 +413,7 @@ const settingsStore = useSettingsStore();
 const systemStore = useSystemStore();
 
 const showScanDialog = ref(false);
+const showAddDialog = ref(false);
 const showDeleteDialog = ref(false);
 const showPortsDialog = ref(false);
 const projectToDelete = ref<Project | null>(null);
@@ -373,6 +425,12 @@ const newPinnedPort = ref<number | null>(null);
 const editingPortValue = ref<number | null>(null);
 const tempPortEdit = ref<number | null>(null);
 const gitLoading = ref<Record<string, boolean>>({});
+
+const newProject = ref({
+  name: '',
+  path: '',
+  description: ''
+});
 
 const selectedIds = computed(() => selectedRows.value.map(r => r.id));
 
@@ -447,12 +505,33 @@ const getShortPath = (path: string) => {
 const checkRadar = async () => {
   if (!radarPort.value) return;
   try {
-    await api.post('/api/projects/sync-all');
-    await projectsStore.loadProjects();
-    const isUsed = projectsStore.projects.some(p => p.ports.includes(radarPort.value!));
-    radarStatus.value = isUsed ? 'busy' : 'free';
-    $q.notify({ message: t('projects.portStatus', { port: radarPort.value, status: isUsed ? 'BUSY' : 'FREE' }), color: isUsed ? 'negative' : 'positive', position: 'top', timeout: 1500 });
+    const inUse = await systemStore.checkPort(radarPort.value);
+    radarStatus.value = inUse ? 'busy' : 'free';
+    $q.notify({ 
+      message: t('projects.portStatus', { 
+        port: radarPort.value, 
+        status: inUse ? t('common.busy').toUpperCase() : t('common.free').toUpperCase() 
+      }), 
+      color: inUse ? 'negative' : 'positive', 
+      position: 'top', 
+      timeout: 1500 
+    });
   } catch (e) {}
+};
+
+const addManualProject = async () => {
+  try {
+    await projectsStore.addManualProject({
+      name: newProject.value.name,
+      path: newProject.value.path,
+      description: newProject.value.description,
+      techs: []
+    });
+    newProject.value = { name: '', path: '', description: '' };
+    $q.notify({ message: t('common.saved'), color: 'positive', icon: 'mdi-check' });
+  } catch (e) {
+    $q.notify({ message: `Error: ${String(e)}`, color: 'negative' });
+  }
 };
 
 const startScan = async () => { if (scanPath.value) { await projectsStore.scanDirectory(scanPath.value); $q.notify({ message: t('projects.scanCompleted'), color: 'positive', icon: 'mdi-check', position: 'bottom-right' }); } };

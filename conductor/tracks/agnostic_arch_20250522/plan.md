@@ -29,15 +29,15 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Store Migration and Capability Awareness' (Protocol in workflow.md)
 
 ## Phase 3: UI Implementation and Platform Adaptation
-- [ ] Task: Implement conditional UI in `Dashboard/HomeView.vue`.
-    - [ ] Wrap resource widgets in `v-if` based on `showSystemStats` and `hasBackend`.
-    - [ ] Replace "Uptime/Platform" with a "System Monitor" button that calls `openTaskManager`.
-    - [ ] Implement manual project entry modal/dialog.
-- [ ] Task: Fix Port Checker UI in `Dashboard/HomeView.vue`.
-    - [ ] Connect the check button to the `systemStore.checkPort` action.
-    - [ ] Show a Quasar dialog or notification with the port status (Available/Taken).
-- [ ] Task: Update `SettingsView.vue` to include the toggle for system statistics.
-- [ ] Task: Implement "Not Supported" tooltips/states for OS actions in SPA mode.
+- [x] Task: Implement conditional UI in `Dashboard/HomeView.vue`.
+    - [x] Wrap resource widgets in `v-if` based on `showSystemStats` and `hasBackend`.
+    - [x] Replace "Uptime/Platform" with a "System Monitor" button that calls `openTaskManager`.
+    - [x] Implement manual project entry modal/dialog.
+- [x] Task: Fix Port Checker UI in `Dashboard/HomeView.vue`.
+    - [x] Connect the check button to the `systemStore.checkPort` action.
+    - [x] Show a Quasar dialog or notification with the port status (Available/Taken).
+- [x] Task: Update `SettingsView.vue` to include the toggle for system statistics.
+- [~] Task: Implement "Not Supported" tooltips/states for OS actions in SPA mode.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: UI Implementation and Platform Adaptation' (Protocol in workflow.md)
 
 ## Phase 4: Final Validation and Multi-Platform Testing

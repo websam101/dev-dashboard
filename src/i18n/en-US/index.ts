@@ -28,7 +28,11 @@ export default {
     importSuccess: 'Import successful',
     importFailed: 'Import failed',
     selectAll: 'Select All',
-    selectItem: 'Select Item'
+    selectItem: 'Select Item',
+    busy: 'Busy',
+    free: 'Free',
+    notSupported: 'Not supported in this mode',
+    saved: 'Saved'
   },
   layout: {
     menu: 'Menu',
@@ -81,7 +85,8 @@ export default {
     backendOffline: 'OS Backend: Offline',
     backendOnlineShort: 'OS OK',
     backendOfflineShort: 'OFFLINE',
-    syncing: 'Syncing your lab...'
+    syncing: 'Syncing your lab...',
+    openTaskManager: 'Open System Task Manager'
   },
   projects: {
     title: 'Project Hub',
@@ -89,6 +94,8 @@ export default {
     scanAllRoots: 'Scan all managed roots',
     manualScan: 'Manual Scan',
     manualScanHint: 'Recursively scan a specific directory for projects',
+    addManual: 'Add Project',
+    addManualHint: 'Manually add a project to the dashboard',
     managedRoots: 'Managed Roots',
     uncommittedChanges: 'Uncommitted Changes',
     gitPull: 'Git Pull',
@@ -214,6 +221,9 @@ export default {
     autoCheckPorts: 'Auto-check Ports',
     autoCheckPortsDesc: 'Periodically scan for active project ports',
     autoCheckPortsHint: 'Enable or disable background port scanning',
+    showSystemStats: 'Show System Statistics',
+    showSystemStatsDesc: 'Display CPU, RAM and Disk usage on dashboard',
+    showSystemStatsHint: 'Toggle visibility of system resource monitors',
     workspace: 'Workspace',
     scanRoots: 'Managed Scan Roots',
     scanRootsCaption: 'Directories to include in full workspace scans',
