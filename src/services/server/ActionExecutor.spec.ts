@@ -88,4 +88,22 @@ describe('ActionExecutor', () => {
     await exec.openFolder('/path')
     expect(open).toHaveBeenCalledWith('/path')
   })
+
+  it('opens Task Manager on win32', () => {
+    Object.defineProperty(process, 'platform', { value: 'win32' })
+    const unref = vi.fn()
+    vi.mocked(spawn).mockReturnValue({ unref } as any)
+
+    exec.openTaskManager()
+    expect(spawn).toHaveBeenCalledWith('taskmgr.exe', [], expect.objectContaining({ detached: true }))
+  })
+
+  it('opens Task Manager on darwin', () => {
+    Object.defineProperty(process, 'platform', { value: 'darwin' })
+    const unref = vi.fn()
+    vi.mocked(spawn).mockReturnValue({ unref } as any)
+
+    exec.openTaskManager()
+    expect(spawn).toHaveBeenCalledWith('open', ['-a', 'Activity Monitor'], expect.objectContaining({ detached: true }))
+  })
 })

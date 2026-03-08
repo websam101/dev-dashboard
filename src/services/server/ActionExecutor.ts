@@ -32,4 +32,16 @@ export class ActionExecutor {
   async openFolder(path: string): Promise<void> {
     await open(path);
   }
+
+  openTaskManager(): void {
+    const platform = process.platform;
+    if (platform === 'win32') {
+      spawn('taskmgr.exe', [], { stdio: 'ignore', detached: true }).unref();
+    } else if (platform === 'darwin') {
+      spawn('open', ['-a', 'Activity Monitor'], { stdio: 'ignore', detached: true }).unref();
+    } else if (platform === 'linux') {
+      // Try common ones
+      spawn('gnome-system-monitor', [], { stdio: 'ignore', detached: true }).unref();
+    }
+  }
 }

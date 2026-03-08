@@ -7,5 +7,5 @@
 
 ---
 
-- [ ] **Track: Agnostic architecture for SPA mode, IndexedDB-only storage, and toggleable system statistics.**
+- [~] **Track: Agnostic architecture for SPA mode, IndexedDB-only storage, and toggleable system statistics.**
 *Link: [./tracks/agnostic_arch_20250522/](./tracks/agnostic_arch_20250522/)*

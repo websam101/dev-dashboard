@@ -136,4 +136,13 @@ export class SystemMonitor {
       this.isFetching = false;
     }
   }
+
+  async checkPort(port: number): Promise<boolean> {
+    try {
+      const network = await si.networkConnections();
+      return network.some(conn => conn.state === 'LISTEN' && parseInt(conn.localPort) === port);
+    } catch {
+      return false;
+    }
+  }
 }

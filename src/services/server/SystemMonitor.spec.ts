@@ -32,10 +32,12 @@ vi.mock('systeminformation', () => ({
   currentLoad: vi.fn(),
   fsSize: vi.fn(),
   networkStats: vi.fn().mockResolvedValue([{ tx_bytes: 1024, rx_bytes: 2048 }]),
+  networkConnections: vi.fn(),
   default: {
     currentLoad: vi.fn(),
     fsSize: vi.fn(),
-    networkStats: vi.fn()
+    networkStats: vi.fn(),
+    networkConnections: vi.fn()
   }
 }))
 
@@ -108,5 +110,17 @@ describe('SystemMonitor', () => {
     expect(stats.cpuLoad).toBe(0)
     expect(stats.memTotal).toBe(16)
     expect(stats.diskTotal).toBe(0)
+  })
+
+  it('checks port status (busy)', async () => {
+    vi.mocked(si.networkConnections).mockResolvedValue([{ state: 'LISTEN', localPort: '8080' }] as any)
+    const inUse = await monitor.checkPort(8080)
+    expect(inUse).toBe(true)
+  })
+
+  it('checks port status (free)', async () => {
+    vi.mocked(si.networkConnections).mockResolvedValue([{ state: 'LISTEN', localPort: '3000' }] as any)
+    const inUse = await monitor.checkPort(8080)
+    expect(inUse).toBe(false)
   })
 })

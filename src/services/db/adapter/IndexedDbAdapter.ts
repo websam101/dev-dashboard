@@ -1,5 +1,13 @@
 import type { DBSchema, IDBPDatabase } from "idb";
 import { openDB } from "idb";
+import type { 
+  StorageAdapter, 
+  Bookmark, 
+  Project, 
+  PortRecord, 
+  GitRepo, 
+  BookmarkCollection 
+} from "../types";
 
 interface DevDashboardDB extends DBSchema {
   bookmarks: {
@@ -28,55 +36,7 @@ interface DevDashboardDB extends DBSchema {
   };
 }
 
-export interface BookmarkCollection {
-  id: string;
-  name: string;
-  color?: string;
-  icon?: string;
-}
-
-export interface Bookmark {
-  id: string;
-  url: string;
-  title: string;
-  description: string;
-  tags: string[];
-  createdAt: string;
-  favorite?: boolean;
-  projectIds?: string[];
-  collectionId?: string | undefined;
-}
-
-export interface Project {
-  id: string;
-  name: string;
-  path: string;
-  description: string;
-  ports: number[];
-  techs: string[];
-  git?: any;
-  managedPorts?: number[];
-  favorite?: boolean;
-}
-
-export interface PortRecord {
-  port: number;
-  projectId: string;
-  reserved: boolean;
-  inUse: boolean;
-  pid?: number | undefined;
-  processName?: string | undefined;
-}
-
-export interface GitRepo {
-  url: string;
-  localPath: string;
-  branch: string;
-  status: "clean" | "dirty" | "ahead" | "behind";
-  lastSync: string;
-}
-
-export class IndexedDbAdapter {
+export class IndexedDbAdapter implements StorageAdapter {
   private dbName = "dev-dashboard-db";
   private db: IDBPDatabase<DevDashboardDB> | null = null;
 

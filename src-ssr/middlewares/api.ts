@@ -181,6 +181,24 @@ export default defineSsrMiddleware(async ({ app, resolve }) => {
     })();
   });
 
+  app.post('/api/actions/open-task-manager', (req, res) => {
+    exec.openTaskManager();
+    res.json({ success: true });
+  });
+
+  app.post('/api/utils/check-port', (req, res) => {
+    void (async () => {
+      try {
+        const { port } = req.body as { port: number };
+        if (!port) return res.status(400).json({ error: 'Port required' });
+        const inUse = await sys.checkPort(port);
+        res.json({ inUse });
+      } catch (e) {
+        res.status(500).json({ error: String(e) });
+      }
+    })();
+  });
+
   app.post('/api/projects/git-pull', (req, res) => {
     void (async () => {
       try {
