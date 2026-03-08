@@ -16,7 +16,7 @@ To provide a unified, local-first command center for developers, bridging the ga
 - **Git Integration:** View current branch, dirty status, and sync status (ahead/behind) across all tracked repositories.
 - **System Monitoring:** Real-time visualization of CPU load, RAM usage, disk space, and system uptime (configurable).
 - **Bookmark Manager:** Organize technical documentation and project-related links with automatic favicon rendering.
-- **Port Manager:** Monitor active network ports and check availability via a dedicated Port Radar.
+- **Port Manager:** Monitor active network ports and check availability via a dedicated Port Radar with proactive ownership warnings.
 - **Quick Actions:** One-click shortcuts to open projects in VS Code, terminal, or file explorer.
 - **Universal Support:** Runs as a native desktop app (Electron), server-rendered web app (SSR), or standalone static site (SPA/BEX).
 
