@@ -7,5 +7,5 @@
 
 ---
 
-- [ ] **Track: Create the French version of all application documentation.**
+- [x] **Track: Create the French version of all application documentation.**
 *Link: [./tracks/fr_docs_20250524/](./tracks/fr_docs_20250524/)*
