@@ -52,7 +52,7 @@ Un centre de commandement robuste et agnostique pour la gestion de vos projets l
 # Installer les dépendances
 npm install
 
-# Lancer en mode développement (détecte le mode auto)
+# Lancer en mode développement
 quasar dev -m electron  # Bureau
 quasar dev -m ssr       # Serveur Web
 quasar dev              # SPA (Statique)
@@ -63,8 +63,7 @@ quasar build -m ssr       # Serveur Web
 quasar build              # SPA (Statique)
 
 # Lancer la suite de tests complète
-npm run test:unit  # Vitest
-npm run test:e2e   # Cypress
+npm test
 ```
 
 ---

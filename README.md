@@ -53,7 +53,7 @@ A robust, platform-agnostic development command center for managing local projec
 # Install dependencies
 npm install
 
-# Start in development mode (detects mode automatically)
+# Start in development mode
 quasar dev -m electron  # Desktop
 quasar dev -m ssr       # Web Server
 quasar dev              # SPA (Static)
@@ -64,8 +64,7 @@ quasar build -m ssr       # Web Server
 quasar build              # SPA (Static)
 
 # Run full test suite
-npm run test:unit  # Vitest
-npm run test:e2e   # Cypress
+npm test
 ```
 
 ## ✅ Quality Standards
