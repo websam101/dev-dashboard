@@ -53,7 +53,9 @@ Un centre de commandement robuste et agnostique pour la gestion de vos projets l
 npm install
 
 # Lancer en mode développement (détecte le mode auto)
-quasar dev
+quasar dev -m electron  # Bureau
+quasar dev -m ssr       # Serveur Web
+quasar dev              # SPA (Statique)
 
 # Compiler pour différentes cibles
 quasar build -m electron  # Bureau

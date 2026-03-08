@@ -8,6 +8,46 @@ vi.mock('#q-app/wrappers', () => ({
   defineConfig: (fn: any) => fn
 }))
 
+// Fully mock IndexedDB for 'idb' library and stores
+if (typeof window !== 'undefined') {
+  const mockIDBRequest = {
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    onsuccess: null,
+    onerror: null,
+    onupgradeneeded: null,
+    result: {
+      close: vi.fn(),
+      transaction: vi.fn().mockReturnValue({
+        objectStore: vi.fn().mockReturnValue({
+          getAll: vi.fn().mockReturnThis(),
+          put: vi.fn().mockReturnThis(),
+          delete: vi.fn().mockReturnThis(),
+          oncomplete: null,
+          onerror: null
+        }),
+        oncomplete: null,
+        onerror: null,
+        onabort: null
+      }),
+      createObjectStore: vi.fn(),
+      objectStoreNames: { contains: vi.fn().mockReturnValue(true) }
+    }
+  };
+
+  (window as any).indexedDB = {
+    open: vi.fn().mockReturnValue(mockIDBRequest),
+    deleteDatabase: vi.fn().mockReturnValue(mockIDBRequest)
+  };
+  (window as any).IDBRequest = class {};
+  (window as any).IDBTransaction = class {};
+  (window as any).IDBDatabase = class {};
+  (window as any).IDBObjectStore = class {};
+  (window as any).IDBIndex = class {};
+  (window as any).IDBCursor = class {};
+  (window as any).IDBKeyRange = class {};
+}
+
 // Mock Quasar internals
 const mockQuasar = {
   notify: vi.fn(),
@@ -25,25 +65,9 @@ const mockQuasar = {
     isActive: false
   },
   screen: {
-    gt: {
-      xs: true,
-      sm: true,
-      md: true,
-      lg: true,
-      xl: true
-    },
-    lt: {
-      xs: false,
-      sm: false,
-      md: false,
-      lg: false,
-      xl: false
-    },
-    xs: false,
-    sm: false,
-    md: true,
-    lg: false,
-    xl: false
+    gt: { xs: true, sm: true, md: true, lg: true, xl: true },
+    lt: { xs: false, sm: false, md: false, lg: false, xl: false },
+    xs: false, sm: false, md: true, lg: false, xl: false
   }
 }
 
@@ -79,41 +103,60 @@ config.global.mocks = {
   $q: mockQuasar
 }
 
+// Mock directives
+config.global.directives = {
+  ripple: {},
+  'close-popup': {}
+}
+
+// Improve component stubs to handle props and avoid Vue warnings
+const BaseStub = { template: '<div><slot /></div>' };
+const TableStub = { 
+  props: ['rows', 'columns', 'rowKey', 'filter', 'pagination'],
+  template: '<div class="q-table-stub"><slot name="top" /><slot /><slot name="bottom" /></div>' 
+};
+
 config.global.stubs = {
-  'q-page': { template: '<div><slot /></div>' },
-  'q-layout': { template: '<div><slot /></div>' },
-  'q-header': { template: '<div><slot /></div>' },
-  'q-drawer': { template: '<div><slot /></div>' },
-  'q-page-container': { template: '<div><slot /></div>' },
-  'q-toolbar': { template: '<div><slot /></div>' },
-  'q-toolbar-title': { template: '<div><slot /></div>' },
-  'q-btn': { template: '<button @click="$emit(\'click\')"><slot /></button>' },
-  'q-icon': { template: '<i><slot /></i>' },
-  'q-avatar': { template: '<div><slot /></div>' },
-  'q-badge': { template: '<span><slot /></span>' },
-  'q-card': { template: '<div><slot /></div>' },
-  'q-card-section': { template: '<div><slot /></div>' },
-  'q-card-actions': { template: '<div><slot /></div>' },
-  'q-list': { template: '<div><slot /></div>' },
-  'q-item': { template: '<div><slot /></div>' },
-  'q-item-section': { template: '<div><slot /></div>' },
-  'q-item-label': { template: '<div><slot /></div>' },
-  'q-toggle': { template: '<input type="checkbox" />' },
-  'q-select': { template: '<div />' },
-  'q-input': { template: '<input />' },
-  'q-tabs': { template: '<div><slot /></div>' },
-  'q-tab': { template: '<div><slot /></div>' },
+  'q-page': BaseStub,
+  'q-layout': BaseStub,
+  'q-header': BaseStub,
+  'q-drawer': BaseStub,
+  'q-page-container': BaseStub,
+  'q-toolbar': BaseStub,
+  'q-toolbar-title': BaseStub,
+  'q-btn': { 
+    props: ['label', 'icon', 'color', 'flat', 'round', 'dense', 'size', 'unelevated', 'outline', 'loading', 'disable'],
+    template: '<button @click="$emit(\'click\')"><slot />{{label}}</button>' 
+  },
+  'q-icon': { props: ['name', 'size', 'color'], template: '<i><slot /></i>' },
+  'q-avatar': BaseStub,
+  'q-badge': BaseStub,
+  'q-card': BaseStub,
+  'q-card-section': BaseStub,
+  'q-card-actions': BaseStub,
+  'q-list': BaseStub,
+  'q-item': BaseStub,
+  'q-item-section': BaseStub,
+  'q-item-label': BaseStub,
+  'q-toggle': { props: ['modelValue'], template: '<input type="checkbox" :checked="modelValue" />' },
+  'q-select': { props: ['modelValue', 'options'], template: '<div class="q-select-stub">{{modelValue}}</div>' },
+  'q-input': { props: ['modelValue'], template: '<input :value="modelValue" />' },
+  'q-tabs': BaseStub,
+  'q-tab': BaseStub,
   'q-separator': { template: '<hr />' },
-  'q-tooltip': { template: '<div />' },
-  'q-checkbox': { template: '<input type="checkbox" />' },
-  'q-table': { template: '<table><slot /></table>' },
-  'q-td': { template: '<td><slot /></td>' },
-  'q-th': { template: '<th><slot /></th>' },
-  'q-tr': { template: '<tr><slot /></tr>' },
-  'q-spinner-dots': { template: '<div />' },
-  'q-spinner-grid': { template: '<div />' },
-  'q-btn-group': { template: '<div><slot /></div>' },
-  'q-slide-transition': { template: '<div><slot /></div>' },
-  'q-menu': { template: '<div><slot /></div>' },
-  'q-dialog': { template: '<div><slot /></div>' }
+  'q-tooltip': BaseStub,
+  'q-checkbox': { props: ['modelValue'], template: '<input type="checkbox" :checked="modelValue" />' },
+  'q-table': TableStub,
+  'q-td': { props: ['props'], template: '<td><slot /></td>' },
+  'q-th': { props: ['props'], template: '<th><slot /></th>' },
+  'q-tr': { props: ['props'], template: '<tr><slot /></tr>' },
+  'q-spinner-dots': BaseStub,
+  'q-spinner-grid': BaseStub,
+  'q-btn-group': BaseStub,
+  'q-slide-transition': BaseStub,
+  'q-menu': BaseStub,
+  'q-dialog': BaseStub,
+  'q-space': { template: '<div class="q-space" style="flex-grow: 1" />' },
+  'q-img': { props: ['src'], template: '<img :src="src" />' },
+  'q-chip': { props: ['label', 'icon', 'color', 'outline', 'clickable', 'dense', 'size'], template: '<div class="q-chip-stub"><slot />{{label}}</div>' }
 }

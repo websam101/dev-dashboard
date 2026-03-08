@@ -54,7 +54,9 @@ A robust, platform-agnostic development command center for managing local projec
 npm install
 
 # Start in development mode (detects mode automatically)
-quasar dev
+quasar dev -m electron  # Desktop
+quasar dev -m ssr       # Web Server
+quasar dev              # SPA (Static)
 
 # Build for different targets
 quasar build -m electron  # Desktop
