@@ -29,11 +29,11 @@
 - [x] Task: Document Data Schema in `src/services/db/README.md`.
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Technical Reference and API' (Protocol in workflow.md)
 
-## Phase 4: Platform and Deployment
-- [ ] Task: Create `docs/modes/README.md`.
-    - [ ] Comparative table of all modes (SPA, SSR, Electron, etc.).
-- [ ] Task: Document mode-specific build/config details.
-    - [ ] Electron integration and system access.
-    - [ ] SSR & Backend dependencies.
-    - [ ] Future modes (Capacitor, BEX, Cordova, PWA) preliminary guides.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Platform and Deployment' (Protocol in workflow.md)
+## Phase 4: Platform and Deployment [checkpoint: 02fddb0]
+- [x] Task: Create `docs/modes/README.md`.
+    - [x] Comparative table of all modes (SPA, SSR, Electron, etc.).
+- [x] Task: Document mode-specific build/config details.
+    - [x] Electron integration and system access.
+    - [x] SSR & Backend dependencies.
+    - [x] Future modes (Capacitor, BEX, Cordova, PWA) preliminary guides.
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Platform and Deployment' (Protocol in workflow.md)
