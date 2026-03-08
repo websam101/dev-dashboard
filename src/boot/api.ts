@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Capability detection flags
-export const hasBackend = process.env.MODE !== 'spa';
+export const hasBackend = !['spa', 'bex'].includes(process.env.MODE || '');
 export const hasFileSystem = process.env.MODE === 'electron'; // SSR might have it but via API, Electron has it via IPC/Local Node
 
 // In Electron, we talk to the internal server on 3001

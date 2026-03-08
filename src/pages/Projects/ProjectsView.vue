@@ -1,81 +1,112 @@
 <template>
   <q-page class="q-pa-md">
     <!-- Compact Header -->
-    <div class="row items-center q-mb-md">
-      <h1 class="text-h5 text-wcag-bold q-mr-lg q-ma-none">{{ $t('projects.title') }}</h1>
+    <div class="row items-center justify-between q-mb-lg q-pa-sm rounded-borders bg-glass shadow-1">
+      <div class="row items-center">
+        <div class="header-accent-line q-mr-md"></div>
+        <div>
+          <h1 class="text-h5 text-wcag-bold q-ma-none line-height-1">{{ $t('projects.title') }}</h1>
+          <div class="text-wcag-caption opacity-70 text-weight-medium">
+            {{ projectsStore.projects.length }} {{ $t('dashboard.activeProjects').toLowerCase() }}
+          </div>
+        </div>
+      </div>
       
-      <div class="row q-gutter-x-sm items-center">
-        <q-input
-          v-model.number="radarPort"
-          :placeholder="$t('projects.portRadar')"
-          dense
-          outlined
-          type="number"
-          style="width: 120px"
-          @keyup.enter="checkRadar"
-          class="shadow-1"
-        >
-          <template v-slot:append>
-            <q-btn flat round dense icon="mdi-radar" :color="radarStatus === 'busy' ? 'negative' : (radarStatus === 'free' ? 'positive' : 'primary')" @click="checkRadar" size="sm" :aria-label="$t('projects.portRadarHint')">
-              <q-tooltip>{{ $t('projects.portRadarHint') }}</q-tooltip>
-            </q-btn>
-          </template>
-        </q-input>
+      <div class="row q-gutter-x-md items-center">
+        <!-- Search & Radar Group -->
+        <div class="row no-wrap shadow-1 rounded-borders overflow-hidden border-subtle">
+          <q-input
+            v-model="searchQuery"
+            :placeholder="searchPlaceholder"
+            dense
+            borderless
+            class="bg-input-header q-px-sm"
+            style="width: 220px"
+            clearable
+            @clear="searchQuery = ''"
+          >
+            <template v-slot:prepend>
+              <q-icon name="mdi-magnify" size="xs" color="primary" />
+            </template>
+          </q-input>
+          
+          <q-separator vertical inset />
 
-        <q-input
-          v-model="searchQuery"
-          :placeholder="searchPlaceholder"
-          dense
-          outlined
-          class="shadow-1"
-          style="width: 200px"
-          clearable
-          @clear="searchQuery = ''"
-        >
-          <template v-slot:prepend>
-            <q-icon name="mdi-magnify" size="sm" />
-          </template>
-        </q-input>
-        
-        <q-btn outline color="primary" icon="mdi-refresh" :loading="projectsStore.isSyncing" @click="projectsStore.syncAll(true)" size="sm" class="text-weight-bold" :aria-label="$t('common.refresh')">
-          <q-tooltip>{{ $t('common.refresh') }}</q-tooltip>
-        </q-btn>
-        <q-btn
-          v-if="hasBackend"
-          color="primary"
-          icon="mdi-history"
-          @click="scanAllRoots"
-          :disable="!settingsStore.settings.scanRoots?.length"
-          size="sm"
-          class="text-weight-bold shadow-1"
-          unelevated
-          :aria-label="$t('projects.scanAllRoots')"
-        >
-          <q-tooltip>{{ $t('projects.scanAllRoots') }}</q-tooltip>
-        </q-btn>
-        <q-btn
-          v-if="hasBackend"
-          color="accent"
-          icon="mdi-magnify-scan"
-          :label="$t('projects.manualScan')"
-          @click="showScanDialog = true"
-          size="sm"
-          class="text-weight-bold shadow-1"
-          unelevated
-        >
-          <q-tooltip>{{ $t('projects.manualScanHint') }}</q-tooltip>
-        </q-btn>
-        <q-btn
-          color="secondary"
-          icon="mdi-plus"
-          :label="$t('projects.addManual')"
-          @click="showAddDialog = true"
-          size="sm"
-          class="text-weight-bold shadow-1"
-          unelevated
-        >
-          <q-tooltip>{{ $t('projects.addManualHint') }}</q-tooltip>
-        </q-btn>
+          <q-input
+            v-model.number="radarPort"
+            :placeholder="$t('projects.portRadar')"
+            dense
+            borderless
+            type="number"
+            class="bg-input-header q-px-sm"
+            style="width: 130px"
+            @keyup.enter="checkRadar"
+          >
+            <template v-slot:append>
+              <q-btn 
+                flat 
+                round 
+                dense 
+                icon="mdi-radar" 
+                :color="radarStatus === 'busy' ? 'negative' : (radarStatus === 'free' ? 'positive' : 'grey-7')" 
+                @click="checkRadar" 
+                size="xs"
+              >
+                <q-tooltip>{{ $t('projects.portRadarHint') }}</q-tooltip>
+              </q-btn>
+            </template>
+          </q-input>
+        </div>
+
+        <!-- Actions Group -->
+        <div class="row q-gutter-x-sm">
+          <q-btn-group unelevated class="shadow-1 rounded-borders overflow-hidden">
+            <q-btn 
+              color="primary" 
+              icon="mdi-refresh" 
+              :loading="projectsStore.isSyncing" 
+              @click="projectsStore.syncAll(true)" 
+              size="sm"
+            >
+              <q-tooltip>{{ $t('common.refresh') }}</q-tooltip>
+            </q-btn>
+            <q-btn
+              v-if="hasBackend"
+              color="primary"
+              icon="mdi-history"
+              @click="scanAllRoots"
+              :disable="!settingsStore.settings.scanRoots?.length"
+              size="sm"
+            >
+              <q-tooltip>{{ $t('projects.scanAllRoots') }}</q-tooltip>
+            </q-btn>
+          </q-btn-group>
+
+          <q-btn
+            v-if="hasBackend"
+            color="accent"
+            icon="mdi-magnify-scan"
+            :label="$q.screen.gt.md ? $t('projects.manualScan') : ''"
+            @click="showScanDialog = true"
+            size="sm"
+            unelevated
+            class="shadow-1 text-weight-bold"
+          >
+            <q-tooltip>{{ $t('projects.manualScanHint') }}</q-tooltip>
+          </q-btn>
+
+          <q-btn
+            color="secondary"
+            icon="mdi-plus"
+            :label="$q.screen.gt.sm ? $t('projects.addManual') : ''"
+            @click="showAddDialog = true"
+            size="sm"
+            unelevated
+            class="shadow-1 text-weight-bolder"
+          >
+            <q-tooltip>{{ $t('projects.addManualHint') }}</q-tooltip>
+          </q-btn>
+        </div>
       </div>
     </div>
 
@@ -661,4 +692,27 @@ onMounted(() => {
 
 .tracking-tight
   letter-spacing: -1.5px
+
+.bg-glass
+  background: rgba(var(--dd-bg-rgb), 0.6)
+  backdrop-filter: blur(10px)
+  border: 1px solid rgba(255, 255, 255, 0.05)
+
+.header-accent-line
+  width: 4px
+  height: 32px
+  background: var(--q-primary)
+  border-radius: 4px
+
+.border-subtle
+  border: 1px solid rgba(255, 255, 255, 0.1)
+
+.bg-input-header
+  background: rgba(0, 0, 0, 0.1)
+  transition: background 0.3s ease
+  &:hover
+    background: rgba(0, 0, 0, 0.2)
+
+.line-height-1
+  line-height: 1
 </style>
