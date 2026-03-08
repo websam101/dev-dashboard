@@ -2,6 +2,7 @@ import { setActivePinia, createPinia } from 'pinia'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useSystemStore } from './systemStore'
 import { useSettingsStore } from './settingsStore'
+import { useProjectsStore } from './projectsStore'
 import { api } from '../boot/api';
 
 vi.mock('../boot/api', () => ({
@@ -20,12 +21,21 @@ vi.mock('./settingsStore', () => ({
   }))
 }))
 
+vi.mock('./projectsStore', () => ({
+  useProjectsStore: vi.fn().mockImplementation(() => ({
+    projects: []
+  }))
+}))
+
 describe('System Store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.resetAllMocks()
     vi.mocked(useSettingsStore).mockReturnValue({
       settings: { showSystemStats: true }
+    } as any)
+    vi.mocked(useProjectsStore).mockReturnValue({
+      projects: []
     } as any)
   })
 
@@ -74,5 +84,35 @@ describe('System Store', () => {
     await store.openTaskManager()
 
     expect(api.post).toHaveBeenCalledWith('/api/actions/open-task-manager')
+  })
+
+  it('detects port ownership by project (physical port)', () => {
+    const store = useSystemStore()
+    vi.mocked(useProjectsStore).mockReturnValue({
+      projects: [{ name: 'Project A', ports: [8080], managedPorts: [] }]
+    } as any)
+
+    const owner = store.checkPortOwnership(8080)
+    expect(owner).toBe('Project A')
+  })
+
+  it('detects port ownership by project (managed port)', () => {
+    const store = useSystemStore()
+    vi.mocked(useProjectsStore).mockReturnValue({
+      projects: [{ name: 'Project B', ports: [], managedPorts: [3000] }]
+    } as any)
+
+    const owner = store.checkPortOwnership(3000)
+    expect(owner).toBe('Project B')
+  })
+
+  it('returns null if port is not owned', () => {
+    const store = useSystemStore()
+    vi.mocked(useProjectsStore).mockReturnValue({
+      projects: [{ name: 'Project A', ports: [8080], managedPorts: [] }]
+    } as any)
+
+    const owner = store.checkPortOwnership(9000)
+    expect(owner).toBeNull()
   })
 })

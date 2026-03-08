@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { api, hasBackend } from '../boot/api';
 import { useSettingsStore } from './settingsStore';
+import { useProjectsStore } from './projectsStore';
 
 export interface SystemStats {
   cpuLoad: number;
@@ -65,6 +66,14 @@ export const useSystemStore = defineStore('system', {
       } catch (e) {
         console.error('Failed to open task manager', e);
       }
+    },
+    checkPortOwnership(port: number): string | null {
+      const projectsStore = useProjectsStore();
+      const owner = projectsStore.projects.find(p => 
+        (p.ports && p.ports.includes(port)) || 
+        (p.managedPorts && p.managedPorts.includes(port))
+      );
+      return owner ? owner.name : null;
     },
     addNotification(notif: Omit<Notification, 'id' | 'time'>) {
       this.notifications.unshift({
