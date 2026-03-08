@@ -1,19 +1,19 @@
 # Implementation Plan: Agnostic Architecture and Universal Storage
 
-## Phase 1: Storage and API Abstraction (The "Agnostic" Core)
+## Phase 1: Storage and API Abstraction (The "Agnostic" Core) [checkpoint: 86d5ca1]
 - [x] Task: Create a `StorageAdapter` interface and an `AgnosticDataService` to abstract DB operations from Pinia stores.
     - [x] Define `StorageAdapter` interface (`src/services/db/types.ts`).
     - [x] Refactor `IndexedDbAdapter.ts` to implement this interface.
     - [x] Create `AgnosticDataService.ts` to orchestrate between local adapter and optional backend sync.
 - [x] Task: Update `boot/api.ts` to include platform capability detection.
     - [x] Add `hasBackend` and `hasFileSystem` flags based on `process.env.MODE` and runtime checks.
-- [~] Task: Implement backend API for opening the system task manager.
-    - [ ] Add `openTaskManager()` to `ActionExecutor.ts` (OS-specific commands).
-    - [ ] Expose `/api/actions/open-task-manager` in SSR/Electron middlewares.
-- [ ] Task: Implement backend API for port checking.
-    - [ ] Add `checkPort(port: number)` to `SystemMonitor.ts`.
-    - [ ] Expose `/api/utils/check-port` in SSR/Electron middlewares.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Storage and API Abstraction' (Protocol in workflow.md)
+- [x] Task: Implement backend API for opening the system task manager.
+    - [x] Add `openTaskManager()` to `ActionExecutor.ts` (OS-specific commands).
+    - [x] Expose `/api/actions/open-task-manager` in SSR/Electron middlewares.
+- [x] Task: Implement backend API for port checking.
+    - [x] Add `checkPort(port: number)` to `SystemMonitor.ts`.
+    - [x] Expose `/api/utils/check-port` in SSR/Electron middlewares.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Storage and API Abstraction' (Protocol in workflow.md)
 
 ## Phase 2: Store Migration and Capability Awareness
 - [ ] Task: Refactor `settingsStore.ts` to use `AgnosticDataService` and include `showSystemStats` setting.
