@@ -16,17 +16,6 @@
             <q-list bordered separator class="rounded-borders q-mb-lg">
               <q-item tag="label" v-ripple>
                 <q-item-section>
-                  <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.darkMode') }}</q-item-label>
-                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.darkModeDesc') }}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-toggle v-model="settingsStore.settings.darkMode" color="primary" />
-                </q-item-section>
-                <q-tooltip>{{ $t('settings.darkModeHint') }}</q-tooltip>
-              </q-item>
-
-              <q-item tag="label" v-ripple>
-                <q-item-section>
                   <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.language') }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
@@ -43,11 +32,34 @@
                 </q-item-section>
                 <q-tooltip>{{ $t('settings.languageHint') }}</q-tooltip>
               </q-item>
+
+              <q-item tag="label" v-ripple>
+                <q-item-section>
+                  <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.darkMode') }}</q-item-label>
+                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.darkModeDesc') }}</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-toggle v-model="settingsStore.settings.darkMode" color="primary" />
+                </q-item-section>
+                <q-tooltip>{{ $t('settings.darkModeHint') }}</q-tooltip>
+              </q-item>
+
             </q-list>
 
             <!-- Automation -->
             <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.automation') }}</div>
             <q-list bordered separator class="rounded-borders q-mb-lg">
+              <q-item tag="label" v-ripple v-if="hasBackend">
+                <q-item-section>
+                  <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.showSystemStats') }}</q-item-label>
+                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.showSystemStatsDesc') }}</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-toggle v-model="settingsStore.settings.showSystemStats" color="accent" />
+                </q-item-section>
+                <q-tooltip>{{ $t('settings.showSystemStatsHint') }}</q-tooltip>
+              </q-item>
+              
               <q-item tag="label" v-ripple>
                 <q-item-section>
                   <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.autoCheckPorts') }}</q-item-label>
@@ -59,27 +71,17 @@
                 <q-tooltip>{{ $t('settings.autoCheckPortsHint') }}</q-tooltip>
               </q-item>
 
-              <q-item tag="label" v-ripple v-if="hasBackend">
-                <q-item-section>
-                  <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.showSystemStats') }}</q-item-label>
-                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.showSystemStatsDesc') }}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-toggle v-model="settingsStore.settings.showSystemStats" color="accent" />
-                </q-item-section>
-                <q-tooltip>{{ $t('settings.showSystemStatsHint') }}</q-tooltip>
-              </q-item>
             </q-list>
 
             <!-- Managed Roots -->
             <div v-if="hasBackend">
               <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.scanRoots') }}</div>
               <div class="row q-gutter-sm q-mb-md">
-                <q-input 
-                  v-model="newRoot" 
-                  :placeholder="$t('settings.rootPathPlaceholder')" 
-                  dense 
-                  outlined 
+                <q-input
+                  v-model="newRoot"
+                  :placeholder="$t('settings.rootPathPlaceholder')"
+                  dense
+                  outlined
                   class="col"
                   @keyup.enter="addRoot"
                 />
@@ -117,29 +119,29 @@
                 <q-icon name="mdi-bug" color="warning" class="q-mr-sm" size="20px" />
                 <div class="text-overline text-wcag-bold">{{ $t('settings.devTools') }}</div>
               </div>
-              
+
               <div class="row q-col-gutter-sm">
                 <div class="col-6">
-                  <q-btn 
-                    outline 
-                    color="primary" 
-                    icon="mdi-database-export" 
-                    :label="$t('settings.pushLocalToBackend')" 
-                    class="full-width" 
-                    dense 
-                    @click="forcePush" 
+                  <q-btn
+                    outline
+                    color="primary"
+                    icon="mdi-database-export"
+                    :label="$t('settings.pushLocalToBackend')"
+                    class="full-width"
+                    dense
+                    @click="forcePush"
                     :loading="syncing"
                   />
                 </div>
                 <div class="col-6">
-                  <q-btn 
-                    outline 
-                    color="secondary" 
-                    icon="mdi-database-import" 
-                    :label="$t('settings.pullBackendToLocal')" 
-                    class="full-width" 
-                    dense 
-                    @click="forcePull" 
+                  <q-btn
+                    outline
+                    color="secondary"
+                    icon="mdi-database-import"
+                    :label="$t('settings.pullBackendToLocal')"
+                    class="full-width"
+                    dense
+                    @click="forcePull"
                     :loading="syncing"
                   />
                 </div>
@@ -151,12 +153,12 @@
           </q-card-section>
 
           <q-card-actions align="right" class="q-pa-md border-top">
-            <q-btn 
-              color="primary" 
-              :label="$t('common.save')" 
-              unelevated 
-              :loading="settingsStore.loading" 
-              @click="settingsStore.saveSettings" 
+            <q-btn
+              color="primary"
+              :label="$t('common.save')"
+              unelevated
+              :loading="settingsStore.loading"
+              @click="settingsStore.saveSettings"
               class="text-weight-bolder"
             >
               <q-tooltip>{{ $t('settings.saveAllHint') }}</q-tooltip>
@@ -240,7 +242,7 @@ onMounted(() => {
 
 .bg-root-list
   background: #fff
-  
+
 .body--dark .bg-root-list
   background: rgba(0, 0, 0, 0.2)
 

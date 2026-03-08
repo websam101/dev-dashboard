@@ -9,7 +9,8 @@ vi.mock('../../boot/api', () => ({
   api: {
     get: vi.fn(() => Promise.resolve({ data: { success: true } })),
     post: vi.fn(() => Promise.resolve({ data: { success: true } }))
-  }
+  },
+  hasBackend: true
 }))
 
 describe('ProjectsView', () => {

@@ -338,7 +338,7 @@ import { useProjectsStore } from '../../stores/projectsStore';
 import { useI18n } from 'vue-i18n';
 import FaviconRenderer from '../../components/FaviconRenderer.vue';
 import FormattedText from '../../components/FormattedText.vue';
-import type { Bookmark } from '../../stores/bookmarksStore';
+import type { Bookmark } from '../../services/db/types';
 import { api } from '../../boot/api';
 import { useQuasar } from 'quasar';
 
@@ -380,7 +380,7 @@ const editingBookmark = ref<Omit<Bookmark, 'id' | 'createdAt'> & { id?: string; 
 const searchPlaceholder = computed(() => t('bookmarks.noMatches', { query: '' }).replace(' ""', '...'));
 
 const projectOptions = computed(() => [{ label: t('bookmarks.globalContext'), value: 'global' }, ...projectsStore.projects.map(p => ({ label: p.name, value: p.id }))]);
-const collectionOptions = computed(() => [{ label: t('bookmarks.unassigned'), value: undefined }, ...bookmarksStore.collections.map(c => ({ label: c.name, value: c.id }))]);
+const collectionOptions = computed(() => [{ label: t('bookmarks.unassigned'), value: undefined }, ...bookmarksStore.collections.map((c: any) => ({ label: c.name, value: c.id }))]);
 const sortedCollections = computed(() => [...bookmarksStore.collections].sort((a, b) => a.name.localeCompare(b.name)));
 
 const filteredFavorites = computed(() => {

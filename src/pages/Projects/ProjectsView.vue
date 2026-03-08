@@ -519,15 +519,19 @@ const checkRadar = async () => {
 
     const inUse = await systemStore.checkPort(radarPort.value);
     radarStatus.value = inUse ? 'busy' : 'free';
-    $q.notify({ 
-      message: t('projects.portStatus', { 
-        port: radarPort.value, 
-        status: inUse ? t('common.busy').toUpperCase() : t('common.free').toUpperCase() 
-      }), 
-      color: inUse ? 'negative' : 'positive', 
-      position: 'top', 
-      timeout: 1500 
-    });
+
+    // Only show the physical status toast if no dashboard owner was warned about
+    if (!owner) {
+      $q.notify({ 
+        message: t('projects.portStatus', { 
+          port: radarPort.value, 
+          status: inUse ? t('common.busy').toUpperCase() : t('common.free').toUpperCase() 
+        }), 
+        color: inUse ? 'negative' : 'positive', 
+        position: 'top', 
+        timeout: 1500 
+      });
+    }
   } catch (e) {}
 };
 

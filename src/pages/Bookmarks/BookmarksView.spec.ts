@@ -8,7 +8,8 @@ import { api } from '../../boot/api';
 vi.mock('../../boot/api', () => ({
   api: {
     post: vi.fn().mockResolvedValue({ data: { success: true } })
-  }
+  },
+  hasBackend: true
 }))
 
 describe('BookmarksView', () => {

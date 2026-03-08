@@ -29,10 +29,10 @@
           >
             <q-tooltip>{{ $t('dashboard.openTaskManager') }}</q-tooltip>
           </q-btn>
-          <div class="text-wcag-caption text-caption text-weight-bold">
+          <!--div class="text-wcag-caption text-caption text-weight-bold">
             {{ systemStore.stats?.platform }} | {{ systemStore.stats?.uptime ? formatUptime(systemStore.stats.uptime) :
               '-' }}
-          </div>
+          </div-->
         </div>
       </div>
 

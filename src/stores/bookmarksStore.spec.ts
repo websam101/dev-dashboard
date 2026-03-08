@@ -49,7 +49,7 @@ describe('Bookmarks Store', () => {
 
   it('loads bookmarks and merges with defaults', async () => {
     const store = useBookmarksStore()
-    const mockLocal = [{ id: '1', title: 'L', url: 'u' }]
+    const mockLocal = [{ id: '1', title: 'L', url: 'u', description: '', tags: [], projectIds: [], favorite: false, createdAt: '' }]
     mockDb.getBookmarks.mockResolvedValue(mockLocal as any)
 
     await store.loadBookmarks()
@@ -63,9 +63,9 @@ describe('Bookmarks Store', () => {
 
   it('adds bookmark with correct structure', async () => {
     const store = useBookmarksStore()
-    const newB = { title: 'N', url: 'u', tags: ['T'] }
+    const newB = { title: 'N', url: 'u', tags: ['T'], description: '' }
 
-    await store.addBookmark(newB)
+    await store.addBookmark(newB as any)
 
     expect(store.bookmarks[0]).toEqual(expect.objectContaining({
       title: 'N',
@@ -76,7 +76,7 @@ describe('Bookmarks Store', () => {
 
   it('deletes bookmark', async () => {
     const store = useBookmarksStore()
-    store.bookmarks = [{ id: '1', title: 'B', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
+    store.bookmarks = [{ id: '1', title: 'B', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [], description: '' }]
 
     await store.deleteBookmark('1')
 
@@ -86,7 +86,7 @@ describe('Bookmarks Store', () => {
 
   it('toggles favorite status', async () => {
     const store = useBookmarksStore()
-    store.bookmarks = [{ id: '1', title: 'B', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
+    store.bookmarks = [{ id: '1', title: 'B', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [], description: '' }]
     
     await store.toggleFavorite('1')
     expect(store.bookmarks[0]!.favorite).toBe(true)
@@ -95,7 +95,7 @@ describe('Bookmarks Store', () => {
 
   it('performs importSnapshot correctly (clears and replaces)', async () => {
     const store = useBookmarksStore()
-    const oldBookmarks = [{ id: 'old', title: 'Old', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
+    const oldBookmarks = [{ id: 'old', title: 'Old', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [], description: '' }]
     const oldCollections = [{ id: 'cold', name: 'OldCol' }]
     
     // Set initial state
@@ -107,7 +107,7 @@ describe('Bookmarks Store', () => {
     mockDb.getCollections.mockResolvedValue(oldCollections as any)
 
     const newSnapshot = {
-      bookmarks: [{ id: 'new', title: 'New', url: 'u', tags: [], createdAt: '' }],
+      bookmarks: [{ id: 'new', title: 'New', url: 'u', tags: [], createdAt: '', description: '' }],
       collections: [{ id: 'cnew', name: 'NewCol' }]
     }
 
@@ -121,7 +121,7 @@ describe('Bookmarks Store', () => {
 
   it('forcePushToBackend calls sync endpoints', async () => {
     const store = useBookmarksStore()
-    store.bookmarks = [{ id: '1', title: 'B', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
+    store.bookmarks = [{ id: '1', title: 'B', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [], description: '' }]
     store.collections = [{ id: 'c1', name: 'C1' }]
 
     await store.forcePushToBackend()
@@ -134,7 +134,7 @@ describe('Bookmarks Store', () => {
     const store = useBookmarksStore()
     vi.mocked(api.get).mockImplementation(async (url) => {
       if (url === '/api/collections') return { data: [{ id: 'rc', name: 'RC' }] }
-      if (url === '/api/bookmarks') return { data: [{ id: 'rb', title: 'RB', url: 'u' }] }
+      if (url === '/api/bookmarks') return { data: [{ id: 'rb', title: 'RB', url: 'u', description: '' }] }
       return { data: [] }
     })
 

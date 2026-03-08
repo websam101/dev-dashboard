@@ -35,7 +35,7 @@ describe('AgnosticDataService', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     service = new AgnosticDataService();
-    mockLocal = (service as any).local;
+    mockLocal = service.local;
   });
 
   it('gets projects from local adapter', async () => {
@@ -48,20 +48,20 @@ describe('AgnosticDataService', () => {
   });
 
   it('saves project locally and syncs to backend when hasBackend is true', async () => {
-    const project = { id: '1', name: 'P1' } as any;
-    (service as any).hasBackend = true;
+    const project = { id: '1', name: 'P1' };
+    service.hasBackend = true;
 
-    await service.saveProject(project);
+    await service.saveProject(project as any);
 
     expect(mockLocal.addProject).toHaveBeenCalledWith(project);
     expect(api.post).toHaveBeenCalledWith('/api/projects/update', project);
   });
 
   it('saves project locally but NOT to backend when hasBackend is false', async () => {
-    const project = { id: '1', name: 'P1' } as any;
-    (service as any).hasBackend = false;
+    const project = { id: '1', name: 'P1' };
+    service.hasBackend = false;
 
-    await service.saveProject(project);
+    await service.saveProject(project as any);
 
     expect(mockLocal.addProject).toHaveBeenCalledWith(project);
     expect(api.post).not.toHaveBeenCalled();
@@ -69,7 +69,7 @@ describe('AgnosticDataService', () => {
 
   it('deletes project locally and syncs to backend when hasBackend is true', async () => {
     const id = '1';
-    (service as any).hasBackend = true;
+    service.hasBackend = true;
 
     await service.deleteProject(id);
 
@@ -88,7 +88,7 @@ describe('AgnosticDataService', () => {
 
   it('sets setting locally and syncs to backend for app_settings', async () => {
     const settings = { darkMode: true };
-    (service as any).hasBackend = true;
+    service.hasBackend = true;
 
     await service.setSetting('app_settings', settings);
 
@@ -98,7 +98,7 @@ describe('AgnosticDataService', () => {
 
   it('sets setting locally but NOT to backend if NOT app_settings', async () => {
     const other = { some: 'data' };
-    (service as any).hasBackend = true;
+    service.hasBackend = true;
 
     await service.setSetting('other_key', other);
 

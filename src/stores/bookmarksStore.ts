@@ -1,19 +1,7 @@
 import { defineStore } from 'pinia';
 import { IndexedDbAdapter } from '../services/db/adapter/IndexedDbAdapter';
-import type { BookmarkCollection } from '../services/db/adapter/IndexedDbAdapter';
+import type { BookmarkCollection, Bookmark } from '../services/db/types';
 import { api } from '../boot/api';
-
-export interface Bookmark {
-  id: string;
-  title: string;
-  url: string;
-  tags: string[];
-  description?: string;
-  favorite?: boolean;
-  projectIds?: string[];
-  collectionId?: string | undefined;
-  createdAt?: string;
-}
 
 const db = new IndexedDbAdapter();
 const clean = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));

@@ -16,7 +16,8 @@ vi.mock('../../boot/api', () => ({
   default: {
     get: vi.fn(),
     post: vi.fn()
-  }
+  },
+  hasBackend: true
 }))
 
 describe('HomeView', () => {
@@ -61,7 +62,7 @@ describe('HomeView', () => {
       { id: '3', name: 'P3', path: 'p3', description: '', techs: [], ports: [], favorite: true },
       { id: '4', name: 'P4', path: 'p4', description: '', techs: [], ports: [], favorite: false }
     ]
-    bookmarksStore.bookmarks = [{ id: 'b1', title: 'B1', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [] }]
+    bookmarksStore.bookmarks = [{ id: 'b1', title: 'B1', url: 'u', tags: [], createdAt: '', favorite: false, projectIds: [], description: '' }]
 
     const wrapper = mount(HomeView, {
       global: {
