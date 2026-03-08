@@ -67,13 +67,6 @@ quasar build              # SPA (Static)
 npm test
 ```
 
-## ✅ Quality Standards
-
-- **Zero-Error Policy:** 100% clean ESLint and TypeScript verification.
-- **Automated Verification:**
-  - `npm run lint`: Code quality check.
-  - `npm test`: Runs all unit and E2E tests.
-
 ---
 
 _Developed for high-efficiency development environments._
