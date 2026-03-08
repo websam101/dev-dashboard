@@ -1,0 +1,8 @@
+{
+  "track_id": "agnostic_arch_20250522",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2025-05-22T22:30:00Z",
+  "updated_at": "2025-05-22T22:30:00Z",
+  "description": "Implement agnostic architecture for SPA mode, IndexedDB-only storage, and toggleable system statistics."
+}
