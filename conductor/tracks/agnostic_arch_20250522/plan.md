@@ -15,7 +15,7 @@
     - [x] Expose `/api/utils/check-port` in SSR/Electron middlewares.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Storage and API Abstraction' (Protocol in workflow.md)
 
-## Phase 2: Store Migration and Capability Awareness
+## Phase 2: Store Migration and Capability Awareness [checkpoint: 1f9c6aa]
 - [x] Task: Refactor `settingsStore.ts` to use `AgnosticDataService` and include `showSystemStats` setting.
     - [x] Add `showSystemStats` to `Settings` interface.
     - [x] Update TDD tests for `settingsStore`.
@@ -23,10 +23,10 @@
     - [x] Update `loadProjects` and `syncAll` to respect `hasBackend` flag.
     - [x] Add manual project entry action.
     - [x] Update TDD tests for `projectsStore`.
-- [~] Task: Update `systemStore.ts` to respect `showSystemStats` setting and `hasBackend` capability.
-    - [ ] Update `fetchStats` to conditionally run.
-    - [ ] Add `openTaskManager` and `checkPort` actions.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Store Migration and Capability Awareness' (Protocol in workflow.md)
+- [x] Task: Update `systemStore.ts` to respect `showSystemStats` setting and `hasBackend` capability.
+    - [x] Update `fetchStats` to conditionally run.
+    - [x] Add `openTaskManager` and `checkPort` actions.
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Store Migration and Capability Awareness' (Protocol in workflow.md)
 
 ## Phase 3: UI Implementation and Platform Adaptation
 - [ ] Task: Implement conditional UI in `Dashboard/HomeView.vue`.
