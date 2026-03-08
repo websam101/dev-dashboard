@@ -10,15 +10,15 @@
     - [x] Testing and Linting guides.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Foundation and Developer Docs' (Protocol in workflow.md)
 
-## Phase 2: User and Feature Guides
-- [ ] Task: Create `docs/user/README.md`.
-    - [ ] Navigation and high-level feature walkthrough.
-- [ ] Task: Create individual feature guides.
-    - [ ] Projects Hub (Scanning, Manual Entry, Git).
-    - [ ] Bookmarks (Collections, Pinning).
-    - [ ] System Monitor & Port Radar.
-    - [ ] Backup/Restore procedure.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: User and Feature Guides' (Protocol in workflow.md)
+## Phase 2: User and Feature Guides [checkpoint: ef2fdb0]
+- [x] Task: Create `docs/user/README.md`.
+    - [x] Navigation and high-level feature walkthrough.
+- [x] Task: Create individual feature guides.
+    - [x] Projects Hub (Scanning, Manual Entry, Git).
+    - [x] Bookmarks (Collections, Pinning).
+    - [x] System Monitor & Port Radar.
+    - [x] Backup/Restore procedure.
+- [x] Task: Conductor - User Manual Verification 'Phase 2: User and Feature Guides' (Protocol in workflow.md)
 
 ## Phase 3: Technical Reference and API
 - [ ] Task: Create `src/services/README.md`.
