@@ -505,6 +505,18 @@ const getShortPath = (path: string) => {
 const checkRadar = async () => {
   if (!radarPort.value) return;
   try {
+    const owner = systemStore.checkPortOwnership(radarPort.value);
+    if (owner) {
+      $q.notify({
+        message: t('projects.portOwnedWarning', { port: radarPort.value, owner }),
+        color: 'warning',
+        textColor: 'dark',
+        icon: 'mdi-alert-circle',
+        position: 'top',
+        timeout: 3000
+      });
+    }
+
     const inUse = await systemStore.checkPort(radarPort.value);
     radarStatus.value = inUse ? 'busy' : 'free';
     $q.notify({ 

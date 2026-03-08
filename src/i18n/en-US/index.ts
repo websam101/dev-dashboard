@@ -131,6 +131,7 @@ export default {
     statusBusy: 'BUSY',
     statusFree: 'FREE',
     portConflict: 'Port Conflict Detected',
+    portOwnedWarning: 'Warning: Port {port} is already managed by project {owner}',
     portActive: 'Port is currently active',
     portPinnedOffline: 'Pinned port (Offline)',
     gitDirty: 'Uncommitted changes detected',
