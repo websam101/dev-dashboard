@@ -1,0 +1,33 @@
+# Implementation Plan: Comprehensive French Application Documentation
+
+## Phase 1: Localized Root and Developer Setup
+- [ ] Task: Create `README.fr.md` in the root.
+    - [ ] Translate overview, features, and tech stack.
+    - [ ] Link to `docs/fr/` documentation map.
+- [ ] Task: Create `docs/fr/dev/README.md`.
+    - [ ] Translate setup, installation, and build commands.
+    - [ ] Document Conductor workflow in French.
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Localized Root and Developer Setup' (Protocol in workflow.md)
+
+## Phase 2: Localized User Manual
+- [ ] Task: Create `docs/fr/user/README.md`.
+    - [ ] High-level overview and localized table of contents.
+- [ ] Task: Create localized feature guides in `docs/fr/user/`.
+    - [ ] `projets.md`: Scanning, Git, and Port management.
+    - [ ] `favoris.md`: Collections and pinning.
+    - [ ] `systeme.md`: Monitoring and Task Manager.
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: Localized User Manual' (Protocol in workflow.md)
+
+## Phase 3: Technical and API Documentation (French)
+- [ ] Task: Create `docs/fr/api/README.md` (mirroring `src/services/README.md`).
+    - [ ] Localize architecture diagrams and endpoint descriptions.
+- [ ] Task: Create `docs/fr/api/schema.md` (mirroring `src/services/db/README.md`).
+    - [ ] Localize data model and storage descriptions.
+- [ ] Task: Conductor - User Manual Verification 'Phase 3: Technical and API Documentation' (Protocol in workflow.md)
+
+## Phase 4: Execution Modes and Final Review
+- [ ] Task: Create `docs/fr/modes/README.md`.
+    - [ ] Localize capability comparison table.
+    - [ ] Translate detailed mode descriptions (Electron, SSR, SPA).
+- [ ] Task: Verify all internal links between French documents are functional.
+- [ ] Task: Conductor - User Manual Verification 'Phase 4: Execution Modes and Final Review' (Protocol in workflow.md)
