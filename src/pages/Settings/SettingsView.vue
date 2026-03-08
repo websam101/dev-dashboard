@@ -2,19 +2,38 @@
   <q-page class="q-pa-md">
     <div class="row q-col-gutter-md justify-center">
       <div class="col-12 col-md-8 col-lg-6">
-        <q-card flat bordered class="rounded-borders shadow-1">
+        <q-card
+          flat
+          bordered
+          class="rounded-borders shadow-1"
+        >
           <q-card-section class="bg-gradient-primary text-white q-py-sm">
             <div class="row items-center">
-              <q-icon name="mdi-palette" color="white" class="q-mr-sm" size="24px" />
+              <q-icon
+                name="mdi-cogs"
+                color="white"
+                class="q-mr-sm"
+                size="24px"
+              />
               <div class="text-h6 text-weight-bolder">{{ $t('settings.title') }}</div>
             </div>
           </q-card-section>
 
           <q-card-section class="q-pa-md">
             <!-- Appearance -->
-            <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.appearance') }}</div>
-            <q-list bordered separator class="rounded-borders q-mb-lg">
-              <q-item tag="label" v-ripple>
+            <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">
+              <q-icon name="mdi-palette" color="white" class="q-mr-sm" size="24px" />
+              {{ $t('settings.appearance') }}
+            </div>
+            <q-list
+              bordered
+              separator
+              class="rounded-borders q-mb-lg"
+            >
+              <q-item
+                tag="label"
+                v-ripple
+              >
                 <q-item-section>
                   <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.language') }}</q-item-label>
                 </q-item-section>
@@ -33,13 +52,22 @@
                 <q-tooltip>{{ $t('settings.languageHint') }}</q-tooltip>
               </q-item>
 
-              <q-item tag="label" v-ripple>
+              <q-item
+                tag="label"
+                v-ripple
+              >
                 <q-item-section>
                   <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.darkMode') }}</q-item-label>
-                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.darkModeDesc') }}</q-item-label>
+                  <q-item-label
+                    caption
+                    class="text-wcag-caption"
+                  >{{ $t('settings.darkModeDesc') }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-toggle v-model="settingsStore.settings.darkMode" color="primary" />
+                  <q-toggle
+                    v-model="settingsStore.settings.darkMode"
+                    color="primary"
+                  />
                 </q-item-section>
                 <q-tooltip>{{ $t('settings.darkModeHint') }}</q-tooltip>
               </q-item>
@@ -47,26 +75,52 @@
             </q-list>
 
             <!-- Automation -->
-            <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.automation') }}</div>
-            <q-list bordered separator class="rounded-borders q-mb-lg">
-              <q-item tag="label" v-ripple v-if="hasBackend">
+            <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">
+              <q-icon name="mdi-creation" color="white" class="q-mr-sm" size="24px" />
+              {{ $t('settings.automation') }}
+            </div>
+            <q-list
+              bordered
+              separator
+              class="rounded-borders q-mb-lg"
+            >
+              <q-item
+                tag="label"
+                v-ripple
+                v-if="hasBackend"
+              >
                 <q-item-section>
                   <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.showSystemStats') }}</q-item-label>
-                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.showSystemStatsDesc') }}</q-item-label>
+                  <q-item-label
+                    caption
+                    class="text-wcag-caption"
+                  >{{ $t('settings.showSystemStatsDesc') }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-toggle v-model="settingsStore.settings.showSystemStats" color="accent" />
+                  <q-toggle
+                    v-model="settingsStore.settings.showSystemStats"
+                    color="accent"
+                  />
                 </q-item-section>
                 <q-tooltip>{{ $t('settings.showSystemStatsHint') }}</q-tooltip>
               </q-item>
-              
-              <q-item tag="label" v-ripple>
+
+              <q-item
+                tag="label"
+                v-ripple
+              >
                 <q-item-section>
                   <q-item-label class="text-weight-bold text-wcag">{{ $t('settings.autoCheckPorts') }}</q-item-label>
-                  <q-item-label caption class="text-wcag-caption">{{ $t('settings.autoCheckPortsDesc') }}</q-item-label>
+                  <q-item-label
+                    caption
+                    class="text-wcag-caption"
+                  >{{ $t('settings.autoCheckPortsDesc') }}</q-item-label>
                 </q-item-section>
                 <q-item-section side>
-                  <q-toggle v-model="settingsStore.settings.autoCheckPorts" color="secondary" />
+                  <q-toggle
+                    v-model="settingsStore.settings.autoCheckPorts"
+                    color="secondary"
+                  />
                 </q-item-section>
                 <q-tooltip>{{ $t('settings.autoCheckPortsHint') }}</q-tooltip>
               </q-item>
@@ -75,7 +129,10 @@
 
             <!-- Managed Roots -->
             <div v-if="hasBackend">
-              <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">{{ $t('settings.scanRoots') }}</div>
+              <div class="text-overline text-wcag-bold opacity-70 q-mb-sm">
+                <q-icon name="mdi-file-tree" color="white" class="q-mr-sm" size="24px" />
+                {{ $t('settings.scanRoots') }}
+              </div>
               <div class="row q-gutter-sm q-mb-md">
                 <q-input
                   v-model="newRoot"
@@ -85,38 +142,86 @@
                   class="col"
                   @keyup.enter="addRoot"
                 />
-                <q-btn v-if="isElectron" outline color="secondary" icon="mdi-folder" @click="browseFolder" :aria-label="$t('settings.browseFolderHint')">
+                <q-btn
+                  v-if="isElectron"
+                  outline
+                  color="secondary"
+                  icon="mdi-folder"
+                  @click="browseFolder"
+                  :aria-label="$t('settings.browseFolderHint')"
+                >
                   <q-tooltip>{{ $t('settings.browseFolderHint') }}</q-tooltip>
                 </q-btn>
-                <q-btn color="primary" :label="$t('settings.addRoot')" @click="addRoot" :disable="!newRoot">
+                <q-btn
+                  color="primary"
+                  :label="$t('settings.addRoot')"
+                  @click="addRoot"
+                  :disable="!newRoot"
+                >
                   <q-tooltip>{{ $t('settings.addRootHint') }}</q-tooltip>
                 </q-btn>
               </div>
 
-              <q-list bordered separator class="rounded-borders bg-root-list q-mb-lg" v-if="settingsStore.settings.scanRoots?.length">
-                <q-item v-for="root in settingsStore.settings.scanRoots" :key="root" dense class="q-py-sm">
+              <q-list
+                bordered
+                separator
+                class="rounded-borders bg-root-list q-mb-lg"
+                v-if="settingsStore.settings.scanRoots?.length"
+              >
+                <q-item
+                  v-for="root in settingsStore.settings.scanRoots"
+                  :key="root"
+                  dense
+                  class="q-py-sm"
+                >
                   <q-item-section avatar>
-                    <q-icon name="mdi-folder" color="primary" />
+                    <q-icon
+                      name="mdi-folder"
+                      color="primary"
+                    />
                   </q-item-section>
                   <q-item-section>
-                    <q-item-label class="text-wcag text-weight-medium ellipsis" style="max-width: 400px">{{ root }}</q-item-label>
+                    <q-item-label
+                      class="text-wcag text-weight-medium ellipsis"
+                      style="max-width: 400px"
+                    >{{ root }}</q-item-label>
                   </q-item-section>
                   <q-item-section side>
-                    <q-btn flat round dense icon="mdi-delete" color="negative" size="sm" @click="removeRoot(root)" :aria-label="$t('common.remove')">
+                    <q-btn
+                      flat
+                      round
+                      dense
+                      icon="mdi-delete"
+                      color="negative"
+                      size="sm"
+                      @click="removeRoot(root)"
+                      :aria-label="$t('common.remove')"
+                    >
                       <q-tooltip>{{ $t('common.remove') }}</q-tooltip>
                     </q-btn>
                   </q-item-section>
                 </q-item>
               </q-list>
-              <div v-else class="text-center q-pa-md text-wcag-caption italic border-dashed rounded-borders q-mb-lg">
+              <div
+                v-else
+                class="text-center q-pa-md text-wcag-caption italic border-dashed rounded-borders q-mb-lg"
+              >
                 {{ $t('settings.noRoots') }}
               </div>
             </div>
 
             <!-- DEV TOOLS (Hidden in Production or if no backend) -->
-            <div v-if="isDev && hasBackend" class="dev-tools-section q-mt-xl q-pa-md rounded-borders border-dashed">
+            <div
+              v-if="isDev && hasBackend"
+              class="dev-tools-section q-mt-xl q-pa-md rounded-borders border-dashed"
+            >
               <div class="row items-center q-mb-md">
-                <q-icon name="mdi-bug" color="warning" class="q-mr-sm" size="20px" />
+                <q-icon
+                  name="mdi-bug"
+                  color="warning"
+                  class="q-mr-sm"
+                  size="20px"
+                />
                 <div class="text-overline text-wcag-bold">{{ $t('settings.devTools') }}</div>
               </div>
 
@@ -154,20 +259,48 @@
             <!-- Backup & Restore -->
             <div class="q-mt-xl q-pa-md rounded-borders border-subtle bg-glass shadow-1">
               <div class="row items-center q-mb-md">
-                <q-icon name="mdi-database-lock" color="primary" class="q-mr-sm" size="20px" />
+                <q-icon
+                  name="mdi-database-lock"
+                  color="primary"
+                  class="q-mr-sm"
+                  size="20px"
+                />
                 <div class="text-overline text-wcag-bold">{{ $t('settings.backupRestore') }}</div>
               </div>
-              
+
               <div class="row q-gutter-sm">
-                <q-btn color="primary" :label="$t('settings.exportBackup')" icon="mdi-download" unelevated size="sm" @click="exportBackup" />
-                <q-btn outline color="secondary" :label="$t('settings.importBackup')" icon="mdi-upload" size="sm" @click="triggerImport" />
-                <input type="file" ref="backupInput" @change="importBackup" style="display: none" accept=".json" />
+                <q-btn
+                  color="primary"
+                  :label="$t('settings.exportBackup')"
+                  icon="mdi-download"
+                  unelevated
+                  size="sm"
+                  @click="exportBackup"
+                />
+                <q-btn
+                  outline
+                  color="secondary"
+                  :label="$t('settings.importBackup')"
+                  icon="mdi-upload"
+                  size="sm"
+                  @click="triggerImport"
+                />
+                <input
+                  type="file"
+                  ref="backupInput"
+                  @change="importBackup"
+                  style="display: none"
+                  accept=".json"
+                />
               </div>
               <div class="text-wcag-caption q-mt-sm opacity-70">{{ $t('settings.backupHint') }}</div>
             </div>
           </q-card-section>
 
-          <q-card-actions align="right" class="q-pa-md border-top">
+          <q-card-actions
+            align="right"
+            class="q-pa-md border-top"
+          >
             <q-btn
               color="primary"
               :label="$t('common.save')"
@@ -279,24 +412,26 @@ const importBackup = async (event: Event) => {
     cancel: true,
     persistent: true,
     dark: true
-  }).onOk(async () => {
-    try {
-      const text = await file.text();
-      await agnosticDataService.importAllData(text);
-      
-      // Reload stores to reflect new data
-      await Promise.all([
-        settingsStore.loadSettings(),
-        projectsStore.loadProjects(true),
-        bookmarksStore.loadBookmarks()
-      ]);
+  }).onOk(() => {
+    void (async () => {
+      try {
+        const text = await file.text();
+        await agnosticDataService.importAllData(text);
 
-      $q.notify({ message: 'Restore complete! Lab updated.', color: 'positive', icon: 'mdi-check' });
-    } catch (e) {
-      $q.notify({ message: 'Import failed: Invalid file', color: 'negative', icon: 'mdi-alert' });
-    } finally {
-      if (backupInput.value) backupInput.value.value = '';
-    }
+        // Reload stores to reflect new data
+        await Promise.all([
+          settingsStore.loadSettings(),
+          projectsStore.loadProjects(true),
+          bookmarksStore.loadBookmarks()
+        ]);
+
+        $q.notify({ message: 'Restore complete! Lab updated.', color: 'positive', icon: 'mdi-check' });
+      } catch (e) {
+        $q.notify({ message: 'Import failed: Invalid file', color: 'negative', icon: 'mdi-alert' });
+      } finally {
+        if (backupInput.value) backupInput.value.value = '';
+      }
+    })();
   });
 };
 

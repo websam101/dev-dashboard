@@ -58,6 +58,23 @@
       <div class="row q-gutter-x-md items-center">
         <!-- Search & Context Group -->
         <div class="row no-wrap shadow-1 rounded-borders overflow-hidden border-subtle">
+          <q-input
+            v-model="searchQuery"
+            :placeholder="searchPlaceholder"
+            dense
+            borderless
+            class="bg-input-header q-px-sm"
+            style="width: 200px"
+            clearable
+            @clear="searchQuery = ''"
+          >
+            <template v-slot:prepend>
+              <q-icon name="search" size="xs" color="primary" />
+            </template>
+          </q-input>
+          
+          <q-separator vertical inset />
+
           <q-select
             v-model="selectedProject"
             :options="projectOptions"
@@ -74,22 +91,6 @@
             </template>
           </q-select>
 
-          <q-separator vertical inset />
-
-          <q-input
-            v-model="searchQuery"
-            :placeholder="searchPlaceholder"
-            dense
-            borderless
-            class="bg-input-header q-px-sm"
-            style="width: 200px"
-            clearable
-            @clear="searchQuery = ''"
-          >
-            <template v-slot:prepend>
-              <q-icon name="search" size="xs" color="primary" />
-            </template>
-          </q-input>
         </div>
 
         <div class="row q-gutter-x-sm">
