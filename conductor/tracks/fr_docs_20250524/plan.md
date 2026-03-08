@@ -25,9 +25,9 @@
     - [x] Localize data model and storage descriptions.
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Technical and API Documentation' (Protocol in workflow.md)
 
-## Phase 4: Execution Modes and Final Review
-- [ ] Task: Create `docs/fr/modes/README.md`.
-    - [ ] Localize capability comparison table.
-    - [ ] Translate detailed mode descriptions (Electron, SSR, SPA).
-- [ ] Task: Verify all internal links between French documents are functional.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Execution Modes and Final Review' (Protocol in workflow.md)
+## Phase 4: Execution Modes and Final Review [checkpoint: c77cd54]
+- [x] Task: Create `docs/fr/modes/README.md`.
+    - [x] Localize capability comparison table.
+    - [x] Translate detailed mode descriptions (Electron, SSR, SPA).
+- [x] Task: Verify all internal links between French documents are functional.
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Execution Modes and Final Review' (Protocol in workflow.md)
