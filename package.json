@@ -6,6 +6,7 @@
   "author": "Sam <websam101@gmail.com>",
   "type": "module",
   "private": true,
+  "license": "GPL-3.0-only",
   "scripts": {
     "lint": "eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\"",
     "test": "vitest",
