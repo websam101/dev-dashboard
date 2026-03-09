@@ -50,7 +50,12 @@
         <div>
           <h1 class="text-h5 text-wcag-bold q-ma-none line-height-1">{{ $t('bookmarks.title') }}</h1>
           <div class="text-wcag-caption opacity-70 text-weight-medium">
-            {{ bookmarksStore.bookmarks.length }} {{ $t('dashboard.savedBookmarks').toLowerCase() }}
+            <template v-if="filteredBookmarks.length < bookmarksStore.bookmarks.length">
+              {{ filteredBookmarks.length }} {{ $t('common.of') }} {{ bookmarksStore.bookmarks.length }} {{ $t('dashboard.savedBookmarks').toLowerCase() }}
+            </template>
+            <template v-else>
+              {{ bookmarksStore.bookmarks.length }} {{ $t('dashboard.savedBookmarks').toLowerCase() }}
+            </template>
           </div>
         </div>
       </div>

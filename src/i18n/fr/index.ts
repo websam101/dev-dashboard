@@ -16,6 +16,7 @@ export default {
     error: 'Erreur',
     ok: 'OK',
     close: 'Fermer',
+    of: 'sur',
     selected: '{count} sélectionnés',
     edit: 'Modifier',
     view: 'Voir',
