@@ -338,8 +338,29 @@
           <div class="text-subtitle1 text-weight-bolder">{{ isEditing ? $t('bookmarks.editResource') : $t('bookmarks.newResource') }}</div>
         </q-card-section>
         <q-card-section class="q-gutter-sm q-pt-md">
-          <q-input v-model="editingBookmark.url" label="URL" dense filled @keyup.enter="fetchMetadata" />
-          <q-input v-model="editingBookmark.title" label="Title" dense filled />
+          <q-input 
+            v-model="editingBookmark.url" 
+            label="URL" 
+            dense 
+            filled 
+            @keyup.enter="fetchMetadata"
+            @blur="autoFetch"
+          >
+            <template v-slot:append>
+              <q-btn 
+                flat 
+                round 
+                dense 
+                icon="mdi-arrow-right-bold-circle-outline" 
+                color="primary" 
+                @click="fetchMetadata"
+                :loading="isFetchingMetadata"
+              >
+                <q-tooltip>{{ $t('bookmarks.fetchMetadata') }}</q-tooltip>
+              </q-btn>
+            </template>
+          </q-input>
+          <q-input v-model="editingBookmark.title" label="Title" dense filled :loading="isFetchingMetadata" />
           <div class="row q-col-gutter-xs">
             <q-select v-model="editingBookmark.collectionId" :options="collectionOptions" label="Collection" dense filled emit-value map-options class="col-6" />
             <q-select v-model="editingBookmark.projectIds" :options="projectOptions" label="Projects" dense filled multiple use-chips emit-value map-options class="col-6" />
@@ -390,6 +411,7 @@ const editingCollectionId = ref<string | null>(null);
 const editingName = ref('');
 const viewingBookmark = ref<Bookmark | null>(null);
 const selectedRows = ref<Bookmark[]>([]);
+const isFetchingMetadata = ref(false);
 
 const columns: any[] = [
   { name: 'title', label: t('bookmarks.colResource'), align: 'left', sortable: true, field: 'title' },
@@ -477,9 +499,24 @@ const addCollection = async () => { if (newCollectionName.value) await bookmarks
 const confirmDeleteCollection = (col: any) => { $q.dialog({ title: t('common.delete'), message: t('bookmarks.removeCollectionConfirm', { name: col.name }), cancel: true, dark: true }).onOk(() => { void (async () => { await bookmarksStore.deleteCollection(col.id); if (activeCollection.value === col.id) activeCollection.value = 'all'; })(); }); };
 
 const fetchMetadata = async () => {
-  const res = await api.post('/api/utils/fetch-metadata', { url: editingBookmark.value.url }).catch(() => null);
-  if (res?.data.title) editingBookmark.value.title = res.data.title;
-  if (res?.data.description) editingBookmark.value.description = res.data.description;
+  if (!editingBookmark.value.url || !editingBookmark.value.url.startsWith('http')) return;
+  
+  isFetchingMetadata.value = true;
+  try {
+    const res = await api.post('/api/utils/fetch-metadata', { url: editingBookmark.value.url });
+    if (res?.data.title) editingBookmark.value.title = res.data.title;
+    if (res?.data.description) editingBookmark.value.description = res.data.description;
+  } catch (e) {
+    console.error('Metadata fetch failed', e);
+  } finally {
+    isFetchingMetadata.value = false;
+  }
+};
+
+const autoFetch = () => {
+  if (!isEditing.value && editingBookmark.value.url && !editingBookmark.value.title) {
+    void fetchMetadata();
+  }
 };
 
 const exportData = () => {

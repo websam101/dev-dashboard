@@ -204,6 +204,7 @@ export default {
     loadLibrary: 'Load library from file',
     exportHint: 'Export your library to a JSON file',
     importHint: 'Import a library from a JSON file',
+    fetchMetadata: 'Fetch title and description from URL',
     openLinkHint: 'Open this link in a new tab',
     sortResetHint: 'Click to sort, Right-click to reset sort',
     autoFetch: 'Auto-fetch title and description'

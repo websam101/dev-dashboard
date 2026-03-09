@@ -204,6 +204,7 @@ export default {
     loadLibrary: 'Charger la bibliothèque',
     exportHint: 'Exporter vers un fichier JSON',
     importHint: 'Importer depuis un fichier JSON',
+    fetchMetadata: 'Récupérer le titre et la description via l\'URL',
     openLinkHint: 'Ouvrir ce lien dans un nouvel onglet',
     sortResetHint: 'Clic pour trier, Clic-droit pour réinitialiser',
     autoFetch: 'Récupération auto du titre/description'
