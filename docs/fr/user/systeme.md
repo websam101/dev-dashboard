@@ -1,26 +1,42 @@
-# Suivi Système
+﻿<!--
+  Copyright (C) 2025-2026 Sam <websam101@gmail.com>
 
-Suivez en temps réel les performances de votre machine hôte pour identifier les goulots d'étranglement ou les conflits de ressources.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-## 📊 Indicateurs de Ressources
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+# Suivi SystÃ¨me
+
+Suivez en temps rÃ©el les performances de votre machine hÃ´te pour identifier les goulots d'Ã©tranglement ou les conflits de ressources.
+
+## ðŸ“Š Indicateurs de Ressources
 Le tableau de bord affiche trois moniteurs principaux :
-1. **CPU :** Pourcentage de charge totale sur l'ensemble de vos cœurs. Sur Windows, nous utilisons un proxy intelligent pour fournir une métrique de charge significative.
-2. **RAM :** Utilisation de la mémoire vive en Go et en pourcentage.
-3. **Disque :** Espace utilisé sur votre partition principale (généralement `C:` ou `/`).
+1. **CPU :** Pourcentage de charge totale sur l'ensemble de vos cÅ“urs. Sur Windows, nous utilisons un proxy intelligent pour fournir une mÃ©trique de charge significative.
+2. **RAM :** Utilisation de la mÃ©moire vive en Go et en pourcentage.
+3. **Disque :** Espace utilisÃ© sur votre partition principale (gÃ©nÃ©ralement `C:` ou `/`).
 
-## 📡 Trafic Réseau
-Visualisez le cumul des données envoyées et reçues depuis le dernier démarrage du système. Utile pour vérifier si un projet consomme de la bande passante de manière inattendue.
+## ðŸ“¡ Trafic RÃ©seau
+Visualisez le cumul des donnÃ©es envoyÃ©es et reÃ§ues depuis le dernier dÃ©marrage du systÃ¨me. Utile pour vÃ©rifier si un projet consomme de la bande passante de maniÃ¨re inattendue.
 
-## 🖥️ Gestionnaire de Tâches
-Une icône **Moniteur** est disponible dans l'en-tête du tableau de bord. Un clic sur celle-ci ouvre instantanément l'outil natif de votre système :
-- **Windows :** Gestionnaire des tâches (`taskmgr.exe`).
-- **macOS :** Moniteur d'activité.
-- **Linux :** GNOME System Monitor (ou équivalent).
+## ðŸ–¥ï¸ Gestionnaire de TÃ¢ches
+Une icÃ´ne **Moniteur** est disponible dans l'en-tÃªte du tableau de bord. Un clic sur celle-ci ouvre instantanÃ©ment l'outil natif de votre systÃ¨me :
+- **Windows :** Gestionnaire des tÃ¢ches (`taskmgr.exe`).
+- **macOS :** Moniteur d'activitÃ©.
+- **Linux :** GNOME System Monitor (ou Ã©quivalent).
 
-## ⚙️ Configuration
-Vous pouvez personnaliser l'affichage du suivi système dans les [Paramètres](./README.md#paramètres) :
-- **Afficher les statistiques :** Activez ou désactivez complètement les moniteurs pour libérer de l'espace visuel ou économiser des ressources.
-- **Vérification Auto des Ports :** Permet à l'application de scanner périodiquement les ports réseau de vos projets en arrière-plan.
+## âš™ï¸ Configuration
+Vous pouvez personnaliser l'affichage du suivi systÃ¨me dans les [ParamÃ¨tres](./README.md#paramÃ¨tres) :
+- **Afficher les statistiques :** Activez ou dÃ©sactivez complÃ¨tement les moniteurs pour libÃ©rer de l'espace visuel ou Ã©conomiser des ressources.
+- **VÃ©rification Auto des Ports :** Permet Ã  l'application de scanner pÃ©riodiquement les ports rÃ©seau de vos projets en arriÃ¨re-plan.
 
 ---
 

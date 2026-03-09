@@ -1,64 +1,80 @@
-# Guide Développeur
+﻿<!--
+  Copyright (C) 2025-2026 Sam <websam101@gmail.com>
 
-Bienvenue dans le guide de développement du Dev Dashboard. Ce document couvre la configuration technique, le flux de travail et les standards de qualité du projet.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-## 🛠️ Configuration de l'environnement
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-### Prérequis
-- **Node.js :** v20+ (LTS recommandée)
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
+# Guide DÃ©veloppeur
+
+Bienvenue dans le guide de dÃ©veloppement du Dev Dashboard. Ce document couvre la configuration technique, le flux de travail et les standards de qualitÃ© du projet.
+
+## ðŸ› ï¸ Configuration de l'environnement
+
+### PrÃ©requis
+- **Node.js :** v20+ (LTS recommandÃ©e)
 - **NPM :** v10+
-- **Quasar CLI :** L'installation globale est optionnelle mais recommandée.
+- **Quasar CLI :** L'installation globale est optionnelle mais recommandÃ©e.
   ```bash
   npm install -g @quasar/cli
   ```
 
 ### Installation
-1. Clonez le dépôt.
-2. Installez les dépendances :
+1. Clonez le dÃ©pÃ´t.
+2. Installez les dÃ©pendances :
    ```bash
    npm install
    ```
 
-## 🔄 Flux de Travail
+## ðŸ”„ Flux de Travail
 
-Le projet suit une méthodologie de **Développement Piloté par les Spécifications** gérée par **Conductor**.
+Le projet suit une mÃ©thodologie de **DÃ©veloppement PilotÃ© par les SpÃ©cifications** gÃ©rÃ©e par **Conductor**.
 
 ### Protocoles Conductor
 - **`/conductor:setup`** : Initialise l'environnement Conductor (Produit, Stack Tech, Workflow).
-- **`/conductor:implement`** : Traite automatiquement la prochaine tâche en attente dans le `Tracks Registry`.
-- **`/conductor:review`** : Génère un résumé des modifications pour revue.
+- **`/conductor:implement`** : Traite automatiquement la prochaine tÃ¢che en attente dans le `Tracks Registry`.
+- **`/conductor:review`** : GÃ©nÃ¨re un rÃ©sumÃ© des modifications pour revue.
 
 ### Standards de Code
-- **Logique Agnostique :** N'importez jamais de modules Node.js (comme `fs`, `path`, `child_process`) directement dans les composants frontend. Utilisez la couche de service et la détection de capacités.
-- **Typage Strict :** Couverture TypeScript à 100%. Évitez `any` sauf si c'est absolument nécessaire pour des mocks de bas niveau.
-- **i18n Obligatoire :** Ne codez jamais de texte en dur dans l'UI. Toutes les chaînes doivent résider dans `src/i18n/`.
+- **Logique Agnostique :** N'importez jamais de modules Node.js (comme `fs`, `path`, `child_process`) directement dans les composants frontend. Utilisez la couche de service et la dÃ©tection de capacitÃ©s.
+- **Typage Strict :** Couverture TypeScript Ã  100%. Ã‰vitez `any` sauf si c'est absolument nÃ©cessaire pour des mocks de bas niveau.
+- **i18n Obligatoire :** Ne codez jamais de texte en dur dans l'UI. Toutes les chaÃ®nes doivent rÃ©sider dans `src/i18n/`.
 
-## 🧪 Tests & Vérification
+## ðŸ§ª Tests & VÃ©rification
 
 ### Tests Unitaires (Vitest)
-Les tests unitaires sont utilisés pour les stores, les services et la logique utilitaire.
+Les tests unitaires sont utilisÃ©s pour les stores, les services et la logique utilitaire.
 - **Lancer tous les tests :** `npm run test:unit`
-- **Lancer un test spécifique :** `npx vitest run src/path/to/test.spec.ts`
+- **Lancer un test spÃ©cifique :** `npx vitest run src/path/to/test.spec.ts`
 
 ### Tests End-to-End (Cypress)
-Cypress est utilisé pour la vérification des fonctionnalités et les audits d'accessibilité (a11y).
+Cypress est utilisÃ© pour la vÃ©rification des fonctionnalitÃ©s et les audits d'accessibilitÃ© (a11y).
 - **Ouvrir l'UI Cypress :** `npx cypress open`
 - **Lancer la suite en mode headless :** `npx cypress run`
 
 ### Linting
-Nous utilisons ESLint avec des règles spécifiques pour Vue 3 et TypeScript.
-- **Vérifier le code :** `npm run lint`
+Nous utilisons ESLint avec des rÃ¨gles spÃ©cifiques pour Vue 3 et TypeScript.
+- **VÃ©rifier le code :** `npm run lint`
 
-## 🏗️ Commandes de Build
+## ðŸ—ï¸ Commandes de Build
 
-L'application peut être compilée pour différentes cibles :
+L'application peut Ãªtre compilÃ©e pour diffÃ©rentes cibles :
 
 | Mode | Commande | Description |
 | :--- | :--- | :--- |
 | **Electron** | `quasar build -m electron` | Application de bureau native. |
-| **SSR** | `quasar build -m ssr` | Application web avec rendu serveur et API intégrée. |
+| **SSR** | `quasar build -m ssr` | Application web avec rendu serveur et API intÃ©grÃ©e. |
 | **SPA** | `quasar build` | Application web statique (local-uniquement). |
 
 ---
 
-_Consultez la [Référence API](../api/README.md) pour plus de détails architecturaux._
+_Consultez la [RÃ©fÃ©rence API](../api/README.md) pour plus de dÃ©tails architecturaux._

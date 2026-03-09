@@ -1,3 +1,19 @@
+﻿<!--
+  Copyright (C) 2025-2026 Sam <websam101@gmail.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
 <template>
   <q-page class="q-pa-md">
     <!-- Compact Header -->
@@ -205,11 +221,11 @@
               <q-tooltip>{{ $t('projects.activeBranch') }}: {{ props.row.git.branch }}</q-tooltip>
             </q-badge>
             <div v-if="props.row.git.ahead > 0" class="text-positive text-weight-bold" style="font-size: 0.7rem">
-              ↑{{ props.row.git.ahead }}
+              â†‘{{ props.row.git.ahead }}
               <q-tooltip>{{ props.row.git.ahead }} {{ $t('projects.commitsAhead') }}</q-tooltip>
             </div>
             <div v-if="props.row.git.behind > 0" class="text-negative text-weight-bold" style="font-size: 0.7rem">
-              ↓{{ props.row.git.behind }}
+              â†“{{ props.row.git.behind }}
               <q-tooltip>{{ props.row.git.behind }} {{ $t('projects.commitsBehind') }}</q-tooltip>
             </div>
           </div>

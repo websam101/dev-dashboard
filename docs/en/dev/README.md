@@ -1,8 +1,24 @@
+﻿<!--
+  Copyright (C) 2025-2026 Sam <websam101@gmail.com>
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+-->
 # Developer Guide
 
 Welcome to the Dev Dashboard development guide. This document covers the technical setup, development workflow, and quality standards for the project.
 
-## 🛠️ Environment Setup
+## ðŸ› ï¸ Environment Setup
 
 ### Prerequisites
 - **Node.js:** v20+ (LTS recommended)
@@ -19,7 +35,7 @@ Welcome to the Dev Dashboard development guide. This document covers the technic
    npm install
    ```
 
-## 🔄 Development Workflow
+## ðŸ”„ Development Workflow
 
 The project follows a **Spec-Driven Development** methodology managed by **Conductor**.
 
@@ -33,7 +49,7 @@ The project follows a **Spec-Driven Development** methodology managed by **Condu
 - **Strict Typing:** 100% TypeScript coverage. Avoid `any` unless absolutely necessary for low-level mocks.
 - **i18n Mandatory:** Never hardcode text in the UI. All strings must reside in `src/i18n/`.
 
-## 🧪 Testing & Verification
+## ðŸ§ª Testing & Verification
 
 ### Unit Testing (Vitest)
 Unit tests are used for stores, services, and utility logic.
@@ -49,7 +65,7 @@ Cypress is used for feature verification and accessibility (a11y) audits.
 We use ESLint with specific rules for Vue 3 and TypeScript.
 - **Check code:** `npm run lint`
 
-## 🏗️ Build Commands
+## ðŸ—ï¸ Build Commands
 
 The application can be built for different targets:
 

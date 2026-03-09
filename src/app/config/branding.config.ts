@@ -14,16 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-interface Window {
-  electronApi?: {
-    selectFolder: () => Promise<string | null>;
-  };
-}
+/**
+ * Branding and Legal Configuration
+ * Centralized source of truth for company and contact data.
+ * Adheres to the "no-hardcoded-text" policy.
+ */
 
-declare namespace NodeJS {
-  interface ProcessEnv {
-    NODE_ENV: string;
-    VUE_ROUTER_MODE: 'hash' | 'history' | 'abstract' | undefined;
-    VUE_ROUTER_BASE: string | undefined;
-  }
-}
+export const branding = {
+  name: "Dev Dashboard",
+  legalName: "Sam <websam101@gmail.com>",
+  manager: "Sam",
+  email: "websam101@gmail.com",
+  city: "Yamachiche", // Or your actual city
+  address: "Yamachiche, Canada", // Or your actual address
+  domain: "exaltweb.com", // Or your actual domain
+  year: "2025-2026",
+  license: "GPL-3.0-only",
+};
+
+export default branding;
