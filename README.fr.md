@@ -71,12 +71,16 @@ npm install
 
 # Lancer en mode développement
 quasar dev -m electron  # Bureau
+## ou
 quasar dev -m ssr       # Serveur Web
+## ou
 quasar dev              # SPA (Statique)
 
 # Compiler pour différentes cibles
 quasar build -m electron  # Bureau
+## ou
 quasar build -m ssr       # Serveur Web
+## ou
 quasar build              # SPA (Statique)
 
 # Lancer la suite de tests complète

@@ -72,12 +72,16 @@ npm install
 
 # Start in development mode
 quasar dev -m electron  # Desktop
+## or
 quasar dev -m ssr       # Web Server
+## or
 quasar dev              # SPA (Static)
 
 # Build for different targets
 quasar build -m electron  # Desktop
+## or
 quasar build -m ssr       # Web Server
+## or
 quasar build              # SPA (Static)
 
 # Run full test suite
