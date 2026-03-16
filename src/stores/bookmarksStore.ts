@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (C) 2025-2026 Sam <websam101@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,6 @@ export const useBookmarksStore = defineStore('bookmarks', {
   }),
   actions: {
     async loadCollections() {
-      if (!process.env.CLIENT) return;
       try {
         this.collections = await db.getCollections();
       } catch (e) {
@@ -38,18 +37,15 @@ export const useBookmarksStore = defineStore('bookmarks', {
       }
     },
     async addCollection(name: string) {
-      if (!process.env.CLIENT) return;
       const collection: BookmarkCollection = { id: Date.now().toString(), name };
       await db.addCollection(collection);
       await this.loadCollections();
     },
     async updateCollection(collection: BookmarkCollection) {
-      if (!process.env.CLIENT) return;
       await db.updateCollection(collection);
       await this.loadCollections();
     },
     async deleteCollection(id: string) {
-      if (!process.env.CLIENT) return;
       await db.deleteCollection(id);
       for (const b of this.bookmarks) {
         if (b.collectionId === id) {
@@ -60,7 +56,6 @@ export const useBookmarksStore = defineStore('bookmarks', {
       await this.loadCollections();
     },
     async loadBookmarks() {
-      if (!process.env.CLIENT) return;
       this.loading = true;
       try {
         await this.loadCollections();
@@ -83,7 +78,7 @@ export const useBookmarksStore = defineStore('bookmarks', {
           const cAt = b.createdAt || (/^\d+$/.test(b.id) ? new Date(parseInt(b.id)).toISOString() : new Date().toISOString());
           return {
             id: b.id, title: b.title, url: b.url,
-            tags: (Array.isArray(raw.tags) && raw.tags.length > 0) ? raw.tags : (raw.category ? [raw.category] : ['General']),
+            tags: (Array.isArray(b.tags) && b.tags.length > 0) ? b.tags : ['General'],
             description: b.description, favorite: !!b.favorite,
             projectIds: pIds.length > 0 ? pIds : ['global'],
             collectionId: b.collectionId || undefined, createdAt: cAt
@@ -100,7 +95,7 @@ export const useBookmarksStore = defineStore('bookmarks', {
               if (rpIds.length === 0) rpIds = ['global'];
               const cleanedRemote = clean({
                 ...remote,
-                tags: Array.isArray(remote.tags) ? remote.tags : (remote.category ? [remote.category] : ['General']),
+                tags: Array.isArray(remote.tags) && remote.tags.length > 0 ? remote.tags : ['General'],
                 favorite: !!remote.favorite, projectIds: rpIds, collectionId: remote.collectionId || undefined,
                 createdAt: remote.createdAt || new Date().toISOString()
               });
@@ -114,29 +109,21 @@ export const useBookmarksStore = defineStore('bookmarks', {
         console.error('Failed to load bookmarks', e);
       } finally { this.loading = false; }
     },
-    /**
-     * Replaces local state with a full snapshot. Used for Import and Pull.
-     */
     async importSnapshot(data: { bookmarks: Bookmark[], collections: BookmarkCollection[] }) {
-      if (!process.env.CLIENT) return;
       this.loading = true;
       try {
-        // 1. Clear Collections
         const oldCols = await db.getCollections();
         for (const c of oldCols) await db.deleteCollection(c.id);
-        // 2. Add New Collections
         for (const c of data.collections || []) await db.addCollection(clean(c));
         await this.loadCollections();
 
-        // 3. Clear Bookmarks
         const oldBs = await db.getBookmarks();
         for (const b of oldBs) await db.deleteBookmark(b.id);
-        // 4. Add New Bookmarks
         for (const b of data.bookmarks || []) {
           const cleaned = clean({
             ...b,
             description: b.description || '',
-            tags: b.tags || [],
+            tags: Array.isArray(b.tags) && b.tags.length > 0 ? b.tags : ['General'],
             createdAt: b.createdAt || new Date().toISOString()
           });
           await db.addBookmark(cleaned as any);
@@ -147,10 +134,8 @@ export const useBookmarksStore = defineStore('bookmarks', {
       }
     },
     async forcePushToBackend() {
-      if (!process.env.CLIENT) return;
       this.loading = true;
       try {
-        // OVERWRITE Backend with Local State (Atomic Batch)
         await api.post('/api/collections/sync', clean(this.collections));
         await api.post('/api/bookmarks/sync', clean(this.bookmarks));
       } finally {
@@ -158,7 +143,6 @@ export const useBookmarksStore = defineStore('bookmarks', {
       }
     },
     async forcePullFromBackend() {
-      if (!process.env.CLIENT) return;
       try {
         const [colRes, bRes] = await Promise.all([
           api.get('/api/collections'),
@@ -182,9 +166,8 @@ export const useBookmarksStore = defineStore('bookmarks', {
       }
     },
     async updateBookmark(bookmark: Bookmark) {
-      if (!process.env.CLIENT) return;
       try {
-        const cleaned = clean(bookmark);
+        const cleaned = clean({ ...bookmark, tags: (Array.isArray(bookmark.tags) && bookmark.tags.length > 0) ? bookmark.tags : ['General'] });
         await db.addBookmark({ ...cleaned, description: cleaned.description || '', createdAt: bookmark.createdAt || new Date().toISOString() });
         const idx = this.bookmarks.findIndex(b => b.id === bookmark.id);
         if (idx > -1) this.bookmarks[idx] = cleaned;
@@ -192,10 +175,10 @@ export const useBookmarksStore = defineStore('bookmarks', {
       } catch (e) { console.error('Failed to update bookmark', e); }
     },
     async addBookmark(bookmark: Omit<Bookmark, 'id' | 'createdAt'>) {
-      if (!process.env.CLIENT) return;
       try {
         const now = new Date().toISOString();
-        const newBookmark: Bookmark = { favorite: false, projectIds: ['global'], ...bookmark, id: Date.now().toString(), createdAt: now };
+        const tags = (Array.isArray(bookmark.tags) && bookmark.tags.length > 0) ? bookmark.tags : ['General'];
+        const newBookmark: Bookmark = { favorite: false, projectIds: ['global'], ...bookmark, tags, id: Date.now().toString(), createdAt: now };
         const cleaned = clean(newBookmark);
         await db.addBookmark({ ...cleaned, description: cleaned.description || '', createdAt: now });
         this.bookmarks.push(cleaned);
@@ -203,7 +186,6 @@ export const useBookmarksStore = defineStore('bookmarks', {
       } catch (e) { console.error('Failed to add bookmark', e); }
     },
     async deleteBookmark(id: string) {
-      if (!process.env.CLIENT) return;
       try {
         await db.deleteBookmark(id);
         this.bookmarks = this.bookmarks.filter(b => b.id !== id);
