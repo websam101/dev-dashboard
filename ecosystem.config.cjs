@@ -15,7 +15,7 @@ module.exports = {
       // ---------- Runtime env ----------
       env: {
         NODE_ENV: 'production',
-        PORT: '9999',
+        PORT: '3000',
         // CORS_ORIGIN is optional — defaults to http://localhost:<PORT>
         // Uncomment and set when the dashboard is accessed from a different host/port:
         // CORS_ORIGIN: 'http://192.168.1.100:3000',
@@ -23,7 +23,7 @@ module.exports = {
 
       env_production: {
         NODE_ENV: 'production',
-        PORT: '9999',
+        PORT: '3000',
       },
 
       // ---------- Process options ----------
