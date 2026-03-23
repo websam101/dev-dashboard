@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { app, BrowserWindow, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Menu } from 'electron';
 import path from 'path';
 import os from 'os';
 import { fileURLToPath } from 'url';
@@ -45,7 +45,12 @@ interface DatabaseSchema {
   projects: ProjectInfo[];
   bookmarks: Bookmark[];
   settings: {
+    darkMode: boolean;
+    autoCheckPorts: boolean;
+    portCheckInterval: number;
     scanRoots: string[];
+    locale: string;
+    showSystemStats: boolean;
   };
 }
 
@@ -67,7 +72,18 @@ async function startInternalServer() {
   }
 
   const dbPath = path.join(dbFolder, 'db.json');
-  const defaultData: DatabaseSchema = { projects: [], bookmarks: [], settings: { scanRoots: [] } };
+  const defaultData: DatabaseSchema = {
+    projects: [],
+    bookmarks: [],
+    settings: {
+      darkMode: true,
+      autoCheckPorts: true,
+      portCheckInterval: 30000,
+      scanRoots: [],
+      locale: 'en-US',
+      showSystemStats: true
+    }
+  };
   const db = await JSONFilePreset<DatabaseSchema>(dbPath, defaultData);
   await db.read();
 
@@ -275,11 +291,19 @@ async function startInternalServer() {
 
   server.post('/api/bookmarks', (req, res) => {
     void (async () => {
-      const bookmark = req.body as Omit<Bookmark, 'id'>;
-      db.data.bookmarks.push({ ...bookmark, id: Date.now().toString() });
+      const bookmark = req.body as Bookmark;
+      // Upsert: update if exists, otherwise push
+      const idx = db.data.bookmarks.findIndex(b => b.id === bookmark.id);
+      if (idx >= 0) db.data.bookmarks[idx] = bookmark;
+      else db.data.bookmarks.push(bookmark);
       await db.write();
       res.json(db.data.bookmarks);
     })();
+  });
+
+  // Open external links in the default OS browser
+  ipcMain.handle('open-external', async (_event, url: string) => {
+    await shell.openExternal(url);
   });
 
   // Listen on a local port that axios boot file can reach
@@ -311,6 +335,15 @@ async function createWindow() {
 
   mainWindow.on('closed', () => {
     mainWindow = undefined;
+  });
+
+  // Remove the application menu entirely
+  Menu.setApplicationMenu(null);
+
+  // Open all target=_blank / window.open links in the default OS browser
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    void shell.openExternal(url);
+    return { action: 'deny' };
   });
 }
 

@@ -20,4 +20,5 @@ contextBridge.exposeInMainWorld('electronApi', {
   selectFolder: () => ipcRenderer.invoke('select-folder'),
   exportBookmarks: (data: string) => ipcRenderer.invoke('export-bookmarks', data),
   importBookmarks: () => ipcRenderer.invoke('import-bookmarks'),
+  openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
 });

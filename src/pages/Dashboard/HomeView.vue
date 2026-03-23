@@ -524,8 +524,18 @@ const settingsStore = useSettingsStore();
 const backendOnline = ref(false);
 let statsInterval: ReturnType<typeof setInterval> | undefined;
 
-const favoriteProjects = computed(() => projectsStore.projects.filter(p => p.favorite));
-const favoriteBookmarks = computed(() => bookmarksStore.bookmarks.filter(b => b.favorite));
+const favoriteProjects = computed(() =>
+  projectsStore.projects
+    .filter(p => p.favorite)
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+);
+const favoriteBookmarks = computed(() =>
+  bookmarksStore.bookmarks
+    .filter(b => b.favorite)
+    .slice()
+    .sort((a, b) => a.title.localeCompare(b.title))
+);
 const totalProjects = computed(() => projectsStore.projects.length);
 const totalBookmarks = computed(() => bookmarksStore.bookmarks.length);
 
@@ -550,7 +560,14 @@ const openVsCode = (path: string) => {
 };
 
 const openLink = (url: string) => {
-  if (typeof window !== 'undefined') window.open(url, '_blank');
+  if (typeof window === 'undefined') return;
+  // In Electron, use shell.openExternal via IPC so links open in the default OS browser
+  const electronApi = (window as any).electronApi;
+  if (electronApi?.openExternal) {
+    void electronApi.openExternal(url);
+  } else {
+    window.open(url, '_blank');
+  }
 };
 
 onMounted(async () => {

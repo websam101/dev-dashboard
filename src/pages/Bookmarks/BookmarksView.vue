@@ -464,7 +464,7 @@ const filteredFavorites = computed(() => {
   if (query) {
     list = list.filter(b => b.title.toLowerCase().includes(query) || b.url.toLowerCase().includes(query) || b.tags.some(t => t.toLowerCase().includes(query)));
   }
-  return list;
+  return list.slice().sort((a, b) => a.title.localeCompare(b.title));
 });
 
 const filteredBookmarks = computed(() => {
@@ -497,7 +497,12 @@ const resetSort = () => {
   pagination.value.descending = false;
 };
 
-const openLink = (url: string) => { if (typeof window !== 'undefined') window.open(url, '_blank'); };
+const openLink = (url: string) => {
+  if (typeof window === 'undefined') return;
+  const electronApi = (window as any).electronApi;
+  if (electronApi?.openExternal) void electronApi.openExternal(url);
+  else window.open(url, '_blank');
+};
 const openViewDialog = (b: Bookmark) => { viewingBookmark.value = b; showViewDialog.value = true; };
 const openEditDialog = (b: Bookmark) => { isEditing.value = true; editingBookmark.value = { ...b }; showDialog.value = true; };
 const openAddDialog = () => { isEditing.value = false; editingBookmark.value = { title: '', url: '', tags: [], description: '', favorite: false, projectIds: [selectedProject.value], collectionId: activeCollection.value !== 'all' ? activeCollection.value : undefined }; showDialog.value = true; };

@@ -29,6 +29,7 @@ import type { Server } from 'node:http';
 import compression from 'compression';
 import express from 'express';
 import type { Application, Request, Response } from 'express';
+import cors from 'cors';
 import {
   defineSsrCreate,
   defineSsrInjectDevMiddleware,
@@ -64,6 +65,17 @@ export const create = defineSsrCreate((/* { ... } */) => {
   if (process.env.PROD) {
     app.use(compression());
   }
+
+  // Dynamic CORS: allow requests from any origin matching PORT or CORS_ORIGIN env
+  const allowedOrigin = process.env.CORS_ORIGIN || `http://localhost:${process.env.PORT || 3000}`;
+  app.use(cors({
+    origin: (origin, callback) => {
+      // Allow same-origin (no origin header) and configured origin
+      if (!origin || origin === allowedOrigin) return callback(null, true);
+      callback(null, false);
+    },
+    credentials: true
+  }));
 
   return app;
 });

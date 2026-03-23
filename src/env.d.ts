@@ -17,6 +17,9 @@
 interface Window {
   electronApi?: {
     selectFolder: () => Promise<string | null>;
+    exportBookmarks: (data: string) => Promise<boolean>;
+    importBookmarks: () => Promise<string | null>;
+    openExternal: (url: string) => Promise<void>;
   };
 }
 
